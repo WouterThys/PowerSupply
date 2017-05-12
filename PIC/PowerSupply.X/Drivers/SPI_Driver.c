@@ -34,8 +34,8 @@ void D_SPI_Init() {
     SPI2CON1bits.DISSCK = 0;        // Internal SPI clock is enabled
     SPI2CON1bits.DISSDO = 0;        // SD02 pin is controlled by the module
     SPI2CON1bits.MODE16 = 1;        // Communication is word-wide (16-bit)
-    SPI2CON1bits.CKE = 0;           // Serial output data changes on transition from idle clock state to active clock state
-    SPI2CON1bits.CKP = 0;           // Idle state for click is a low level, active state is a high level
+    SPI2CON1bits.CKE = 1;           // Serial output data changes on transition from active clock state to Idle clock state (refer to bit 6)
+    SPI2CON1bits.CKP = 1;           // Idle state for clock is a high level; active state is a low level
     SPI2CON1bits.SSEN = 1;          // SS2 pin is used for Slave mode
     SPI2CON1bits.MSTEN = 1;         // Master mode
     SPI2CON1bits.SPRE = 0b00;       // Secondary pre-scale 8:1

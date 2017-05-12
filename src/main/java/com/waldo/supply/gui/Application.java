@@ -45,14 +45,20 @@ public class Application extends JFrame implements OnMessageListener {
         inputArea = new JTextArea(50, 100);
         inputArea.setEditable(false);
 
-        voltageSlider = new JSlider(JSlider.VERTICAL, 0, 12, 0);
-        voltageSlider.setMajorTickSpacing(5);
+        voltageSlider = new JSlider(JSlider.VERTICAL, 0, 120, 0);
+        voltageSlider.setMajorTickSpacing(10);
         voltageSlider.setMinorTickSpacing(1);
         voltageSlider.setPaintTicks(true);
         voltageSlider.addChangeListener(e -> {
             JSlider slider = (JSlider) e.getSource();
             if (!slider.getValueIsAdjusting()) {
-                Double value = (slider.getValue() * ADC_MAX_VAL) / 12;
+
+                Double value = (slider.getValue() * ADC_MAX_VAL) / 120; // Value from 0 -> ADC_MAX_VALUE
+                Double dacVoltage = calculateVoltage(value.intValue());
+                Double ampVoltage = calculateVoltage(value.intValue() * 3);
+
+                System.out.println("DAC: " + round(dacVoltage, 2) + "V, AMP: " + round(ampVoltage, 2) + "V");
+
                 serial().write("V", String.valueOf(value.intValue()));
             }
         });

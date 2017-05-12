@@ -45,9 +45,9 @@ const char* messageCharacter =     "M";
 const char* blockCharacter =       "B";
 
 typedef struct {
-    uint8_t command[3];      // Command buffer
+    char command[3];      // Command buffer
     uint8_t commandCnt;   // Count of command buffer
-    uint8_t message[10];  // Message buffer
+    char message[10];  // Message buffer
     uint8_t messageCnt;   // Count of the message buffer
 } READ_ComMes;
 
@@ -129,7 +129,7 @@ void fillDataBuffer(uint8_t data){
             if (data == SEP_CHAR) {
                 comMes.message[comMes.messageCnt] = '\0';
                 readBuffer.comMes[bufferCnt] = comMes;
-                uint8_t i = 0;
+                register uint8_t i = 0;
                 for (i=0; i < comMes.commandCnt; i++) {
                     comMes.command[i] = 0;
                 }
@@ -257,16 +257,27 @@ void C_UART_NewData(uint8_t data) {
 READ_Data C_UART_Read(){
     READ_ComMes cm = readBuffer.comMes[0];
     readData.sender = readBuffer.id;
-    readData.command = cm.command;
-    readData.message = cm.message;
+    uint16_t i = 0;
+    for (i = 0; i < 3; i++) {
+        readData.command[i] = cm.command[i];
+    }
+    for (i = 0; i < 10; i++) {
+        readData.message[i] = cm.message[i];
+    }
     return readData;
 }
 
 READ_Data C_UART_ReadBlock(uint8_t cnt) {
     READ_ComMes cm = readBuffer.comMes[cnt];
     readData.sender = readBuffer.id;
-    readData.command = cm.command;
-    readData.message = cm.message;
+    uint16_t i = 0;
+    for (i = 0; i < 3; i++) {
+        readData.command[i] = cm.command[i];
+    }
+    for (i = 0; i < 10; i++) {
+        readData.message[i] = cm.message[i];
+    }
+
     return readData;
 }
 

@@ -2,16 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="33134188-02c7-4a60-82f4-b0d25b1850ea" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dbnavigator.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/waldo/supply/serial/Message.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/waldo/supply/serial/OnMessageListener.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/waldo/supply/Main$1.class" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/waldo/supply/Main.class" afterPath="$PROJECT_DIR$/target/classes/com/waldo/supply/Main.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PIC/PowerSupply.X/build/default/debug/Controllers/UART_Controller.o" afterPath="$PROJECT_DIR$/PIC/PowerSupply.X/build/default/debug/Controllers/UART_Controller.o" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PIC/PowerSupply.X/build/default/debug/main.o" afterPath="$PROJECT_DIR$/PIC/PowerSupply.X/build/default/debug/main.o" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/waldo/supply/gui/Application.class" afterPath="$PROJECT_DIR$/target/classes/com/waldo/supply/gui/Application.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/waldo/supply/Main.java" afterPath="$PROJECT_DIR$/src/main/java/com/waldo/supply/Main.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PIC/PowerSupply.X/Controllers/UART_Controller.c" afterPath="$PROJECT_DIR$/PIC/PowerSupply.X/Controllers/UART_Controller.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PIC/PowerSupply.X/Controllers/UART_Controller.h" afterPath="$PROJECT_DIR$/PIC/PowerSupply.X/Controllers/UART_Controller.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PIC/PowerSupply.X/Drivers/SPI_Driver.c" afterPath="$PROJECT_DIR$/PIC/PowerSupply.X/Drivers/SPI_Driver.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PIC/PowerSupply.X/Settings.h" afterPath="$PROJECT_DIR$/PIC/PowerSupply.X/Settings.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PIC/PowerSupply.X/main.c" afterPath="$PROJECT_DIR$/PIC/PowerSupply.X/main.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PIC/PowerSupply.X/nbproject/Makefile-genesis.properties" afterPath="$PROJECT_DIR$/PIC/PowerSupply.X/nbproject/Makefile-genesis.properties" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/waldo/supply/gui/Application.java" afterPath="$PROJECT_DIR$/src/main/java/com/waldo/supply/gui/Application.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/waldo/supply/serial/SerialManager.java" afterPath="$PROJECT_DIR$/src/main/java/com/waldo/supply/serial/SerialManager.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -41,8 +42,8 @@
       <file leaf-file-name="Application.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/waldo/supply/gui/Application.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="157">
-              <caret line="95" column="44" lean-forward="false" selection-start-line="95" selection-start-column="44" selection-end-line="95" selection-end-column="44" />
+            <state relative-caret-position="480">
+              <caret line="59" column="101" lean-forward="false" selection-start-line="59" selection-start-column="101" selection-end-line="59" selection-end-column="101" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -53,10 +54,17 @@
       <file leaf-file-name="SerialManager.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/waldo/supply/serial/SerialManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2250">
+            <state relative-caret-position="2220">
               <caret line="158" column="36" lean-forward="false" selection-start-line="158" selection-start-column="36" selection-end-line="158" selection-end-column="36" />
               <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#453#454#0" expanded="false" />
+                <element signature="e#484#485#0" expanded="false" />
+                <element signature="e#1202#1203#0" expanded="false" />
+                <element signature="e#1290#1291#0" expanded="false" />
+                <element signature="e#1966#1967#0" expanded="false" />
+                <element signature="e#2043#2044#0" expanded="false" />
+                <element signature="e#2118#2119#0" expanded="false" />
+                <element signature="e#2172#2173#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -78,9 +86,16 @@
             <state relative-caret-position="600">
               <caret line="43" column="30" lean-forward="false" selection-start-line="43" selection-start-column="20" selection-end-line="43" selection-end-column="30" />
               <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#3741#3742#0" expanded="true" />
-                <element signature="e#3779#3780#0" expanded="true" />
+                <element signature="e#510#511#0" expanded="false" />
+                <element signature="e#567#568#0" expanded="false" />
+                <element signature="e#3667#3668#0" expanded="false" />
+                <element signature="e#3703#3704#0" expanded="false" />
+                <element signature="e#3829#3830#0" expanded="false" />
+                <element signature="e#3875#3876#0" expanded="false" />
+                <element signature="e#3913#3914#0" expanded="false" />
+                <element signature="e#3951#3952#0" expanded="false" />
+                <element signature="e#4001#4002#0" expanded="false" />
+                <element signature="e#4047#4048#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -144,6 +159,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
@@ -246,7 +262,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -480,8 +495,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1" y="0" width="1922" height="1053" extended-state="7" />
-    <editor active="false" />
+    <frame x="-1" y="0" width="1922" height="1053" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -492,10 +507,10 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.319337" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.319337" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26040554" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26307365" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="MaxCompute Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="MaxCompute Job Explorer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Running Info" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -548,6 +563,68 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/main/java/com/waldo/supply/Main.java">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="40" lean-forward="false" selection-start-line="2" selection-start-column="40" selection-end-line="2" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/waldo/supply/gui/Application.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/waldo/supply/serial/SerialManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2370">
+          <caret line="158" column="36" lean-forward="false" selection-start-line="158" selection-start-column="36" selection-end-line="158" selection-end-column="36" />
+          <folding>
+            <element signature="e#453#454#0" expanded="false" />
+            <element signature="e#484#485#0" expanded="false" />
+            <element signature="e#1202#1203#0" expanded="false" />
+            <element signature="e#1290#1291#0" expanded="false" />
+            <element signature="e#1966#1967#0" expanded="false" />
+            <element signature="e#2043#2044#0" expanded="false" />
+            <element signature="e#2118#2119#0" expanded="false" />
+            <element signature="e#2172#2173#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/waldo/supply/serial/OnMessageListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="44" lean-forward="false" selection-start-line="3" selection-start-column="44" selection-end-line="3" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/waldo/supply/serial/Message.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="600">
+          <caret line="43" column="30" lean-forward="false" selection-start-line="43" selection-start-column="20" selection-end-line="43" selection-end-column="30" />
+          <folding>
+            <element signature="e#510#511#0" expanded="false" />
+            <element signature="e#567#568#0" expanded="false" />
+            <element signature="e#3667#3668#0" expanded="false" />
+            <element signature="e#3703#3704#0" expanded="false" />
+            <element signature="e#3829#3830#0" expanded="false" />
+            <element signature="e#3875#3876#0" expanded="false" />
+            <element signature="e#3913#3914#0" expanded="false" />
+            <element signature="e#3951#3952#0" expanded="false" />
+            <element signature="e#4001#4002#0" expanded="false" />
+            <element signature="e#4047#4048#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/waldo/supply/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
@@ -577,7 +654,14 @@
         <state relative-caret-position="570">
           <caret line="42" column="40" lean-forward="false" selection-start-line="42" selection-start-column="40" selection-end-line="42" selection-end-column="40" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#453#454#0" expanded="false" />
+            <element signature="e#484#485#0" expanded="false" />
+            <element signature="e#1202#1203#0" expanded="false" />
+            <element signature="e#1290#1291#0" expanded="false" />
+            <element signature="e#1966#1967#0" expanded="false" />
+            <element signature="e#2043#2044#0" expanded="false" />
+            <element signature="e#2118#2119#0" expanded="false" />
+            <element signature="e#2172#2173#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -595,9 +679,16 @@
         <state relative-caret-position="1680">
           <caret line="117" column="36" lean-forward="false" selection-start-line="117" selection-start-column="36" selection-end-line="117" selection-end-column="36" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#3741#3742#0" expanded="true" />
-            <element signature="e#3779#3780#0" expanded="true" />
+            <element signature="e#510#511#0" expanded="false" />
+            <element signature="e#567#568#0" expanded="false" />
+            <element signature="e#3667#3668#0" expanded="false" />
+            <element signature="e#3703#3704#0" expanded="false" />
+            <element signature="e#3829#3830#0" expanded="false" />
+            <element signature="e#3875#3876#0" expanded="false" />
+            <element signature="e#3913#3914#0" expanded="false" />
+            <element signature="e#3951#3952#0" expanded="false" />
+            <element signature="e#4001#4002#0" expanded="false" />
+            <element signature="e#4047#4048#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -625,7 +716,14 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#453#454#0" expanded="false" />
+            <element signature="e#484#485#0" expanded="false" />
+            <element signature="e#1202#1203#0" expanded="false" />
+            <element signature="e#1290#1291#0" expanded="false" />
+            <element signature="e#1966#1967#0" expanded="false" />
+            <element signature="e#2043#2044#0" expanded="false" />
+            <element signature="e#2118#2119#0" expanded="false" />
+            <element signature="e#2172#2173#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -635,9 +733,16 @@
         <state relative-caret-position="465">
           <caret line="32" column="79" lean-forward="false" selection-start-line="32" selection-start-column="79" selection-end-line="32" selection-end-column="79" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#3741#3742#0" expanded="true" />
-            <element signature="e#3779#3780#0" expanded="true" />
+            <element signature="e#510#511#0" expanded="false" />
+            <element signature="e#567#568#0" expanded="false" />
+            <element signature="e#3667#3668#0" expanded="false" />
+            <element signature="e#3703#3704#0" expanded="false" />
+            <element signature="e#3829#3830#0" expanded="false" />
+            <element signature="e#3875#3876#0" expanded="false" />
+            <element signature="e#3913#3914#0" expanded="false" />
+            <element signature="e#3951#3952#0" expanded="false" />
+            <element signature="e#4001#4002#0" expanded="false" />
+            <element signature="e#4047#4048#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -673,7 +778,14 @@
         <state relative-caret-position="1350">
           <caret line="98" column="0" lean-forward="false" selection-start-line="98" selection-start-column="0" selection-end-line="98" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#453#454#0" expanded="false" />
+            <element signature="e#484#485#0" expanded="false" />
+            <element signature="e#1202#1203#0" expanded="false" />
+            <element signature="e#1290#1291#0" expanded="false" />
+            <element signature="e#1966#1967#0" expanded="false" />
+            <element signature="e#2043#2044#0" expanded="false" />
+            <element signature="e#2118#2119#0" expanded="false" />
+            <element signature="e#2172#2173#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -699,8 +811,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/waldo/supply/gui/Application.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="95" column="44" lean-forward="false" selection-start-line="95" selection-start-column="44" selection-end-line="95" selection-end-column="44" />
+        <state relative-caret-position="480">
+          <caret line="59" column="101" lean-forward="false" selection-start-line="59" selection-start-column="101" selection-end-line="59" selection-end-column="101" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -709,10 +821,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/waldo/supply/serial/SerialManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2250">
+        <state relative-caret-position="2220">
           <caret line="158" column="36" lean-forward="false" selection-start-line="158" selection-start-column="36" selection-end-line="158" selection-end-column="36" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#453#454#0" expanded="false" />
+            <element signature="e#484#485#0" expanded="false" />
+            <element signature="e#1202#1203#0" expanded="false" />
+            <element signature="e#1290#1291#0" expanded="false" />
+            <element signature="e#1966#1967#0" expanded="false" />
+            <element signature="e#2043#2044#0" expanded="false" />
+            <element signature="e#2118#2119#0" expanded="false" />
+            <element signature="e#2172#2173#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -730,9 +849,16 @@
         <state relative-caret-position="600">
           <caret line="43" column="30" lean-forward="false" selection-start-line="43" selection-start-column="20" selection-end-line="43" selection-end-column="30" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#3741#3742#0" expanded="true" />
-            <element signature="e#3779#3780#0" expanded="true" />
+            <element signature="e#510#511#0" expanded="false" />
+            <element signature="e#567#568#0" expanded="false" />
+            <element signature="e#3667#3668#0" expanded="false" />
+            <element signature="e#3703#3704#0" expanded="false" />
+            <element signature="e#3829#3830#0" expanded="false" />
+            <element signature="e#3875#3876#0" expanded="false" />
+            <element signature="e#3913#3914#0" expanded="false" />
+            <element signature="e#3951#3952#0" expanded="false" />
+            <element signature="e#4001#4002#0" expanded="false" />
+            <element signature="e#4047#4048#0" expanded="false" />
           </folding>
         </state>
       </provider>

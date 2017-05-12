@@ -71,7 +71,7 @@ extern "C" {
  *  DAC
  */
     
-#define DAC_MODE        (SLOW_MODE | PWR_ON)    /* DAC slow mode and power on */
+#define DAC_MODE        (FAST_MODE | PWR_ON)    /* DAC slow mode and power on */
     
     
 /**

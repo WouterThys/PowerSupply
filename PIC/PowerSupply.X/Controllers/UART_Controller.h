@@ -28,9 +28,9 @@ extern bool UART_flag;
  */
 typedef struct {
     uint8_t sender;
-    const char* command;
-    const char* message;
-}READ_Data;
+    char command[3];
+    char message[10];
+} READ_Data;
     
 
 void C_UART_Init();
