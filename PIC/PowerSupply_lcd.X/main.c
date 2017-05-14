@@ -65,7 +65,7 @@ void initialize() {
     D_LCD_Init();
     
     // I2C
-    D_I2C_InitSlave(I2C_LCD_ADDRESS);
+    D_I2C_InitSlave(I2C_LCD_ADDRESS, &readData);
 }
 
 /*******************************************************************************
@@ -82,10 +82,13 @@ int main(void) {
 
     D_LCD_Enable(true);
     D_I2C_Enable(true);
+    
+    uint8_t i = 0;
 
     while(1) {
         if (I2C_ReadyToRead) {
-            if (D_I2C_SlaveRead(&readData) == I2C_OK) {
+            I2C_ReadyToRead = false;
+            if (I2C_SlaveReadResult == I2C_OK) {
                 D_LCD_ClearSreen();
                 D_LCD_WriteString("Command: ");
                 D_LCD_WriteInt(readData.command);
@@ -98,8 +101,19 @@ int main(void) {
                 readData.data1++;
                 readData.data2 += 5;
             } else {
+                
+                D_LCD_ClearSreen();
+                D_LCD_WriteString("I2C Error ");
+                D_LCD_WriteInt(I2C_InterruptCnt);
+                D_LCD_WriteString(" ");
+                D_LCD_WriteInt(I2C_TestCnt);
+                D_LCD_Goto(2,0);
+                D_LCD_WriteInt(I2C1STAT);
+                
                 D_I2C_Reset();
             }
+            i++;
+            D_LCD_WriteInt(i);
         }
     }
     return 0;

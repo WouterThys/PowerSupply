@@ -33,7 +33,10 @@
 
  */
 
-extern bool I2C_ReadyToRead;
+extern bool I2C_ReadyToRead; /* Flag to indicate a read was performed         */
+extern uint16_t I2C_SlaveReadResult;  /* Result of the read operation         */
+extern uint16_t I2C_InterruptCnt;
+extern uint16_t I2C_TestCnt;
 
 struct I2C_Data {
     uint8_t address;    /* Address (7-bit) of the slave                       */
@@ -52,8 +55,9 @@ void D_I2C_InitMaster();
 /**
  * 
  * @param address
+ * @param slaveData
  */
-void D_I2C_InitSlave(uint16_t address);
+void D_I2C_InitSlave(uint16_t address, i2cData_t * slaveData);
 
 /**
  * 

@@ -84,6 +84,8 @@ int main(void) {
     uartData.command = 1;
     variableData.command = 2;
     lcdData.command = 3;
+    lcdData.data1 = 5;
+    lcdData.data2 = 4;
     
     LED1 = 1;
     DelayMs(2000);
@@ -97,7 +99,7 @@ int main(void) {
 //        LED1 = 1;
 //    } 
 //    DelayUs(100);
-    if (D_I2C_MasterRead(&lcdData) == I2C_OK) {
+    if (D_I2C_MasterWrite(&lcdData) == I2C_OK) {
         LED1 = 1;
     } 
     while(1) {
