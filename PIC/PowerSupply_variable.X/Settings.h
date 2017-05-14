@@ -7,12 +7,10 @@
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
-#ifndef XC_HEADER_TEMPLATE_H
-#define	XC_HEADER_TEMPLATE_H
+#ifndef SETTINGS_H
+#define	SETTINGS_H
 
 #include <xc.h> // include processor files - each processor file is guarded.  
-
-#include "../Common/Drivers/I2C_Driver.h"
 
 #ifdef	__cplusplus
 extern "C" {
@@ -37,10 +35,6 @@ extern "C" {
 #define LED2            PORTBbits.RB14
 #define LED2_Dir        TRISBbits.TRISB14
     
-/**
- * I2C
- */   
-#define I2C_ADDRESS     0x56
     
 
 #ifdef	__cplusplus

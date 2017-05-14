@@ -7,36 +7,21 @@
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
-#ifndef SETTINGS_H
-#define	SETTINGS_H
+#ifndef I2C_SETTINGS_H
+#define	I2C_SETTINGS_H
 
 #include <xc.h> // include processor files - each processor file is guarded.  
 
-#include "../Common/Drivers/I2C_Driver.h"
-
 #ifdef	__cplusplus
 extern "C" {
-#endif /* __cplusplus */
-
-
-/**
- * Interrupt priorities
- */
-
-#define MI2C_IP     1
-
-
-
+#endif /* __cplusplus */  
     
 /**
- *  PIC
- */
- 
-#define LED1            PORTBbits.RB15
-#define LED1_Dir        TRISBbits.TRISB15
-#define LED2            PORTBbits.RB14
-#define LED2_Dir        TRISBbits.TRISB14
-    
+ * I2C
+ */   
+#define I2C_UART_ADDRESS     0x55
+#define I2C_VARIABLE_ADDRESS 0x56
+#define I2C_LCD_ADDRESS      0x57    
 
 #ifdef	__cplusplus
 }

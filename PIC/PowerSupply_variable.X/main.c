@@ -21,7 +21,9 @@
 
 #include "Drivers/INTERRUPT_Driver.h"
 #include "Drivers/SYSTEM_Driver.h"
+
 #include "../Common/Drivers/I2C_Driver.h"
+#include "../Common/I2C_Settings.h"
 
 
 /*******************************************************************************
@@ -60,7 +62,7 @@ void initialize() {
     D_INT_EnableInterrupts(true);
     
     // I2C
-    D_I2C_InitSlave(I2C_ADDRESS);
+    D_I2C_InitSlave(I2C_VARIABLE_ADDRESS);
 }
 
 /*******************************************************************************
@@ -83,8 +85,8 @@ int main(void) {
     
     while(1) {
         if (I2C_ReadyToRead) {
-            
-            if (D_I2C_Read(&readData) == I2C_OK) {
+            LED1 = 0;
+            if (D_I2C_SlaveRead(&readData) == I2C_OK) {
                 LED1 = 1;
             } else {
                 LED1 = 1;

@@ -71,14 +71,21 @@ void D_I2C_Reset();
  * @param data: i2cData_t containing address and data for and from the slave
  * @return Positive if OK
  */
-int16_t D_I2C_Write(i2cData_t *data);
+int16_t D_I2C_MasterWrite(i2cData_t *data);
+
+/**
+ * Read data from slave
+ * @param data
+ * @return Positive if OK
+ */
+int16_t D_I2C_MasterRead(i2cData_t *data);
 
 /**
  * Read data from master, after the Master has initiated a transaction.
  * @param data: i2cData_t containing data from master and answer from slave.
  * @return Positive if OK
  */
-int16_t D_I2C_Read(i2cData_t *data);
+int16_t D_I2C_SlaveRead(i2cData_t *data);
 
 
 

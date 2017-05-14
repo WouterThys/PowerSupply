@@ -21,7 +21,9 @@
 
 #include "Drivers/INTERRUPT_Driver.h"
 #include "Drivers/SYSTEM_Driver.h"
+
 #include "../Common/Drivers/I2C_Driver.h"
+#include "../Common/I2C_Settings.h"
 
 
 /*******************************************************************************
@@ -41,7 +43,9 @@
  *          LOCAL FUNCTIONS
  ******************************************************************************/
 static void initialize();
-static i2cData_t testData;
+static i2cData_t uartData;
+static i2cData_t variableData;
+static i2cData_t lcdData;
 
 void initialize() {
     D_INT_EnableInterrupts(false);
@@ -58,6 +62,9 @@ void initialize() {
     
     // I2C
     D_I2C_InitMaster();
+    uartData.address = I2C_UART_ADDRESS;
+    variableData.address = I2C_VARIABLE_ADDRESS;
+    lcdData.address = I2C_LCD_ADDRESS;
 }
 
 /*******************************************************************************
@@ -74,19 +81,23 @@ int main(void) {
     
     D_I2C_Enable(true);
     
-    testData.address = 0x56;
-    testData.command = 6;
+    uartData.command = 1;
+    variableData.command = 2;
+    lcdData.command = 3;
     
     LED1 = 1;
     DelayMs(2000);
-    
-    if (D_I2C_Write(&testData) == I2C_OK) {
-        LED1 = 1;
-        
-    } 
-    DelayUs(100);
-    testData.address = 0x55;
-    if (D_I2C_Write(&testData) == I2C_OK) {
+    LED1 = 0;
+//    if (D_I2C_MasterRead(&variableData) == I2C_OK) {
+//        LED1 = 1;
+//        
+//    } 
+//    DelayUs(100);
+//    if (D_I2C_MasterRead(&uartData) == I2C_OK) {
+//        LED1 = 1;
+//    } 
+//    DelayUs(100);
+    if (D_I2C_MasterRead(&lcdData) == I2C_OK) {
         LED1 = 1;
     } 
     while(1) {

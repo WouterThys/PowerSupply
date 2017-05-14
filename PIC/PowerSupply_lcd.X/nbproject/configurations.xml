@@ -7,7 +7,13 @@
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/SYSTEM_Driver.h</itemPath>
         <itemPath>Drivers/INTERRUPT_Driver.h</itemPath>
+        <itemPath>Drivers/LCD_Driver.h</itemPath>
         <itemPath>../Common/Drivers/I2C_Driver.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="Headers" displayName="Headers" projectFiles="true">
+        <itemPath>Headers/custom_char.h</itemPath>
+        <itemPath>Headers/GLCD_Bitmaps.h</itemPath>
+        <itemPath>Headers/GLCD_Font.h</itemPath>
       </logicalFolder>
       <itemPath>Settings.h</itemPath>
     </logicalFolder>
@@ -21,10 +27,11 @@
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/INTERRUPT_Driver.c</itemPath>
         <itemPath>Drivers/SYSTEM_Driver.c</itemPath>
+        <itemPath>Drivers/LCD_Driver.c</itemPath>
         <itemPath>../Common/Drivers/I2C_Driver.c</itemPath>
       </logicalFolder>
-      <itemPath>main.c</itemPath>
       <itemPath>configuration.c</itemPath>
+      <itemPath>main.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -34,7 +41,8 @@
   </logicalFolder>
   <sourceRootList>
     <Elem>Drivers</Elem>
-    <Elem>../Common</Elem>
+    <Elem>../Common/Drivers</Elem>
+    <Elem>Headers</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -116,6 +124,25 @@
       <C30-AR>
         <property key="additional-options-chop-files" value="false"/>
       </C30-AR>
+      <C30-AS>
+        <property key="assembler-symbols" value=""/>
+        <property key="expand-macros" value="false"/>
+        <property key="extra-include-directories-for-assembler" value=""/>
+        <property key="extra-include-directories-for-preprocessor" value=""/>
+        <property key="false-conditionals" value="false"/>
+        <property key="keep-locals" value="false"/>
+        <property key="list-assembly" value="false"/>
+        <property key="list-section-info" value="false"/>
+        <property key="list-source" value="false"/>
+        <property key="list-symbols" value="false"/>
+        <property key="oXC16asm-extra-opts" value=""/>
+        <property key="oXC16asm-list-to-file" value="false"/>
+        <property key="omit-debug-dirs" value="false"/>
+        <property key="omit-forms" value="false"/>
+        <property key="preprocessor-macros" value=""/>
+        <property key="relax" value="false"/>
+        <property key="warning-level" value="emit-warnings"/>
+      </C30-AS>
       <C30-LD>
         <property key="additional-options-use-response-files" value="false"/>
         <property key="boot-eeprom" value="no_eeprom"/>
@@ -193,6 +220,7 @@
         <property key="OUTPUT COMPARE 3" value="true"/>
         <property key="OUTPUT COMPARE 4" value="true"/>
         <property key="PTG" value="true"/>
+        <property key="PWM" value="true"/>
         <property key="SPI 1" value="true"/>
         <property key="SPI 2" value="true"/>
         <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
@@ -206,7 +234,6 @@
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
         <property key="UART 1" value="true"/>
         <property key="UART 2" value="true"/>
-        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>
@@ -220,7 +247,7 @@
         <property key="memories.instruction.ram.ranges"
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
-        <property key="memories.programmemory.ranges" value="0-157ff"/>
+        <property key="memories.programmemory.ranges" value="0-57eb"/>
         <property key="poweroptions.powerenable" value="false"/>
         <property key="programmertogo.imagename" value=""/>
         <property key="programoptions.donoteraseauxmem" value="false"/>

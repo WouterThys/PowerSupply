@@ -21,6 +21,7 @@
 
 #include "Drivers/INTERRUPT_Driver.h"
 #include "Drivers/SYSTEM_Driver.h"
+#include "Drivers/LCD_Driver.h"
 
 #include "../Common/Drivers/I2C_Driver.h"
 #include "../Common/I2C_Settings.h"
@@ -50,7 +51,6 @@ static void initialize();
 
 void initialize() {
     D_INT_EnableInterrupts(false);
-    LED1 = 0;
     
     // Initialize system
     D_SYS_InitPll();
@@ -61,8 +61,11 @@ void initialize() {
     D_INT_Init();
     D_INT_EnableInterrupts(true);
     
+    // LCD
+    D_LCD_Init();
+    
     // I2C
-    D_I2C_InitSlave(I2C_UART_ADDRESS);
+    D_I2C_InitSlave(I2C_LCD_ADDRESS);
 }
 
 /*******************************************************************************
@@ -76,24 +79,26 @@ void initialize() {
 int main(void) {
     
     initialize();
-    
+
+    D_LCD_Enable(true);
     D_I2C_Enable(true);
-    LED1 = 1;
-    readData.data1 = 0b00001111;
-    readData.data2 = 0b11110000;
-    readData.status = 3;
-    
+
     while(1) {
         if (I2C_ReadyToRead) {
-            LED1 = 0;
             if (D_I2C_SlaveRead(&readData) == I2C_OK) {
-                LED1 = 1;
-            } else {
-                LED1 = 1;
-                D_I2C_Reset();
-                DelayUs(10);
-                LED1 = 0;
+                D_LCD_ClearSreen();
+                D_LCD_WriteString("Command: ");
+                D_LCD_WriteInt(readData.command);
+                D_LCD_Goto(2,0);
+                D_LCD_WriteString("Data: ");
+                D_LCD_WriteInt(readData.data1);
+                D_LCD_WriteString(" & ");
+                D_LCD_WriteInt(readData.data2);
                 
+                readData.data1++;
+                readData.data2 += 5;
+            } else {
+                D_I2C_Reset();
             }
         }
     }

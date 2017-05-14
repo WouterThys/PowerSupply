@@ -3,7 +3,7 @@
 #include <stdint.h>        /* Includes uint16_t definition                    */
 #include <stdbool.h>       /* Includes true/false definition                  */
 
-#include "../CommonSettings.h"
+#include"../I2C_Settings.h"
 #include "I2C_Driver.h"
 
 /*******************************************************************************
@@ -47,11 +47,11 @@
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-static uint16_t readState;
-static uint16_t writeState;
+static uint16_t slaveState;
+static uint16_t masterState;
 
-static bool readReady;
-static bool writeReady;
+static bool slaveReady;
+static bool masterReady;
 
 static bool slaveInterrupt;
 static bool masterInterrupt;
@@ -84,8 +84,8 @@ void D_I2C_InitMaster() {
     D_I2C_Enable(false);
     
     /* Variables */
-    writeState = I2C_STATE_IDLE;
-    writeReady = true;
+    masterState = I2C_STATE_IDLE;
+    masterReady = true;
     firstTime = true;
     
     /* Ports */
@@ -119,9 +119,9 @@ void D_I2C_InitSlave(uint16_t address) {
     I2C1ADD = address;
     
     /* Variables */
-    readState = I2C_STATE_IDLE;
+    slaveState = I2C_STATE_IDLE;
     I2C_ReadyToRead = false;
-    readReady = true;
+    slaveReady = true;
     firstTime = true;
     
     /* Interrupts master */
@@ -145,13 +145,13 @@ void D_I2C_Reset() {
     I2C1STAT = 0x0000;
     
     /* Variables */
-    writeState = I2C_STATE_IDLE;
-    writeReady = true;
+    masterState = I2C_STATE_IDLE;
+    masterReady = true;
     firstTime = true;
     
-    readState = I2C_STATE_IDLE;
+    slaveState = I2C_STATE_IDLE;
     I2C_ReadyToRead = false;
-    readReady = true;
+    slaveReady = true;
     firstTime = true;
     
     /* Interrupts */
@@ -167,35 +167,34 @@ void D_I2C_Reset() {
     D_I2C_Enable(true);
 }
 
-int16_t D_I2C_Write(i2cData_t *data) {
-    if (!writeReady) {
+int16_t D_I2C_MasterWrite(i2cData_t *data) {
+    if (!masterReady) {
         return I2C_NOK; // Still busy
     }
-    writeReady = false;
+    masterReady = false;
     int16_t result = I2C_OK;
-    while(!writeReady) {
-        switch(writeState) {
+    while(!masterReady) {
+        switch(masterState) {
             // Check the P status bit to ensure that the bus is in an Idle state.
             case I2C_STATE_IDLE: 
                 if (firstTime) { // Don't check for P and S bits
                     firstTime = false;
-                    writeState = I2C_STATE_START;
+                    masterState = I2C_STATE_START;
                 } else {
                     if (!check(CHECK_S) && check(CHECK_P)) {
-                        writeState = I2C_STATE_START;
+                        masterState = I2C_STATE_START;
                     } else {
                         result = I2C_NOK;
-                        writeReady = true;
-                        writeState = I2C_STATE_IDLE;
+                        masterReady = true;
+                        masterState = I2C_STATE_IDLE;
                     }
                 }
                 break;
                 
             // Generating Start Bus Event   
             case I2C_STATE_START:
-                LED1 = 0;
                 I2C1CONbits.SEN = 1; // Start master event
-                writeState = I2C_STATE_ADDRESS;
+                masterState = I2C_STATE_ADDRESS;
                 break;
             // Send address and R/W bit to slave   
             case I2C_STATE_ADDRESS:
@@ -204,10 +203,10 @@ int16_t D_I2C_Write(i2cData_t *data) {
                     // Do checks
                     if (check(CHECK_S) && !check(CHECK_P)) {
                         i2cAddressWrite(data->address); // Address, write
-                        writeState = I2C_CHECK_ADDRESS;
+                        masterState = I2C_CHECK_ADDRESS;
                     } else {
                         I2C1CONbits.PEN = 1; // Initiate stop event
-                        writeState = I2C_STATE_STOP;
+                        masterState = I2C_STATE_STOP;
                         result = I2C_NOK; // ACK not received, something went wrong
                     }
                 }
@@ -218,10 +217,10 @@ int16_t D_I2C_Write(i2cData_t *data) {
                     masterInterrupt = false;
                     // Do checks
                     if(!check(CHECK_ACKSTAT) && !check(CHECK_IWCOL)) {
-                        writeState = I2C_STATE_COMMAND;
+                        masterState = I2C_STATE_COMMAND;
                     } else {
                         I2C1CONbits.PEN = 1; // Initiate stop event
-                        writeState = I2C_STATE_STOP;
+                        masterState = I2C_STATE_STOP;
                         result = I2C_NOK; // ACK not received, something went wrong
                     }
                 }
@@ -229,7 +228,7 @@ int16_t D_I2C_Write(i2cData_t *data) {
             // Write command
             case I2C_STATE_COMMAND:
                 i2cDataWrite(data->command);
-                writeState = I2C_CHECK_COMMAND;
+                masterState = I2C_CHECK_COMMAND;
                 break;
             // Check if command went OK    
             case I2C_CHECK_COMMAND:
@@ -237,10 +236,144 @@ int16_t D_I2C_Write(i2cData_t *data) {
                     masterInterrupt = false;
                     // Do checks
                     if(!check(CHECK_ACKSTAT) && !check(CHECK_IWCOL)) {
-                        writeState = I2C_STATE_REPEATED_START;
+                        masterState = I2C_STATE_FIRST_DATA;
                     } else {
                         I2C1CONbits.PEN = 1; // Initiate stop event
-                        writeState = I2C_STATE_STOP;
+                        masterState = I2C_STATE_STOP;
+                        result = I2C_NOK; // ACK not received, something went wrong
+                    }
+                }
+                break;
+            // Write first 8 bits 
+            case I2C_STATE_FIRST_DATA:
+                i2cDataWrite(data->data1);
+                masterState = I2C_CHECK_FIRST_DATA;
+                break;
+            // Check first data  
+            case I2C_CHECK_FIRST_DATA:
+                if(masterInterrupt) {
+                    masterInterrupt = false;
+                    // Do checks
+                    if(!check(CHECK_ACKSTAT) && !check(CHECK_IWCOL)) {
+                        masterState = I2C_STATE_SECOND_DATA;
+                    } else {
+                        I2C1CONbits.PEN = 1; // Initiate stop event
+                        masterState = I2C_STATE_STOP;
+                        result = I2C_NOK; // ACK not received, something went wrong
+                    }
+                }
+                break;
+            // Receive last 8 bits 
+            case I2C_STATE_SECOND_DATA:
+                i2cDataWrite(data->data2);
+                masterState = I2C_CHECK_SECOND_DATA;
+                break;    
+            // Stop Sequence
+            case I2C_CHECK_SECOND_DATA:
+                if(masterInterrupt) {
+                    masterInterrupt = false;
+                    // Do checks
+                    if(!check(CHECK_ACKSTAT) && !check(CHECK_IWCOL)) {
+                        I2C1CONbits.PEN = 1; // Initiate stop event
+                        masterState = I2C_STATE_STOP;
+                    } else {
+                        I2C1CONbits.PEN = 1; // Initiate stop event
+                        masterState = I2C_STATE_STOP;
+                        result = I2C_NOK; // ACK not received, something went wrong
+                    }
+                }
+                break;
+            // End    
+            case I2C_STATE_STOP:
+                if(masterInterrupt) {
+                    masterInterrupt = false;
+                    masterState = I2C_STATE_IDLE;
+                    masterReady = true;
+                }
+                break;
+            default:
+                masterState = I2C_STATE_IDLE;
+                masterReady = true;
+                break;    
+                
+        }
+    }
+    return result;
+}
+
+int16_t D_I2C_MasterRead(i2cData_t *data) {
+    if (!masterReady) {
+        return I2C_NOK; // Still busy
+    }
+    masterReady = false;
+    int16_t result = I2C_OK;
+    while(!masterReady) {
+        switch(masterState) {
+            // Check the P status bit to ensure that the bus is in an Idle state.
+            case I2C_STATE_IDLE: 
+                if (firstTime) { // Don't check for P and S bits
+                    firstTime = false;
+                    masterState = I2C_STATE_START;
+                } else {
+                    if (!check(CHECK_S) && check(CHECK_P)) {
+                        masterState = I2C_STATE_START;
+                    } else {
+                        result = I2C_NOK;
+                        masterReady = true;
+                        masterState = I2C_STATE_IDLE;
+                    }
+                }
+                break;
+                
+            // Generating Start Bus Event   
+            case I2C_STATE_START:
+                I2C1CONbits.SEN = 1; // Start master event
+                masterState = I2C_STATE_ADDRESS;
+                break;
+            // Send address and R/W bit to slave   
+            case I2C_STATE_ADDRESS:
+                if(masterInterrupt) {
+                    masterInterrupt = false;
+                    // Do checks
+                    if (check(CHECK_S) && !check(CHECK_P)) {
+                        i2cAddressWrite(data->address); // Address, write
+                        masterState = I2C_CHECK_ADDRESS;
+                    } else {
+                        I2C1CONbits.PEN = 1; // Initiate stop event
+                        masterState = I2C_STATE_STOP;
+                        result = I2C_NOK; // ACK not received, something went wrong
+                    }
+                }
+                break;
+            // Check if address went OK
+            case I2C_CHECK_ADDRESS:
+                if(masterInterrupt) {
+                    masterInterrupt = false;
+                    // Do checks
+                    if(!check(CHECK_ACKSTAT) && !check(CHECK_IWCOL)) {
+                        masterState = I2C_STATE_COMMAND;
+                    } else {
+                        I2C1CONbits.PEN = 1; // Initiate stop event
+                        masterState = I2C_STATE_STOP;
+                        result = I2C_NOK; // ACK not received, something went wrong
+                    }
+                }
+                break;
+            // Write command
+            case I2C_STATE_COMMAND:
+                i2cDataWrite(data->command);
+                masterState = I2C_CHECK_COMMAND;
+                break;
+            // Check if command went OK    
+            case I2C_CHECK_COMMAND:
+                if(masterInterrupt) {
+                    masterInterrupt = false;
+                    // Do checks
+                    if(!check(CHECK_ACKSTAT) && !check(CHECK_IWCOL)) {
+                        masterState = I2C_STATE_REPEATED_START;
+                    } else {
+                        I2C1CONbits.PEN = 1; // Initiate stop event
+                        masterState = I2C_STATE_STOP;
                         result = I2C_NOK; // ACK not received, something went wrong
                     }
                 }
@@ -248,14 +381,14 @@ int16_t D_I2C_Write(i2cData_t *data) {
             // Repeated start
             case I2C_STATE_REPEATED_START:
                 I2C1CONbits.RSEN = 1;
-                writeState = I2C_CHECK_REP_START;
+                masterState = I2C_CHECK_REP_START;
                 break;
             // Check repeated start
             case I2C_CHECK_REP_START:
                 if (masterInterrupt) {
                     masterInterrupt = false;
                     i2cAddressRead(data->address);
-                    writeState = I2C_STATE_ENABLE_RECEIVE;
+                    masterState = I2C_STATE_ENABLE_RECEIVE;
                 }
                 break;
             // Enable receiving of data    
@@ -263,7 +396,7 @@ int16_t D_I2C_Write(i2cData_t *data) {
                 if (masterInterrupt) {
                     masterInterrupt = false;
                     I2C1CONbits.RCEN = 1;
-                    writeState = I2C_STATE_FIRST_DATA;
+                    masterState = I2C_STATE_FIRST_DATA;
                 }
                 break;
             // Receive first 8 bits 
@@ -278,7 +411,7 @@ int16_t D_I2C_Write(i2cData_t *data) {
                     I2C1CONbits.ACKDT = 0; //Send ACK during Acknowledge
                     I2C1CONbits.ACKEN = 1;
                     
-                    writeState = I2C_CHECK_FIRST_DATA;
+                    masterState = I2C_CHECK_FIRST_DATA;
                 }
                 break;
             // Receive enable    
@@ -286,7 +419,7 @@ int16_t D_I2C_Write(i2cData_t *data) {
                 if(masterInterrupt) {
                     masterInterrupt = false;
                     I2C1CONbits.RCEN = 1;
-                    writeState = I2C_STATE_SECOND_DATA;
+                    masterState = I2C_STATE_SECOND_DATA;
                 }
                 break;
             // Receive last 8 bits 
@@ -299,7 +432,7 @@ int16_t D_I2C_Write(i2cData_t *data) {
                     I2C1CONbits.ACKDT = 1; //Send NACK during Acknowledge
                     I2C1CONbits.ACKEN = 1;
                     
-                    writeState = I2C_CHECK_SECOND_DATA;
+                    masterState = I2C_CHECK_SECOND_DATA;
                 }
                 break;    
             // Stop Sequence
@@ -307,20 +440,20 @@ int16_t D_I2C_Write(i2cData_t *data) {
                 if(masterInterrupt) {
                     masterInterrupt = false;
                     I2C1CONbits.PEN = 1; // Initiate stop event
-                    writeState = I2C_STATE_STOP;
+                    masterState = I2C_STATE_STOP;
                 }
                 break;
             // End    
             case I2C_STATE_STOP:
                 if(masterInterrupt) {
                     masterInterrupt = false;
-                    writeState = I2C_STATE_IDLE;
-                    writeReady = true;
+                    masterState = I2C_STATE_IDLE;
+                    masterReady = true;
                 }
                 break;
             default:
-                writeState = I2C_STATE_IDLE;
-                writeReady = true;
+                masterState = I2C_STATE_IDLE;
+                masterReady = true;
                 break;    
                 
         }
@@ -328,26 +461,25 @@ int16_t D_I2C_Write(i2cData_t *data) {
     return result;
 }
 
-int16_t D_I2C_Read(i2cData_t *data) {
-    if (!readReady) {
+int16_t D_I2C_SlaveRead(i2cData_t *data) {
+    if (!slaveReady) {
         return I2C_NOK;
     }
-    readReady = false;
+    slaveReady = false;
     int16_t result = I2C_OK;
-    while(!readReady) {
-        switch(readState) {
+    while(!slaveReady) {
+        switch(slaveState) {
             // This slaves address is detected
             case I2C_STATE_IDLE:
                 if (slaveInterrupt) {
-                    LED1 = 0;
                     if (check(CHECK_S) && !check(CHECK_DA)) {
                         slaveInterrupt = false;
                         data->address = i2cDataRead(); // Read to clean buffer
-                        readState = I2C_STATE_COMMAND;
+                        slaveState = I2C_STATE_COMMAND;
                     } else {
                         result = I2C_NOK;
-                        readReady = true;
-                        readState = I2C_STATE_IDLE; 
+                        slaveReady = true;
+                        slaveState = I2C_STATE_IDLE; 
                     }
                 }
                 break;
@@ -358,33 +490,30 @@ int16_t D_I2C_Read(i2cData_t *data) {
                     
                     if (check(CHECK_DA)) {
                         data->command = i2cDataRead();
-                        readState = I2C_STATE_FIRST_DATA;
+                        slaveState = I2C_STATE_FIRST_DATA;
                     } else {
                         result = I2C_NOK;
-                        readReady = true;
-                        readState = I2C_STATE_IDLE; 
+                        slaveReady = true;
+                        slaveState = I2C_STATE_IDLE; 
                     }
                 }
                 break;
-            // Write first data byte    
+            // Write/Read first data byte    
             case I2C_STATE_FIRST_DATA:
                 if (slaveInterrupt) { // Repeated start
                     slaveInterrupt = false;
                     
-                    if (!check(CHECK_DA)) {
+                    if (!check(CHECK_DA)) { // Address, master is asking to send data
                         data->address = i2cDataRead(); // Read again to prevent buffer overflow
                     
                         i2cDataWrite(data->data1);
                         while (!check(CHECK_TBF)); // Wait until buffer is full
                         I2C1CONbits.SCLREL = 1; // Release clock hold
-
-                        readState = I2C_STATE_SECOND_DATA;
+                       
                     } else {
-                        result = I2C_NOK;
-                        readReady = true;
-                        readState = I2C_STATE_IDLE; 
+                        data->data1 = i2cDataRead(); // Read data
                     }
-                    
+                    slaveState = I2C_STATE_SECOND_DATA;
                 }
                 break;
             // Write second data
@@ -396,21 +525,18 @@ int16_t D_I2C_Read(i2cData_t *data) {
                         i2cDataWrite(data->data2);
                         while (!check(CHECK_TBF)); // Wait until buffer is full
                         I2C1CONbits.SCLREL = 1; // Release clock hold
-                    
-                        readState = I2C_CHECK_SECOND_DATA;
                     } else {
-                        result = I2C_NOK;
-                        readReady = true;
-                        readState = I2C_STATE_IDLE; 
+                        data->data2= i2cDataRead(); // Read data
                     }
+                    slaveState = I2C_CHECK_SECOND_DATA;
                 }
                 break;
             // Master should generate NACK and end transmission
             case I2C_CHECK_SECOND_DATA:
                 if (slaveInterrupt) {
                     slaveInterrupt = false;
-                    readReady = true;
-                    readState = I2C_STATE_IDLE;
+                    slaveReady = true;
+                    slaveState = I2C_STATE_IDLE;
                 }
                 break;
         }
