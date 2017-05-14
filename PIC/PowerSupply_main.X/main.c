@@ -99,7 +99,7 @@ int main(void) {
 //        LED1 = 1;
 //    } 
 //    DelayUs(100);
-    if (D_I2C_MasterWrite(&lcdData) == I2C_OK) {
+    if (D_I2C_MasterRead(&lcdData) == I2C_OK) {
         LED1 = 1;
     } 
     while(1) {
