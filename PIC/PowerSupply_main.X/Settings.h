@@ -12,21 +12,11 @@
 
 #include <xc.h> // include processor files - each processor file is guarded.  
 
-#include "../Common/Drivers/I2C_Driver.h"
-
-#ifdef	__cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-
 /**
  * Interrupt priorities
  */
 
-#define MI2C_IP     1
-
-
-
+#define T2_IP     1     /* Timer 1 priority for Rotary encoder                */
     
 /**
  *  PIC
@@ -37,19 +27,14 @@ extern "C" {
 #define LED2            PORTBbits.RB14
 #define LED2_Dir        TRISBbits.TRISB14
     
-///**
-// * I2C
-// */   
-//#define I2C_MODE        I2C_MASTER_MODE    
-//    
-//#define I2C_SCL_Dir     TRISBbits.TRISB8
-//#define I2C_SDA_Dir     TRISBbits.TRISB9
+/**
+ * ENCODER
+ */ 
+#define ENC_Pin_1       PORTBbits.RB10
+#define ENC_Pin_2       PORTBbits.RB11
+#define ENC_Dir_1       TRISBbits.TRISB10
+#define ENC_Dir_2       TRISBbits.TRISB11
     
- 
-
-#ifdef	__cplusplus
-}
-#endif /* __cplusplus */
 
 #endif	/* XC_HEADER_TEMPLATE_H */
 

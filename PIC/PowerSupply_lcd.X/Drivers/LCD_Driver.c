@@ -152,12 +152,12 @@ void D_LCD_ClearSreen() {
 
 void D_LCD_Goto(uint8_t line, uint8_t pos) {
     switch(line) {
-        case 1:
+        case 0:
             if (pos < 16) {
                 lcdSendCommand(_DDRAM_ADDR + pos);
             }
             break;
-        case 2:
+        case 1:
             if (pos < 16) {
                 lcdSendCommand(_DDRAM_ADDR + (pos + 0x40));
             }

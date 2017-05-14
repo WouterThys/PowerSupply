@@ -40,8 +40,8 @@
 /*******************************************************************************
  *          MACRO FUNCTIONS
  ******************************************************************************/
-#define i2cAddressWrite(addr) I2C1TRN = (((addr << 1) & I2C_ADDRESS_MASK) + I2C_WRITE)
-#define i2cAddressRead(addr) I2C1TRN = (((addr << 1) & I2C_ADDRESS_MASK) + I2C_READ)
+#define i2cAddressWrite(addr) I2C1TRN = (((addr << 1) & I2C_ADDRESS_MASK) + 0)
+#define i2cAddressRead(addr) I2C1TRN = (((addr << 1) & I2C_ADDRESS_MASK) + 1)
 #define i2cDataWrite(data) I2C1TRN = data
 #define i2cDataRead() I2C1RCV
 
@@ -129,9 +129,11 @@ void i2cRead() {
                 while (!check(CHECK_TBF)); // Wait until buffer is full
                 I2C1CONbits.SCLREL = 1; // Release clock hold
                 masterWrite = false;
+                I2C_SlaveReadResult = I2C_MREAD;
             } else {
                 slaveReadData->data1 = i2cDataRead(); // Read data
                 masterWrite = true;
+                I2C_SlaveReadResult = I2C_MWRITE;
             }
             slaveState = I2C_STATE_SECOND_DATA;
 
@@ -588,16 +590,17 @@ void __attribute__((interrupt, no_auto_psv)) _MI2C1Interrupt(void) {
 
 void __attribute__((interrupt, no_auto_psv)) _SI2C1Interrupt(void) {
     if (_SI2C1IF) {
+        PORTAbits.RA0 = !PORTAbits.RA0;
         slaveInterrupt = true;
         _SI2C1IF = 0;
-        I2C_InterruptCnt++;
         
-        if (!I2C_ReadyToRead) {
+//        if (!I2C_ReadyToRead) {
             i2cRead();
             if (slaveState == I2C_STATE_STOP) {
                 i2cRead(); // Execute one more time
             }
-        }
+//        }
+        
     }
 }
 

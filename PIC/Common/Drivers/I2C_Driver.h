@@ -16,9 +16,8 @@
 #define I2C_MASTER_MODE     1
 #define I2C_SLAVE_MODE      0
 
-#define I2C_WRITE           0
-#define I2C_READ            1
-
+#define I2C_MWRITE          3
+#define I2C_MREAD           2
 #define I2C_OK              1
 #define I2C_NOK             -1     
 #define I2C_OVERFLOW        -2
@@ -35,8 +34,6 @@
 
 extern bool I2C_ReadyToRead; /* Flag to indicate a read was performed         */
 extern uint16_t I2C_SlaveReadResult;  /* Result of the read operation         */
-extern uint16_t I2C_InterruptCnt;
-extern uint16_t I2C_TestCnt;
 
 struct I2C_Data {
     uint8_t address;    /* Address (7-bit) of the slave                       */

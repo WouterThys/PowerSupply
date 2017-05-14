@@ -21,6 +21,7 @@
 
 #include "Drivers/INTERRUPT_Driver.h"
 #include "Drivers/SYSTEM_Driver.h"
+#include "Drivers/ENC_Driver.h"
 
 #include "../Common/Drivers/I2C_Driver.h"
 #include "../Common/I2C_Settings.h"
@@ -65,6 +66,9 @@ void initialize() {
     uartData.address = I2C_UART_ADDRESS;
     variableData.address = I2C_VARIABLE_ADDRESS;
     lcdData.address = I2C_LCD_ADDRESS;
+    
+    // Rotary encoder
+    D_ENC_Init();
 }
 
 /*******************************************************************************
@@ -80,29 +84,16 @@ int main(void) {
     initialize();
     
     D_I2C_Enable(true);
+    D_ENC_Enable(true);
     
-    uartData.command = 1;
-    variableData.command = 2;
-    lcdData.command = 3;
-    lcdData.data1 = 5;
-    lcdData.data2 = 4;
-    
-    LED1 = 1;
-    DelayMs(2000);
-    LED1 = 0;
-//    if (D_I2C_MasterRead(&variableData) == I2C_OK) {
-//        LED1 = 1;
-//        
-//    } 
-//    DelayUs(100);
-//    if (D_I2C_MasterRead(&uartData) == I2C_OK) {
-//        LED1 = 1;
-//    } 
-//    DelayUs(100);
-    if (D_I2C_MasterRead(&lcdData) == I2C_OK) {
-        LED1 = 1;
-    } 
+
     while(1) {
+        
+
+        if (ENC_Change) {
+            lcdData.data1 = D_ENC_GetValue();
+            D_I2C_MasterWrite(&lcdData);
+        }
         
     }
     return 0;
