@@ -45,6 +45,12 @@ void D_LCD_ClearLine(uint8_t line);
 void D_LCD_WriteString(char * str);
 
 /**
+ * 
+ * @param c
+ */
+void D_LCD_WriteChar(char c);
+
+/**
  * Write integer value to the screen.
  * @param value
  */

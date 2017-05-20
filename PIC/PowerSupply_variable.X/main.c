@@ -22,6 +22,8 @@
 #include "Drivers/INTERRUPT_Driver.h"
 #include "Drivers/SYSTEM_Driver.h"
 
+#include "Controllers/MCP4131_Driver.h"
+
 #include "../Common/Drivers/I2C_Driver.h"
 #include "../Common/I2C_Settings.h"
 
@@ -61,8 +63,11 @@ void initialize() {
     D_INT_Init();
     D_INT_EnableInterrupts(true);
     
+    // Digital potentiometer
+    C_MCP4131_Init();
+    
     // I2C
-    D_I2C_InitSlave(I2C_VARIABLE_ADDRESS);
+    D_I2C_InitSlave(I2C_VARIABLE_ADDRESS, &readData);
 }
 
 /*******************************************************************************
@@ -78,15 +83,17 @@ int main(void) {
     initialize();
     
     D_I2C_Enable(true);
+    C_MCP4131_Enable(true);
+    
     LED1 = 1;
-    readData.data1 = 0b10011001;
-    readData.data2 = 0b01100110;
-    readData.status = 3;
+    
+    C_MCP4131_SetR(2358);
+    
     
     while(1) {
         if (I2C_ReadyToRead) {
             LED1 = 0;
-            if (D_I2C_SlaveRead(&readData) == I2C_OK) {
+            if (I2C_SlaveReadResult >= I2C_OK) {
                 LED1 = 1;
             } else {
                 LED1 = 1;

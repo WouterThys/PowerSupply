@@ -51,17 +51,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c Drivers/LCD_Driver.c ../Common/Drivers/I2C_Driver.c configuration.c main.c
+SOURCEFILES_QUOTED_IF_SPACED=Controllers/LCD_Controller.c Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c Drivers/LCD_Driver.c ../Common/Drivers/I2C_Driver.c configuration.c main.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/LCD_Driver.o ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/Drivers/INTERRUPT_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/Drivers/LCD_Driver.o.d ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/main.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Controllers/LCD_Controller.o ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/LCD_Driver.o ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/Controllers/LCD_Controller.o.d ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/Drivers/LCD_Driver.o.d ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/main.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/LCD_Driver.o ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o
+OBJECTFILES=${OBJECTDIR}/Controllers/LCD_Controller.o ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/LCD_Driver.o ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o
 
 # Source Files
-SOURCEFILES=Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c Drivers/LCD_Driver.c ../Common/Drivers/I2C_Driver.c configuration.c main.c
+SOURCEFILES=Controllers/LCD_Controller.c Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c Drivers/LCD_Driver.c ../Common/Drivers/I2C_Driver.c configuration.c main.c
 
 
 CFLAGS=
@@ -88,6 +88,13 @@ MP_LINKER_FILE_OPTION=,--script=p33EP32MC202.gld
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
+${OBJECTDIR}/Controllers/LCD_Controller.o: Controllers/LCD_Controller.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Controllers" 
+	@${RM} ${OBJECTDIR}/Controllers/LCD_Controller.o.d 
+	@${RM} ${OBJECTDIR}/Controllers/LCD_Controller.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  Controllers/LCD_Controller.c  -o ${OBJECTDIR}/Controllers/LCD_Controller.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Controllers/LCD_Controller.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/Controllers/LCD_Controller.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o: Drivers/INTERRUPT_Driver.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Drivers" 
 	@${RM} ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o.d 
@@ -131,6 +138,13 @@ ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 else
+${OBJECTDIR}/Controllers/LCD_Controller.o: Controllers/LCD_Controller.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Controllers" 
+	@${RM} ${OBJECTDIR}/Controllers/LCD_Controller.o.d 
+	@${RM} ${OBJECTDIR}/Controllers/LCD_Controller.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  Controllers/LCD_Controller.c  -o ${OBJECTDIR}/Controllers/LCD_Controller.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Controllers/LCD_Controller.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/Controllers/LCD_Controller.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o: Drivers/INTERRUPT_Driver.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Drivers" 
 	@${RM} ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o.d 

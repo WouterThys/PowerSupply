@@ -36,17 +36,18 @@
  ******************************************************************************/
 
 /*******************************************************************************
- *          DEFINES
+ *          VARIABLES
  ******************************************************************************/
-
+static i2cData_t uartData;
+static i2cData_t variableData;
+static i2cData_t lcdData;
+static enc_t encState;
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
  ******************************************************************************/
 static void initialize();
-static i2cData_t uartData;
-static i2cData_t variableData;
-static i2cData_t lcdData;
+
 
 void initialize() {
     D_INT_EnableInterrupts(false);
@@ -91,9 +92,15 @@ int main(void) {
         
 
         if (ENC_Change) {
-            lcdData.data1 = D_ENC_GetValue();
-            D_I2C_MasterWrite(&lcdData);
+            D_ENC_GetState(&encState);
+            if (encState.pressCount > 0 || encState.turnCount > 0) {
+                lcdData.data1 = encState.pressCount;
+                lcdData.data2 = encState.turnCount;
+                D_I2C_MasterWrite(&lcdData);
+            }
         }
+        
+        DelayMs(20);
         
     }
     return 0;

@@ -4,6 +4,9 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <logicalFolder name="Controllers" displayName="Controllers" projectFiles="true">
+        <itemPath>Controllers/LCD_Controller.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/SYSTEM_Driver.h</itemPath>
         <itemPath>Drivers/INTERRUPT_Driver.h</itemPath>
@@ -14,6 +17,7 @@
         <itemPath>Headers/custom_char.h</itemPath>
         <itemPath>Headers/GLCD_Bitmaps.h</itemPath>
         <itemPath>Headers/GLCD_Font.h</itemPath>
+        <itemPath>Drivers/Menu.h</itemPath>
       </logicalFolder>
       <itemPath>Settings.h</itemPath>
     </logicalFolder>
@@ -24,7 +28,12 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <logicalFolder name="Controllers" displayName="Controllers" projectFiles="true">
+        <itemPath>Controllers/LCD_Controller.c</itemPath>
+      </logicalFolder>
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
+        <logicalFolder name="Controllers" displayName="Controllers" projectFiles="true">
+        </logicalFolder>
         <itemPath>Drivers/INTERRUPT_Driver.c</itemPath>
         <itemPath>Drivers/SYSTEM_Driver.c</itemPath>
         <itemPath>Drivers/LCD_Driver.c</itemPath>
@@ -43,6 +52,7 @@
     <Elem>Drivers</Elem>
     <Elem>../Common/Drivers</Elem>
     <Elem>Headers</Elem>
+    <Elem>Controllers</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

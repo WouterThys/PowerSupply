@@ -30,10 +30,13 @@
 /**
  * ENCODER
  */ 
-#define ENC_Pin_1       PORTBbits.RB10
-#define ENC_Pin_2       PORTBbits.RB11
+#define ENC_Pin_1       PORTBbits.RB10      /* First turn pin of rotary       */
+#define ENC_Pin_2       PORTBbits.RB11      /* Sencond turn pin of rotary     */
+#define ENC_Pin_3       PORTBbits.RB12      /* Push button pin of rotary      */
 #define ENC_Dir_1       TRISBbits.TRISB10
 #define ENC_Dir_2       TRISBbits.TRISB11
+#define ENC_Dir_3       TRISBbits.TRISB12
+
     
 
 #endif	/* XC_HEADER_TEMPLATE_H */

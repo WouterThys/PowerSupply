@@ -90,7 +90,7 @@ void lcdSendCommand(uint8_t cmd) {
     lcdSetE();
     DelayUs(50);
     lcdClrE();
-    DelayMs(100);
+    DelayMs(5);
 }
 
 void lcdSendData(uint8_t data) {
@@ -185,6 +185,10 @@ void D_LCD_WriteString(char * str) {
     while (str && *str) {
         lcdSendData(*str++);
     }
+}
+
+void D_LCD_WriteChar(char c) {
+    lcdSendData(c);
 }
 
 void D_LCD_WriteInt(int16_t value) {

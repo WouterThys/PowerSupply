@@ -43,6 +43,16 @@ void D_INT_EnableInterrupts(bool enable) {
     }
 }
 
+void D_INT_EnableSPI2Interrupts(bool enable) {
+    if (enable) {
+        _SPI2IF = 0; // Clear flag
+        _SPI2IP = SPI2_IP; // Priority
+        _SPI2IE = 1;
+    } else {
+        _SPI2IE = 0; // Disable interrupts
+    }
+}
+
 /*******************************************************************************
  *          INTERRUPTS
  ******************************************************************************/

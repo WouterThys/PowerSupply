@@ -176,7 +176,8 @@ void i2cRead() {
             slaveState = I2C_STATE_IDLE;
             slaveReady = true;
             if (check(CHECK_RBF) || check(CHECK_I2COV)) {
-                uint8_t dummy = i2cDataRead();
+                slaveReadData->data1 = i2cDataRead();
+               
                 I2C1STATbits.I2COV = 0;
             }
             I2C_ReadyToRead = true;
