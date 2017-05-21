@@ -41,15 +41,15 @@ void encode() {
     encPressPosition <<= 1;
     encPressPosition |= ENC_Pin_3;
     
-    if ((encPressPosition & 0x000F) == 0x000F) {
+    if ((encPressPosition & 0x000F) == 0x0000) {
         if (!encPressed) {
-            ENC_Change = true;
+//            ENC_Change = true;
         }
         encPressed = true;
         encPressedCount++;
-    } else if ((encPressPosition & 0x000F) == 0x0000) {
+    } else if ((encPressPosition & 0x000F) == 0x000F) {
         if (encPressed) {
-            ENC_Change = true;
+//            ENC_Change = true;
             encPressedCount = 0;
         }
         encPressed = false;
@@ -102,9 +102,9 @@ void D_ENC_Enable(bool enable) {
 void D_ENC_GetState(enc_t *state) {
     // Rotary
     if (encTurnValue >= 0) {
-        state->turn = UP;
+        state->turn = RIGHT;
     } else {
-        state->turn = DOWN;
+        state->turn = LEFT;
     }
     
     if (encTurnValue < 0) {
@@ -113,11 +113,11 @@ void D_ENC_GetState(enc_t *state) {
     
     state->turnCount = encTurnValue / 2;  
     
-    encTurnValue = encTurnValue % 2;
+    encTurnValue = oldTurnEncValue = encTurnValue % 2;
     
-    // Button
-    state->press = encPressed;
-    state->pressCount = encPressedCount;
+//    // Button
+//    state->press = PRE;
+//    state->pressCount = encPressedCount;
     
     // Clear
     ENC_Change = false;

@@ -12,15 +12,12 @@
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
-#define ARROW_L 127
-#define ARROW_R 126
-#define ARROW_U 0b00011110
-#define ARROW_D 0b00011111
+
 
 /*******************************************************************************
  *          LOCAL FUNCTION DEFINES
  ******************************************************************************/
-static void lcdDrawField(menuField_t field);
+static void lcdDrawField(field_t field);
 static void lcdDrawSubMenu(subMenu_t subMenu);
 static void lcdDrawMenu(menu_t menu);
 
@@ -35,28 +32,41 @@ static void lcdDrawMenu(menu_t menu);
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-static menu_t currentMenu;
 static bool drawing;
 
-static menuField_t voltageField, currentField, loadCurrentField, temperatureField;
-static subMenu_t subMenu1, subMenu2;
-static menu_t variableMenu;
+const static uint16_t menuCnt = 1;
+const static uint16_t subMenuCnt = 2;
+const static uint16_t fieldCnt = 4;
+
+static menu_t menus[1];
+static subMenu_t subMenus[2];
+static field_t fields[4];
+
+static int8_t selectedMenuId;
+static int8_t selectedSubMenuId;
+static int8_t selectedFieldId;
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
  ******************************************************************************/
-void lcdDrawField(menuField_t field) {
+void lcdDrawField(field_t field) {
     bool clearDrawing = false;
     if (!drawing) {
         drawing = true;
         clearDrawing = true;
     }
     // Name, value, units
-    writeString(field.line,5, field.name);
-    writeChar(field.line,6, ':');
-    writeDouble(field.line,7, field.value);
-    D_LCD_WriteString(field.units);
-    
+    writeString(field.line, 5, field.unit.symbol);
+    writeChar(field.line, 6, ':');
+    uint8_t pos = 0;
+    if (field.value >= 10) {
+        pos = 7;
+    } else {
+        pos = 8;
+    }
+    writeDouble(field.line, pos, field.value);
+    writeString(field.line, 12, field.unit.units);
+
     if (clearDrawing) {
         drawing = false;
     }
@@ -70,32 +80,37 @@ void lcdDrawSubMenu(subMenu_t subMenu) {
     }
     // Name and arrow
     writeString(1, 13, subMenu.name);
-    writeChar(0,15, ARROW_R);
-    
+    writeChar(subMenu.arrow->line, subMenu.arrow->pos, subMenu.arrow->arrow);
+
     // Draw fields
     lcdDrawField(*subMenu.field1);
     lcdDrawField(*subMenu.field2);
     
+    // Go to field1 as default 
+    D_LCD_Goto(subMenu.field1->line, subMenu.field1->pos);
+    D_LCD_CursorStyle(true, false);
+
     if (clearDrawing) {
         drawing = false;
     }
 }
 
 void lcdDrawMenu(menu_t menu) {
+    bool clearDrawing = false;
     if (!drawing) {
         drawing = true;
+        clearDrawing = true;
     }
-    clearScreen(); // Clear and go to origin
-    
+
     // Menu name and arrow
-    writeString(0,0,menu.name);
-    writeChar(1,1, ARROW_R);
-    writeChar(0,3, '|');
-    writeChar(1,3, '|');
-    
-    // Draw sub menus
-    lcdDrawSubMenu(*menu.subMenu1);
-    drawing = false;
+    writeString(0, 0, menu.name);
+    writeChar(menu.arrow->line, menu.arrow->pos, menu.arrow->arrow);
+    writeChar(0, 3, '|');
+    writeChar(1, 3, '|');
+
+    if (clearDrawing) {
+        drawing = false;
+    }
 }
 
 /*******************************************************************************
@@ -106,95 +121,90 @@ void C_LCD_Init() {
     D_LCD_Init();
     D_LCD_Enable(true);
     D_LCD_CursorStyle(false, false);
-    
+
     drawing = false;
-    
-//    int16_t i = 0;
-//    // TEST
-//    while(1) {
-//        D_LCD_Goto(0,0);
-//        D_LCD_WriteInt(i);
-//        D_LCD_Goto(1,0);
-//        D_LCD_WriteChar(i);
-//        i++;
-//        DelayMs(200);
-//    }
-    
-    // Fields
-    voltageField.id = 0;
-    voltageField.name = "V";
-    voltageField.units = "mV";
-    voltageField.line = 0;
-    voltageField.value = 1.25;
-    voltageField.selectable = true;
-    voltageField.selected = true;
-    
-    currentField.id = 1;
-    currentField.name = "I";
-    currentField.units = "mA";
-    currentField.line = 1;
-    currentField.value = 0.12;
-    currentField.selectable = true;
-    currentField.selected = false;
-    
-    loadCurrentField.id = 2;
-    loadCurrentField.name = "I";
-    loadCurrentField.units = "mA";
-    loadCurrentField.line = 0;
-    loadCurrentField.value = 0.08;
-    loadCurrentField.selectable = false;
-    loadCurrentField.selected = false;
-    
-    temperatureField.id = 3;
-    temperatureField.name = "T";
-    temperatureField.units = "°C";
-    temperatureField.line = 1;
-    temperatureField.value = 85;
-    temperatureField.selectable = false;
-    temperatureField.selected = false;
-    
-    
-    voltageField.nextField = &currentField;
-    currentField.nextField = &voltageField;
-    loadCurrentField.nextField = NULL;
-    temperatureField.nextField = NULL;
-    
-    // Sub menus
-    subMenu1.id = 0;
-    subMenu1.name = "";
-    subMenu1.selected = true;
-    subMenu1.field1 = &voltageField;
-    subMenu1.field2 = &currentField;
-    
-    subMenu2.id = 1;
-    subMenu2.name = "";
-    subMenu2.selected = false;
-    subMenu2.field1 = &loadCurrentField;
-    subMenu2.field2 = &temperatureField;
-    
-    subMenu1.nexSubMenu = &subMenu2;
-    subMenu2.nexSubMenu = &subMenu1;
-    
-    // Menus
-    variableMenu.id = 0;
-    variableMenu.name = "VAR";
-    variableMenu.selected = false;
-    variableMenu.subMenu1 = &subMenu1;
-    variableMenu.subMenu2 = &subMenu2;
-    variableMenu.nextMenu = NULL;
-    
-    lcdDrawMenu(variableMenu);
-    currentMenu = variableMenu;
-    currentMenu.selectedSubMenu = &subMenu1;
+
+    menus[0] = varMn;
+
+    subMenus[0] = varSm1;
+    subMenus[1] = varSm2;
+
+    fields[0] = voltageFld;
+    fields[1] = currentFld;
+    fields[2] = temperatureFld;
+    fields[3] = loadCurrentFld;
+
+    selectedMenuId = -1;
+    selectedSubMenuId = -1;
+    selectedFieldId = -1;
+
+    C_LCD_DrawMenu(varMn.id);
+    C_LCD_DrawSubMenu(varSm1.id);
+    C_LCD_SetSelected(1, voltageFld.id, false);
 }
 
-void C_LCD_NextMenu() {
-    
+void C_LCD_DrawMenu(uint8_t id) {
+    if (id < menuCnt) {
+        selectedMenuId = id;
+        lcdDrawMenu(menus[id]);
+    }
 }
 
-void C_LCD_NextSubMenu() {
-    if (!drawing) {
-        currentMenu.selectedSubMenu = currentMenu.selectedSubMenu->nexSubMenu;
-        lcdDrawSubMenu(*currentMenu.selectedSubMenu);
+void C_LCD_DrawSubMenu(uint8_t id) {
+    if (id < subMenuCnt) {
+        selectedSubMenuId = id;
+        lcdDrawSubMenu(subMenus[id]);
+    }
+}
+
+void C_LCD_SetSelected(uint8_t what, uint8_t id, bool select) {
+    if (id < fieldCnt) {
+        subMenu_t sm = subMenus[selectedSubMenuId];
+
+        switch (what) {
+            case TYPE_ARROW:
+                D_LCD_Goto(sm.arrow->line, sm.arrow->pos);
+                D_LCD_CursorStyle(true, select);
+                break;
+            case TYPE_FIELD:
+                if (sm.field1->id == id || sm.field2->id == id) {
+                    D_LCD_CursorStyle(true, select);
+                    D_LCD_Goto(fields[id].line, fields[id].pos);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+void C_LCD_SetFieldValue(uint8_t id, int16_t value) {
+    if (id < fieldCnt) {
+        switch (fields[id].unit.id) {
+            case ID_VOLTAGE:
+                // Convert to voltage
+                // ...
+                fields[id].value = (double) value;
+                break;
+            case ID_CURRENT:
+                // Convert to current
+                // ...
+                fields[id].value = (double) value;
+                break;
+            case ID_TEMPERATURE:
+                // Convert to temperature
+                // ...
+                fields[id].value = (double) value;
+                break;
+            default:
+                break;
+        }
+
+        subMenu_t sm = subMenus[selectedSubMenuId];
+        if (sm.field1->id == id || sm.field2->id == id) {
+            lcdDrawField(fields[id]);
+            D_LCD_Goto(fields[id].line, fields[id].pos);
+        }
+
     }
 }

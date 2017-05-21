@@ -21,12 +21,16 @@
 
 #include "Drivers/INTERRUPT_Driver.h"
 #include "Drivers/SYSTEM_Driver.h"
+#include "Drivers/LCD_Driver.h"
 
 #include "Controllers/LCD_Controller.h"
 
 #include "../Common/Drivers/I2C_Driver.h"
 #include "../Common/I2C_Settings.h"
-#include "Drivers/LCD_Driver.h"
+#include "../Common/COM_Settings.h"
+#include "../Common/MENU_Settings.h"
+
+
 
 
 /*******************************************************************************
@@ -53,20 +57,20 @@ static void initialize();
 
 void initialize() {
     D_INT_EnableInterrupts(false);
-    
+
     // Initialize system
     D_SYS_InitPll();
     D_SYS_InitOscillator();
     D_SYS_InitPorts();
-    
+
     // Interrupts
     D_INT_Init();
     D_INT_EnableInterrupts(true);
-    
+
     // LCD
     C_LCD_Init();
-    
-    
+
+
     // I2C
     D_I2C_InitSlave(I2C_LCD_ADDRESS, &readData);
 }
@@ -80,43 +84,54 @@ void initialize() {
  ******************************************************************************/
 
 int main(void) {
-    
+
     initialize();
 
-    
     D_I2C_Enable(true);
-//    D_LCD_ClearSreen();
-//    D_LCD_Goto(0,0);
-//    D_LCD_WriteString("Turn:  ");
-//    
-//    D_LCD_Goto(1,0);
-//    D_LCD_WriteString("Press: ");
 
-    while(1) {
+    while (1) {
         if (I2C_ReadyToRead) {
+            
             I2C_ReadyToRead = false;
             if (I2C_SlaveReadResult >= I2C_OK) {
                 
-                PORTAbits.RA0 = !PORTAbits.RA0;
-//                
-//                D_LCD_Goto(0,7);
-//                D_LCD_WriteInt(readData.data2);
-//                D_LCD_Goto(1,7);
-//                D_LCD_WriteInt(readData.data1);
-
-//                if (readData.data1 % 2 == 0) {
-                    C_LCD_NextSubMenu();
-//                }
+                uint8_t command = readData.command;
+                uint8_t com = (command >> 6) & 0x03;
                 
+                switch (com) {
+                    case COM_LCD_COM_DRAW: {
+                        uint8_t menuId = ((command >> 3) & 0x07);
+                        uint8_t subMenuId = command & 0x07;
+                        C_LCD_DrawMenu(menuId);
+                        C_LCD_DrawSubMenu(subMenuId);
+                    } break;
+                        
+                    case COM_LCD_COM_SELECT: {
+                        uint8_t what = (command >> 5) & 0x01;
+                        uint8_t select = (command >> 4) & 0x01;
+                        uint8_t id = command & 0x0F;
+                        C_LCD_SetSelected(what, id, select);
+                    } break;
+                        
+                    case COM_LCD_COM_SET: {
+                        if (I2C_SlaveReadResult == I2C_MWRITE) {
+                            uint8_t id = command & 0x3F;
+                            int16_t val = (readData.data2 << 8) | (readData.data1);
+                            C_LCD_SetFieldValue(id, val);
+                        }
+                    } break;
+                    default:
+                        break;
+                }
+
             } else {
                 D_LCD_ClearSreen();
                 D_LCD_WriteString("I2C Error ");
-                D_LCD_Goto(1,0);
+                D_LCD_Goto(1, 0);
                 D_LCD_WriteInt(I2C1STAT);
                 D_I2C_Reset();
-            } 
-            
-            
+            }
+
         }
     }
     return 0;

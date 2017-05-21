@@ -12,17 +12,25 @@
 
 #include <xc.h> // include processor files - each processor file is guarded.  
 
-#define UP      1
-#define DOWN    2
+typedef enum {
+    NONE,
+    LEFT,
+    RIGHT
+} encTurn_t;
+
+typedef enum {
+    PRESS, 
+    NO_PRESS
+} encPress_t;
 
 
 extern bool ENC_Change;     /* Encoder value changed                          */
 
 typedef struct {
-    uint16_t turn;
-    uint16_t turnCount;
-    bool press;
-    uint16_t pressCount;
+    encTurn_t turn;         /* encTurn_t indicating turn direction LEFT-RIGHT */
+    uint16_t turnCount;     /* Amount of turns in "turn" direction            */
+    encPress_t press;       /* encPress_t indicating PRESS or NO_PRESS        */
+    uint16_t pressCount;    /* Time of the press                              */
 } enc_t;
 
 

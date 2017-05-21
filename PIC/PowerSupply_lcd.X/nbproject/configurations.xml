@@ -6,6 +6,7 @@
                    projectFiles="true">
       <logicalFolder name="Controllers" displayName="Controllers" projectFiles="true">
         <itemPath>Controllers/LCD_Controller.h</itemPath>
+        <itemPath>Controllers/COM_Controller.h</itemPath>
       </logicalFolder>
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/SYSTEM_Driver.h</itemPath>
@@ -14,10 +15,9 @@
         <itemPath>../Common/Drivers/I2C_Driver.h</itemPath>
       </logicalFolder>
       <logicalFolder name="Headers" displayName="Headers" projectFiles="true">
-        <itemPath>Headers/custom_char.h</itemPath>
-        <itemPath>Headers/GLCD_Bitmaps.h</itemPath>
-        <itemPath>Headers/GLCD_Font.h</itemPath>
         <itemPath>Drivers/Menu.h</itemPath>
+        <itemPath>../Common/MENU_Settings.h</itemPath>
+        <itemPath>../Common/COM_Settings.h</itemPath>
       </logicalFolder>
       <itemPath>Settings.h</itemPath>
     </logicalFolder>
@@ -50,9 +50,9 @@
   </logicalFolder>
   <sourceRootList>
     <Elem>Drivers</Elem>
-    <Elem>../Common/Drivers</Elem>
     <Elem>Headers</Elem>
     <Elem>Controllers</Elem>
+    <Elem>../Common</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -244,6 +244,7 @@
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
         <property key="UART 1" value="true"/>
         <property key="UART 2" value="true"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>

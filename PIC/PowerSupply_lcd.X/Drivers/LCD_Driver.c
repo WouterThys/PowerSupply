@@ -6,7 +6,6 @@
 #include <stdlib.h>          /* Includes math definitions                       */
 
 #include "../Settings.h"
-#include "../Headers/custom_char.h"
 
 #include "SYSTEM_Driver.h"
 #include "LCD_Driver.h"

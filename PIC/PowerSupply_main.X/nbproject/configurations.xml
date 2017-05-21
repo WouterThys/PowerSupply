@@ -4,13 +4,22 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <logicalFolder name="Controllers" displayName="Controllers" projectFiles="true">
+        <itemPath>Controllers/COM_Driver.h</itemPath>
+        <itemPath>Controllers/LCD_Controller.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/SYSTEM_Driver.h</itemPath>
         <itemPath>Drivers/INTERRUPT_Driver.h</itemPath>
         <itemPath>../Common/Drivers/I2C_Driver.h</itemPath>
         <itemPath>Drivers/ENC_Driver.h</itemPath>
       </logicalFolder>
-      <itemPath>Settings.h</itemPath>
+      <logicalFolder name="Headers" displayName="Headers" projectFiles="true">
+        <itemPath>Headers/Menu.h</itemPath>
+        <itemPath>../Common/MENU_Settings.h</itemPath>
+        <itemPath>Settings.h</itemPath>
+        <itemPath>../Common/COM_Settings.h</itemPath>
+      </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -19,6 +28,10 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <logicalFolder name="Controllers" displayName="Controllers" projectFiles="true">
+        <itemPath>Controllers/COM_Driver.c</itemPath>
+        <itemPath>Controllers/LCD_Controller.c</itemPath>
+      </logicalFolder>
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/INTERRUPT_Driver.c</itemPath>
         <itemPath>Drivers/SYSTEM_Driver.c</itemPath>
@@ -37,6 +50,8 @@
   <sourceRootList>
     <Elem>Drivers</Elem>
     <Elem>../Common</Elem>
+    <Elem>Controllers</Elem>
+    <Elem>Headers</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -209,6 +224,7 @@
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
         <property key="UART 1" value="true"/>
         <property key="UART 2" value="true"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>
