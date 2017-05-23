@@ -16,7 +16,7 @@
  * Interrupt priorities
  */
 
-#define T2_IP     1     /* Timer 1 priority for Rotary encoder                */
+#define CN_IP     1     
     
 /**
  *  PIC

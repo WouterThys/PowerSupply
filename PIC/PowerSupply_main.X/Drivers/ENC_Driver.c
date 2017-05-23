@@ -4,12 +4,16 @@
 #include <stdbool.h>
 
 #include "../Settings.h"
+#include "SYSTEM_Driver.h"
 #include "ENC_Driver.h"
 
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
-
+#define ALEFT   0x0001
+#define BLEFT   0x0003
+#define ARIGHT  0x0003
+#define BRIGHT  0x0001
 
 /*******************************************************************************
  *          MACRO FUNCTIONS
@@ -18,13 +22,11 @@
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-static int16_t encTurnStates[] = {0,-1,1,0,1,0,0,-1,-1,0,0,1,0,1,-1,0}; 
-static uint16_t encPressPosition = 0;
-static int16_t encTurnPosition = 0;
-static int16_t encTurnValue = 0;
-static int16_t oldTurnEncValue = 0;
-static uint16_t encPressedCount = 0;
-static bool encPressed;
+static uint16_t encA = 0;       /* Rotary line A                              */
+static uint16_t encB = 0;       /* Rotary line B                              */
+static uint16_t encAcnt = 0;    /* Counts turns in A direction                */
+static uint16_t encBcnt = 0;    /* Counts turns in B direction                */
+static bool encPressed = false;
 
 bool ENC_Change;
 
@@ -34,36 +36,40 @@ bool ENC_Change;
 static void encode();
 
 void encode() {
-    encTurnPosition <<= 2;  // Remember previous state
-    encTurnPosition |= ((ENC_Pin_2 << 1) + (ENC_Pin_1)) & 0x0003; // LSB are new value
-    encTurnValue += encTurnStates[(encTurnPosition & 0x000F)]; // Lower 4 bits as index of the states array
-    
-    encPressPosition <<= 1;
-    encPressPosition |= ENC_Pin_3;
-    
-    if ((encPressPosition & 0x000F) == 0x0000) {
-        if (!encPressed) {
-//            ENC_Change = true;
-        }
-        encPressed = true;
-        encPressedCount++;
-    } else if ((encPressPosition & 0x000F) == 0x000F) {
-        if (encPressed) {
-//            ENC_Change = true;
-            encPressedCount = 0;
-        }
-        encPressed = false;
-    }
-    
-    if (encTurnValue == oldTurnEncValue) {
-        return;
-    } else {
-        if ((encTurnValue % 2) == 0) {
+    uint8_t A = ENC_Pin_1;
+    uint8_t B = ENC_Pin_2;
+    uint8_t C = ENC_Pin_3;
+
+    if (C == 0) {
+        if (ENC_Change == false) {
             ENC_Change = true;
         }
+        encPressed = true;
+    } else {
+        if (encPressed == true) {
+            encPressed = false;
+        } else {
+        
+            encA <<= 1;
+            encA |= A;
+
+            encB <<= 1;
+            encB |= B;
+
+            encA &= 0x0003;
+            encB &= 0x0003;
+
+            // Compare with expected
+            if (((encA == 0x0003) && (encB == 0x0001)) || ((encA == 0x0000) && (encB == 0x0002))) {
+                ENC_Change = true;
+                encAcnt++;
+            }
+            if (((encA == 0x0001) && (encB == 0x0003)) || ((encA == 0x0002) && (encB == 0x0000))) {
+                ENC_Change = true;
+                encBcnt++;
+            }
+        }
     }
-    
-    oldTurnEncValue = encTurnValue;
 }
 
 /*******************************************************************************
@@ -72,64 +78,73 @@ void encode() {
 
 void D_ENC_Init() {
     D_ENC_Enable(false);
-    
-    /* Variables */
-    ENC_Change = false;
-    
+
     /* T2CON register */
     T2CONbits.TCKPS = 0b00;
-    
+
     /* Interrupts */
-    _T2IF = 0; // Clear
-    _T2IP = T2_IP; // Priority
-    _T2IE = 1; // Enable
+    CNENBbits.CNIEB10 = 1;
+    CNENBbits.CNIEB11 = 1;
+    CNENBbits.CNIEB12 = 1;
+    CNPUBbits.CNPUB10 = 1;
+    CNPUBbits.CNPUB11 = 1;
+    CNPUBbits.CNPUB12 = 1;
+
+    _CNIF = 0; // Clear flag
+    _CNIP = CN_IP;
+    _CNIE = 0;
+
+    /* Variables */
+    ENC_Change = false;
 }
 
 void D_ENC_Enable(bool enable) {
     if (enable) {
-        ENC_Dir_1 = 1;      // Input
-        ENC_Dir_2 = 1;      // Input
-        ENC_Dir_3 = 1;      // Input
-        T2CONbits.TON = 1;  // Enable timer
+        ENC_Dir_1 = 1; // Input
+        ENC_Dir_2 = 1; // Input
+        ENC_Dir_3 = 1; // Input
+        ENC_Change = false;
+        DelayMs(1);
+        _CNIE = 1;
     } else {
-        ENC_Dir_1 = 0;      // Output
-        ENC_Dir_2 = 0;      // Output
-        ENC_Dir_3 = 0;      // Output
-        T2CONbits.TON = 0;  // Disable timer
+        ENC_Dir_1 = 0; // Output
+        ENC_Dir_2 = 0; // Output
+        ENC_Dir_3 = 0; // Output
+        _CNIE = 0;
     }
 }
 
 void D_ENC_GetState(enc_t *state) {
-    // Rotary
-    if (encTurnValue >= 0) {
-        state->turn = RIGHT;
-    } else {
+    if (encAcnt > encBcnt) {
         state->turn = LEFT;
+        state->turnCount = encAcnt - encBcnt;
+    } else if (encAcnt < encBcnt) {
+        state->turn = RIGHT;
+        state->turnCount = encBcnt - encAcnt;
+    } else {
+        state->turn = NONE;
+        state->turnCount = 0;
     }
-    
-    if (encTurnValue < 0) {
-        encTurnValue *= -1;
+
+    if (encPressed) {
+        state->press = PRESS;
+    } else {
+        state->press = NO_PRESS;
     }
-    
-    state->turnCount = encTurnValue / 2;  
-    
-    encTurnValue = oldTurnEncValue = encTurnValue % 2;
-    
-//    // Button
-//    state->press = PRE;
-//    state->pressCount = encPressedCount;
-    
-    // Clear
+    state->pressCount = 0;
+
+    encAcnt = 0;
+    encBcnt = 0;
     ENC_Change = false;
 }
 
 /*******************************************************************************
  *          INTERRUPTS
  ******************************************************************************/
-void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void) {
-    if (_T2IF) {
-        _T2IF = 0;
+void __attribute__((interrupt, no_auto_psv)) _CNInterrupt(void) {
+    if (_CNIF) {
         encode();
+        _CNIF = 0;
     }
 }
 

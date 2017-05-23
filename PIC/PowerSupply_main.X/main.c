@@ -22,11 +22,10 @@
 #include "Drivers/INTERRUPT_Driver.h"
 #include "Drivers/SYSTEM_Driver.h"
 #include "Drivers/ENC_Driver.h"
+#include "../Common/Drivers/I2C_Driver.h"
 
 #include "Controllers/COM_Driver.h"
 #include "Controllers/LCD_Controller.h"
-
-#include "../Common/MENU_Settings.h"
 
 
 /*******************************************************************************
@@ -40,8 +39,10 @@
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
+static enc_t encState;
+static cursor_t lcdCursor;
 
-
+static uint16_t retryCnt = 0;
 /*******************************************************************************
  *          LOCAL FUNCTIONS
  ******************************************************************************/
@@ -65,7 +66,7 @@ void initialize() {
     C_COM_Init();
     
     // LCD
-    C_LCD_Init();
+    C_LCD_Init(&lcdCursor);
     
     // Rotary encoder
     D_ENC_Init();
@@ -85,8 +86,7 @@ int main(void) {
     
     C_COM_Enable(true);
     D_ENC_Enable(true);
-    
-    C_LCD_Next();
+   
     
 //    // Go to 2nd field
 //    C_COM_LcdSelect(TYPE_FIELD, false, ID_M0_SM0_F1);
@@ -104,12 +104,54 @@ int main(void) {
 
     while(1) {
         
-//        if (ENC_Change) {
-//            D_ENC_GetState(&encState);
-//            C_COM_SendEncoderState(encState);
-//        }
+        if (ENC_Change) {
+            D_ENC_GetState(&encState);
+            if (encState.press == PRESS) {
+                C_LCD_Press(&lcdCursor);
+            }
+            if (encState.turn != NONE) {
+                C_LCD_Turn(&lcdCursor, encState);
+            }
+        }
         
-        DelayMs(20);
+        if (lcdCursor.nextActionCnt > 0) {
+            int16_t i2cResult = -1;
+            
+            switch (lcdCursor.nextActions[0]) {
+                case DRAW:
+                    i2cResult = C_COM_LcdDraw(lcdCursor.currentMenu->id, lcdCursor.currentSubMenu->id);
+                    break;
+                case SELECT:
+                    if (lcdCursor.currentType == ARROW) {
+                        i2cResult = C_COM_LcdSelect(TYPE_ARROW, false, lcdCursor.currentId);
+                    } else if (lcdCursor.currentType == FIELD) {
+                        i2cResult = C_COM_LcdSelect(TYPE_FIELD, (lcdCursor.current.field->selected == SELECTED), lcdCursor.currentId);
+                    }
+                    break;
+                case SET:
+                    i2cResult = C_COM_LcdSet(lcdCursor.currentId, lcdCursor.current.field->value);
+                    break;
+                default:
+                    break;
+            }
+            
+            if (i2cResult >= I2C_OK) {
+                // Shift actions
+                uint8_t i;
+                for (i = 0; i < 3; i++) {
+                    lcdCursor.nextActions[i] = lcdCursor.nextActions[i+1];
+                }
+                lcdCursor.nextActionCnt--;
+            } else {
+                C_COM_I2CReset();
+                retryCnt++;
+//                if (retryCnt > 3) {
+//                    // Horror
+//                }
+            }
+        }
+        
+        DelayMs(50);
         
     }
     return 0;

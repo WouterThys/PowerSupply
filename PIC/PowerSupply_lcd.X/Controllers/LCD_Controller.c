@@ -12,7 +12,32 @@
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
+/**
+ * Initial values
+ */  
 
+// Units
+#define VOLTAGE     {ID_VOLTAGE,     "V", "mV"}
+#define CURRENT     {ID_CURRENT,     "I", "mA"}
+#define TEMPERATURE {ID_TEMPERATURE, "T", "°C"}
+
+// Arrows 
+#define M0_SM0_AR   {ID_M0_SM0_AR,  126, 0, 15}  /* 127 is right arrow  */     
+#define M0_SM1_AR   {ID_M0_SM1_AR,  127, 0, 15}  /* 126 is left arrow   */     
+#define M0_AR       {ID_M0_AR,      126, 1, 1}  
+
+// Fields:           id,            units,       value, line, position
+#define M0_SM0_F0   {ID_M0_SM0_F0,  VOLTAGE,     0.0,   0,    11} 
+#define M0_SM0_F1   {ID_M0_SM0_F1,  CURRENT,     0.0,   1,    11}
+#define M0_SM1_F0   {ID_M0_SM1_F0,  TEMPERATURE, 0.0,   0,    11} 
+#define M0_SM1_F1   {ID_M0_SM1_F1,  CURRENT,     0.0,   1,    11} 
+
+// Sub menus:    id,         name, field1,           field2,          arrow      
+#define M0_SM0  {ID_M0_SM0,  "",   &voltageFld,      &currentFld,     &sm0Arw}
+#define M0_SM1  {ID_M0_SM1,  "",   &loadCurrentFld,  &temperatureFld, &sm1Arw}
+
+// Menus:    id,     name,  arrow
+#define M0  {ID_M0,  "VAR", &m0Arw}
 
 /*******************************************************************************
  *          LOCAL FUNCTION DEFINES
@@ -32,15 +57,35 @@ static void lcdDrawMenu(menu_t menu);
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
+
+/**
+ * Assign
+ */
+static arrow_t sm0Arw = M0_SM0_AR;
+static arrow_t sm1Arw = M0_SM1_AR;
+static arrow_t m0Arw = M0_AR;
+    
+static field_t voltageFld = M0_SM0_F0;
+static field_t currentFld = M0_SM0_F1;
+static field_t loadCurrentFld = M0_SM1_F0;
+static field_t temperatureFld = M0_SM1_F1;
+    
+static subMenu_t varSm1 = M0_SM0;
+static subMenu_t varSm2 = M0_SM1;
+    
+static menu_t varMn = M0;
+
+
 static bool drawing;
 
 const static uint16_t menuCnt = 1;
 const static uint16_t subMenuCnt = 2;
 const static uint16_t fieldCnt = 4;
 
-static menu_t menus[1];
-static subMenu_t subMenus[2];
-static field_t fields[4];
+static menu_t    *menus[1];
+static subMenu_t *subMenus[2];
+static field_t   *fields[4];
+static arrow_t   *arrows[3];
 
 static int8_t selectedMenuId;
 static int8_t selectedSubMenuId;
@@ -85,7 +130,7 @@ void lcdDrawSubMenu(subMenu_t subMenu) {
     // Draw fields
     lcdDrawField(*subMenu.field1);
     lcdDrawField(*subMenu.field2);
-    
+
     // Go to field1 as default 
     D_LCD_Goto(subMenu.field1->line, subMenu.field1->pos);
     D_LCD_CursorStyle(true, false);
@@ -124,15 +169,19 @@ void C_LCD_Init() {
 
     drawing = false;
 
-    menus[0] = varMn;
+    menus[varMn.id] = &varMn;
 
-    subMenus[0] = varSm1;
-    subMenus[1] = varSm2;
+    subMenus[varSm1.id] = &varSm1;
+    subMenus[varSm2.id] = &varSm2;
 
-    fields[0] = voltageFld;
-    fields[1] = currentFld;
-    fields[2] = temperatureFld;
-    fields[3] = loadCurrentFld;
+    fields[voltageFld.id]     = &voltageFld;
+    fields[currentFld.id]     = &currentFld;
+    fields[temperatureFld.id] = &temperatureFld;
+    fields[loadCurrentFld.id] = &loadCurrentFld;
+    
+    arrows[sm0Arw.id] = &sm0Arw;
+    arrows[sm1Arw.id] = &sm1Arw;
+    arrows[m0Arw.id]  = &m0Arw;
 
     selectedMenuId = -1;
     selectedSubMenuId = -1;
@@ -146,64 +195,69 @@ void C_LCD_Init() {
 void C_LCD_DrawMenu(uint8_t id) {
     if (id < menuCnt) {
         selectedMenuId = id;
-        lcdDrawMenu(menus[id]);
+        lcdDrawMenu(*menus[id]);
     }
 }
 
 void C_LCD_DrawSubMenu(uint8_t id) {
     if (id < subMenuCnt) {
         selectedSubMenuId = id;
-        lcdDrawSubMenu(subMenus[id]);
+        lcdDrawSubMenu(*subMenus[id]);
     }
 }
 
 void C_LCD_SetSelected(uint8_t what, uint8_t id, bool select) {
-    if (id < fieldCnt) {
-        subMenu_t sm = subMenus[selectedSubMenuId];
 
-        switch (what) {
-            case TYPE_ARROW:
-                D_LCD_Goto(sm.arrow->line, sm.arrow->pos);
+    menu_t m = *menus[selectedMenuId];
+    subMenu_t sm = *subMenus[selectedSubMenuId];
+    
+    switch (what) {
+        case TYPE_ARROW: {
+            // If arrow is visible
+            if (sm.arrow->id == id || m.arrow->id == id) {
+                D_LCD_Goto(arrows[id]->line, arrows[id]->pos);
                 D_LCD_CursorStyle(true, select);
-                break;
-            case TYPE_FIELD:
-                if (sm.field1->id == id || sm.field2->id == id) {
-                    D_LCD_CursorStyle(true, select);
-                    D_LCD_Goto(fields[id].line, fields[id].pos);
-                }
-                break;
-            default:
-                break;
-        }
+            }
+        } break;
+        case TYPE_FIELD: {
+            // If field is visible
+            if (sm.field1->id == id || sm.field2->id == id) {
+                D_LCD_CursorStyle(true, select);
+                D_LCD_Goto(fields[id]->line, fields[id]->pos);
+            }
+        } break;
+        default:
+            break;
     }
+
 }
 
 void C_LCD_SetFieldValue(uint8_t id, int16_t value) {
     if (id < fieldCnt) {
-        switch (fields[id].unit.id) {
+        switch (fields[id]->unit.id) {
             case ID_VOLTAGE:
                 // Convert to voltage
                 // ...
-                fields[id].value = (double) value;
+                fields[id]->value = (double) value;
                 break;
             case ID_CURRENT:
                 // Convert to current
                 // ...
-                fields[id].value = (double) value;
+                fields[id]->value = (double) value;
                 break;
             case ID_TEMPERATURE:
                 // Convert to temperature
                 // ...
-                fields[id].value = (double) value;
+                fields[id]->value = (double) value;
                 break;
             default:
                 break;
         }
 
-        subMenu_t sm = subMenus[selectedSubMenuId];
+        subMenu_t sm = *subMenus[selectedSubMenuId];
         if (sm.field1->id == id || sm.field2->id == id) {
-            lcdDrawField(fields[id]);
-            D_LCD_Goto(fields[id].line, fields[id].pos);
+            lcdDrawField(*fields[id]);
+            D_LCD_Goto(fields[id]->line, fields[id]->pos);
         }
 
     }

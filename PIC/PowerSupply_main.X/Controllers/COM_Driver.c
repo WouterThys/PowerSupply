@@ -45,26 +45,30 @@ void C_COM_Enable(bool enable) {
     D_I2C_Enable(enable);
 }
 
-void C_COM_LcdDraw(uint8_t menuId, uint8_t subMenuId) {
+void C_COM_I2CReset() {
+    D_I2C_Reset();
+}
+
+int16_t C_COM_LcdDraw(uint8_t menuId, uint8_t subMenuId) {
     uint8_t command = (COM_LCD_COM_DRAW << 6) & 0xC0;
     command |= ((menuId << 3) & 0x38);
     command |= (subMenuId & 0x07);
     
     lcdData.command = command;
-    D_I2C_MasterRead(&lcdData); // Write command, and read back status
+    return D_I2C_MasterRead(&lcdData); // Write command, and read back status
 }
 
-void C_COM_LcdSelect(uint8_t what, bool select, uint8_t id) {
+int16_t C_COM_LcdSelect(uint8_t what, bool select, uint8_t id) {
     uint8_t command = (COM_LCD_COM_SELECT << 6) & 0xC0;
     command |= ((what << 5) & 0x20);
     command |= ((select << 4) & 0x10);
     command |= (id & 0x0F);
     
     lcdData.command = command;
-    D_I2C_MasterRead(&lcdData); // Write command, and read back status
+    return D_I2C_MasterRead(&lcdData); // Write command, and read back status
 }
 
-void C_COM_LcdSet(uint8_t id, int16_t value) {
+int16_t C_COM_LcdSet(uint8_t id, int16_t value) {
     uint8_t command = (COM_LCD_COM_SET << 6) & 0xC0;
     command |= (id & 0x0F);
     
@@ -72,7 +76,7 @@ void C_COM_LcdSet(uint8_t id, int16_t value) {
     lcdData.data1 = (value & 0x00FF);
     lcdData.data2 = ((value >> 8) & 0x00FF);
     
-    D_I2C_MasterWrite(&lcdData); // Write command and data
+    return D_I2C_MasterWrite(&lcdData); // Write command and data
 }
 
 

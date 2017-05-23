@@ -27,7 +27,7 @@ typedef enum {
 extern bool ENC_Change;     /* Encoder value changed                          */
 
 typedef struct {
-    encTurn_t turn;         /* encTurn_t indicating turn direction LEFT-RIGHT */
+    encTurn_t turn;         /* encTurn_t indicating turn direction LEFT-RIGHT or NONE */
     uint16_t turnCount;     /* Amount of turns in "turn" direction            */
     encPress_t press;       /* encPress_t indicating PRESS or NO_PRESS        */
     uint16_t pressCount;    /* Time of the press                              */

@@ -23,10 +23,9 @@
 #define ID_CURRENT      1
 #define ID_TEMPERATURE  2
 
-#define ID_ARROW_M_L    0
-#define ID_ARROW_M_R    1
-#define ID_ARROW_SM_L   2
-#define ID_ARROW_SM_R   3
+#define ID_M0_SM0_AR    0
+#define ID_M0_SM1_AR    1
+#define ID_M0_AR        2
 
 #define ID_M0_SM0_F0    0
 #define ID_M0_SM0_F1    1

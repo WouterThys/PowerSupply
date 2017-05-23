@@ -90,6 +90,7 @@ void i2cRead() {
         case I2C_STATE_IDLE:
             slaveReady = false;
             I2C_SlaveReadResult = I2C_OK;
+            PORTAbits.RA0 = 1;
 
             if (check(CHECK_S) && !check(CHECK_DA)) {
                 slaveReadData->address = i2cDataRead(); // Read to clean buffer
@@ -180,6 +181,7 @@ void i2cRead() {
                
                 I2C1STATbits.I2COV = 0;
             }
+            PORTAbits.RA0 = 0;
             I2C_ReadyToRead = true;
             break;
     }
@@ -591,7 +593,6 @@ void __attribute__((interrupt, no_auto_psv)) _MI2C1Interrupt(void) {
 
 void __attribute__((interrupt, no_auto_psv)) _SI2C1Interrupt(void) {
     if (_SI2C1IF) {
-        PORTAbits.RA0 = !PORTAbits.RA0;
         slaveInterrupt = true;
         _SI2C1IF = 0;
         
