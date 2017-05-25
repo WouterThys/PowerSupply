@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <p33EP32MC202.h>       /* Includes true/false definition                  */
 
+#include "../COM_Settings.h"
 #include"../I2C_Settings.h"
 #include "I2C_Driver.h"
 
@@ -61,6 +62,7 @@ static bool firstTime;
 static bool masterWrite;
 
 static i2cData_t *slaveReadData;
+static i2cAnswer_t *answerData;
 
 bool I2C_ReadyToRead;
 uint16_t I2C_SlaveReadResult;
@@ -80,8 +82,33 @@ uint16_t I2C_TestCnt;
 static bool check(uint16_t mask);
 static void i2cRead();
 
+static void setI2cData(i2cData_t * data);
+
 static bool check(uint16_t mask) {
     return ((I2C1STAT & mask) > 0);
+}
+
+void setI2cData(i2cData_t * data) {
+    if (((data->command >> 6) & 0x03) == COM_VAR_READ) {
+        switch ((data->command) & 0x3F) {
+            case 0:
+                data->data1 = (answerData->value0 >> 8) & 0x00FF;
+                data->data2 = (answerData->value0 >> 0) & 0x00FF;
+                break;
+            case 1:
+                data->data1 = (answerData->value1 >> 8) & 0x00FF;
+                data->data2 = (answerData->value1 >> 0) & 0x00FF;
+                break;
+            case 2:
+                data->data1 = (answerData->value2 >> 8) & 0x00FF;
+                data->data2 = (answerData->value2 >> 0) & 0x00FF;
+                break;
+            case 3:
+                data->data1 = (answerData->value3 >> 8) & 0x00FF;
+                data->data2 = (answerData->value3 >> 0) & 0x00FF;
+                break;
+        }
+    }
 }
 
 void i2cRead() {
@@ -90,7 +117,6 @@ void i2cRead() {
         case I2C_STATE_IDLE:
             slaveReady = false;
             I2C_SlaveReadResult = I2C_OK;
-            PORTAbits.RA0 = 1;
 
             if (check(CHECK_S) && !check(CHECK_DA)) {
                 slaveReadData->address = i2cDataRead(); // Read to clean buffer
@@ -109,6 +135,7 @@ void i2cRead() {
         case I2C_STATE_COMMAND:
             if (check(CHECK_DA)) {
                 slaveReadData->command = i2cDataRead();
+                setI2cData(slaveReadData);
                 slaveState = I2C_STATE_FIRST_DATA;
             } else {
                 I2C_SlaveReadResult = I2C_NOK;
@@ -181,7 +208,6 @@ void i2cRead() {
                
                 I2C1STATbits.I2COV = 0;
             }
-            PORTAbits.RA0 = 0;
             I2C_ReadyToRead = true;
             break;
     }
@@ -215,7 +241,7 @@ void D_I2C_InitMaster() {
     _MI2C1IE = 1; // Enable
 }
 
-void D_I2C_InitSlave(uint16_t address, i2cData_t * slaveData) {
+void D_I2C_InitSlave(uint16_t address, i2cData_t * slaveData, i2cAnswer_t * answer) {
     D_I2C_Enable(false);
 
     /* Ports */
@@ -237,6 +263,7 @@ void D_I2C_InitSlave(uint16_t address, i2cData_t * slaveData) {
     slaveReady = true;
     firstTime = true;
     slaveReadData = slaveData;
+    answerData = answer;
 
     /* Interrupts master */
     _SI2C1IF = 0; // Clear flag

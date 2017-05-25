@@ -16,7 +16,8 @@
  * Interrupt priorities
  */
 
-#define CN_IP     1     
+#define CN_IP       2     
+#define T2_IP       1  
     
 /**
  *  PIC
@@ -36,6 +37,12 @@
 #define ENC_Dir_1       TRISBbits.TRISB10
 #define ENC_Dir_2       TRISBbits.TRISB11
 #define ENC_Dir_3       TRISBbits.TRISB12
+
+/**
+ * Clock
+ */
+#define CLK_Pin         PORTBbits.RB7
+#define CLK_Dir         TRISBbits.TRISB7
 
     
 

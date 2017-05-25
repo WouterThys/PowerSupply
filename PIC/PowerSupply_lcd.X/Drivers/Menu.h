@@ -39,7 +39,7 @@ struct Unit {
 struct Field {
     uint8_t     id;         /* Unique id                                      */
     unit_t      unit;       /* Units of the field                             */
-    double      value;      /* Value of the field                             */
+    int16_t     value;      /* Value of the field                             */
     uint8_t     line;       /* Line where field is written on the screen      */
     uint8_t     pos;        /* Position of last digit on screen               */
 };

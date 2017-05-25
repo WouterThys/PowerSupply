@@ -13,6 +13,7 @@
         <itemPath>Drivers/INTERRUPT_Driver.h</itemPath>
         <itemPath>../Common/Drivers/I2C_Driver.h</itemPath>
         <itemPath>Drivers/ENC_Driver.h</itemPath>
+        <itemPath>Drivers/CLK_Driver.h</itemPath>
       </logicalFolder>
       <logicalFolder name="Headers" displayName="Headers" projectFiles="true">
         <itemPath>Headers/Menu.h</itemPath>
@@ -37,6 +38,7 @@
         <itemPath>Drivers/SYSTEM_Driver.c</itemPath>
         <itemPath>../Common/Drivers/I2C_Driver.c</itemPath>
         <itemPath>Drivers/ENC_Driver.c</itemPath>
+        <itemPath>Drivers/CLK_Driver.c</itemPath>
       </logicalFolder>
       <itemPath>main.c</itemPath>
       <itemPath>configuration.c</itemPath>

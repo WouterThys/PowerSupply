@@ -22,10 +22,10 @@
 #define M0_AR       {ID_M0_AR   ,  NS, {FIELD, ID_M0_SM0_F0},{ARROW, ID_M0_SM0_AR}}
 
 // Fields
-#define M0_SM0_F0   {ID_M0_SM0_F0, 0, CURSOR,         {FIELD, ID_M0_SM0_F1},  {ARROW, ID_M0_AR}}
-#define M0_SM0_F1   {ID_M0_SM0_F1, 0, NS,             {ARROW, ID_M0_SM0_AR},  {FIELD, ID_M0_SM0_F0}}
-#define M0_SM1_F0   {ID_M0_SM1_F0, 0, NOT_SELECTABLE, {NOTHING, -1}, {NOTHING, -1}}
-#define M0_SM1_F1   {ID_M0_SM1_F1, 0, NOT_SELECTABLE, {NOTHING, -1}, {NOTHING, -1}}
+#define M0_SM0_F0   {ID_M0_SM0_F0, 0, 0, 100,30000, OUTPUT_VOLTAGE, CURSOR,         {FIELD, ID_M0_SM0_F1},  {ARROW, ID_M0_AR}}  /* Voltage field */
+#define M0_SM0_F1   {ID_M0_SM0_F1, 0, 50,50, 1500,  CURRENT_LIMIT,  NS,             {ARROW, ID_M0_SM0_AR},  {FIELD, ID_M0_SM0_F0}} /* Current field */
+#define M0_SM1_F0   {ID_M0_SM1_F0, 0, 0, 0,  0,     TEMPERATURE,    NOT_SELECTABLE, {NOTHING, -1}, {NOTHING, -1}} /* Temperature field */
+#define M0_SM1_F1   {ID_M0_SM1_F1, 0, 0, 0,  0,     CURRENT_LOAD,   NOT_SELECTABLE, {NOTHING, -1}, {NOTHING, -1}} /* Load current field */
 
 // Sub menus
 #define M0_SM0  {ID_M0_SM0, ID_M0_SM0_F0, ID_M0_SM0_F1, ID_M0_SM0_AR, ID_M0_SM1}
@@ -44,24 +44,19 @@
 /**
  * Assign
  */
-arrow_t sm0Arw = M0_SM0_AR;
-arrow_t sm1Arw = M0_SM1_AR;
-arrow_t m0Arw = M0_AR;
+static arrow_t sm0Arw = M0_SM0_AR;
+static arrow_t sm1Arw = M0_SM1_AR;
+static arrow_t m0Arw = M0_AR;
 
-field_t voltageFld = M0_SM0_F0;
-field_t currentFld = M0_SM0_F1;
-field_t temperatureFld = M0_SM1_F0;
-field_t loadCurrentFld = M0_SM1_F1;
+static field_t voltageFld = M0_SM0_F0;
+static field_t currentFld = M0_SM0_F1;
+static field_t temperatureFld = M0_SM1_F0;
+static field_t loadCurrentFld = M0_SM1_F1;
 
-subMenu_t varSm0 = M0_SM0;
-subMenu_t varSm1 = M0_SM1;
+static subMenu_t varSm0 = M0_SM0;
+static subMenu_t varSm1 = M0_SM1;
 
-menu_t varMn = M0;
-
-const static uint16_t arrowCnt = 3;
-const static uint16_t menuCnt = 1;
-const static uint16_t subMenuCnt = 2;
-const static uint16_t fieldCnt = 4;
+static menu_t varMn = M0;
 
 static menu_t menus[1];
 static subMenu_t subMenus[2];
@@ -74,7 +69,7 @@ static arrow_t arrows[4];
  ******************************************************************************/
 static void setNext(cursor_t *cursor, enc_t encValue);
 static void setSelected(cursor_t *cursor);
-static void setValue(cursor_t *cursor, enc_t encValue);
+static void setValueFromTurn(cursor_t *cursor, enc_t encValue);
 static void setNewSubMenu(cursor_t *cursor, int8_t newSubMenuId);
 
 static void nextFromArrow(cursor_t *cursor, enc_t encValue);
@@ -163,11 +158,17 @@ void setNewSubMenu(cursor_t *cursor, int8_t newSubMenuId) {
     cursor->nextActionCnt++;
 }
 
-void setValue(cursor_t *cursor, enc_t encValue) {
+void setValueFromTurn(cursor_t *cursor, enc_t encValue) {
     if (encValue.turn == RIGHT) {
-        cursor->current.field->value += (encValue.turnCount);
+        cursor->current.field->value += (encValue.turnCount * cursor->current.field->step);
+        if (cursor->current.field->value > cursor->current.field->max) {
+            cursor->current.field->value = cursor->current.field->max;
+        }
     } else {
-        cursor->current.field->value -= (encValue.turnCount);
+        cursor->current.field->value -= (encValue.turnCount * cursor->current.field->step);
+        if (cursor->current.field->value < cursor->current.field->min) {
+            cursor->current.field->value = cursor->current.field->min;
+        }
     }
     
     // Actions
@@ -292,7 +293,7 @@ void C_LCD_Enable(bool enable) {
 void C_LCD_Turn(cursor_t *cursor, enc_t encValues) {
     if (cursor->currentType == FIELD) {
         if (cursor->current.field->selected == SELECTED) {
-            setValue(cursor, encValues);
+            setValueFromTurn(cursor, encValues);
         } else {
             setNext(cursor, encValues);
         }

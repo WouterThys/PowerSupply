@@ -66,6 +66,10 @@ struct Arrow {
 struct Field {
     int8_t      id;         /* Unique id                                      */
     int16_t     value;      /* Value of the field                             */
+    int16_t     min;        /* Min value                                      */
+    int16_t     step;       /* Step size                                      */
+    int16_t     max;        /* Max value                                      */
+    fieldType_t type;       /* OUTPUT_VOLTAGE - CURRENT_LIMIT - CURRENT_LOAD - TEMPERATURE */
     selected_t  selected;   /* Selected state: NS - CURSOR - SELECTED         */
     next_t      next;       /* Next item to select                            */
     next_t      previous;   /* Previous arrow of field to select              */

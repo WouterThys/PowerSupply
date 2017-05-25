@@ -216,19 +216,21 @@ void D_LCD_WriteInt(int16_t value) {
 
 void D_LCD_WriteDouble(double value, uint16_t precision) {
     D_LCD_WriteInt((int16_t)value); // Write digits before decimal point
-    D_LCD_WriteString(",");
+    if (precision > 0) {
+        D_LCD_WriteString(",");
 
-    if (value < 0) {
-        value = value * (-1);
-    }
-    double fraction = value - (uint16_t) value;
-    
-    while (precision) {
-        fraction = fraction * 10;
+        if (value < 0) {
+            value = value * (-1);
+        }
+        double fraction = value - (uint16_t) value;
 
-        D_LCD_WriteInt((uint16_t)fraction);
-        fraction = fraction - (uint16_t) fraction;
-        
-        precision--;
+        while (precision) {
+            fraction = fraction * 10;
+
+            D_LCD_WriteInt((uint16_t)fraction);
+            fraction = fraction - (uint16_t) fraction;
+
+            precision--;
+        }
     }
 }

@@ -11,6 +11,16 @@
 #define	MENU_SETTINGS_H
 
 /**
+ * Field value types
+ */
+typedef enum {
+    OUTPUT_VOLTAGE,
+    CURRENT_LIMIT,
+    CURRENT_LOAD,
+    TEMPERATURE
+} fieldType_t;
+
+/**
  * Type definitions
  */
 #define TYPE_ARROW      0

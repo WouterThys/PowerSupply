@@ -20,7 +20,7 @@
  *          VARIABLES
  ******************************************************************************/
 static i2cData_t uartData;
-static i2cData_t variableData;
+static i2cData_t varData;
 static i2cData_t lcdData;
 
 
@@ -37,7 +37,7 @@ void C_COM_Init() {
     // I2C
     D_I2C_InitMaster();
     uartData.address = I2C_UART_ADDRESS;
-    variableData.address = I2C_VARIABLE_ADDRESS;
+    varData.address = I2C_VARIABLE_ADDRESS;
     lcdData.address = I2C_LCD_ADDRESS;
 }
 
@@ -77,6 +77,22 @@ int16_t C_COM_LcdSet(uint8_t id, int16_t value) {
     lcdData.data2 = ((value >> 8) & 0x00FF);
     
     return D_I2C_MasterWrite(&lcdData); // Write command and data
+}
+
+int16_t C_COM_VarRead(uint8_t what) {
+    int16_t result = I2C_OK;
+    uint8_t command = (COM_VAR_READ << 6) & 0xC0;
+    command |= (what & 0x3F);
+    
+    varData.command = command;
+    result = D_I2C_MasterRead(&varData);
+    
+    if (result >= I2C_OK) {
+        return ((varData.data1 << 8) & 0xFF00) | (varData.data2 & 0x00FF);
+    } else {
+        D_I2C_Reset();
+        return result;
+    }
 }
 
 

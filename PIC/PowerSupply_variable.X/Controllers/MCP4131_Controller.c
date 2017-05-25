@@ -4,8 +4,9 @@
 #include <stdbool.h>       /* Includes true/false definition                  */
 #include <math.h>
 
+#include "../Settings.h"
 #include "../Drivers/SPI2_Driver.h"
-#include "MCP4131_Driver.h"
+#include "MCP4131_Controller.h"
 
 /*******************************************************************************
  *          DEFINES
@@ -34,10 +35,13 @@ void mcpWriteData(mcpData_t *data) {
     dataWord |= ((data->command << 10) & MCP_COMMAND_MASK);
     dataWord |= ((data->writeData) & MCP_DATA_MASK);
     
+    while(CS_MCP_Pin == 0 || CS_DAC_Pin == 0); // Wait while still writing previous data
+    CS_MCP_Pin = 0;
+    
     D_SPI2_Write(dataWord);
-    while(!SPI2_ReadyToRead);
-    SPI2_ReadyToRead = false;
-    data->readData = SPI2_ReadData;
+//    while(!SPI2_ReadyToRead);
+//    SPI2_ReadyToRead = false;
+//    data->readData = SPI2_ReadData;
 }
 
 /*******************************************************************************
@@ -46,6 +50,10 @@ void mcpWriteData(mcpData_t *data) {
 void C_MCP4131_Init() {
     /* SPI2 Module */
     D_SPI2_Init();
+    
+    /* Ports*/
+    CS_MCP_Dir = 0; // Output
+    CS_MCP_Pin = 1; // Active low chip select
 }
 
 void C_MCP4131_Enable(bool enable) {

@@ -18,14 +18,17 @@
 #include <string.h>
 
 #include "Settings.h"
+#include "../Common/I2C_Settings.h"
+#include "../Common/Drivers/I2C_Driver.h"
 
 #include "Drivers/INTERRUPT_Driver.h"
 #include "Drivers/SYSTEM_Driver.h"
 
-#include "Controllers/MCP4131_Driver.h"
+#include "Controllers/DAC_Controller.h"
+#include "Controllers/MCP4131_Controller.h"
+#include "Drivers/ADC_Driver.h"
 
-#include "../Common/Drivers/I2C_Driver.h"
-#include "../Common/I2C_Settings.h"
+
 
 
 /*******************************************************************************
@@ -44,6 +47,7 @@
  *          VARIABLES
  ******************************************************************************/
 static i2cData_t readData;
+static i2cAnswer_t answerData;
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
@@ -66,8 +70,12 @@ void initialize() {
     // Digital potentiometer
     C_MCP4131_Init();
     
+    // DAC and ADC
+    C_DAC_Init();
+    D_ADC_Init(&answerData);
+    
     // I2C
-    D_I2C_InitSlave(I2C_VARIABLE_ADDRESS, &readData);
+    D_I2C_InitSlave(I2C_VARIABLE_ADDRESS, &readData, &answerData);
 }
 
 /*******************************************************************************
@@ -82,27 +90,33 @@ int main(void) {
     
     initialize();
     
+    // Enable
     D_I2C_Enable(true);
     C_MCP4131_Enable(true);
+    C_DAC_Enable(true);
     
-    LED1 = 1;
+    LED1 = 0;
     
-    C_MCP4131_SetR(2358);
+    C_MCP4131_SetR(4000);
+    C_DAC_Write(3000);
     
     
     while(1) {
         if (I2C_ReadyToRead) {
-            LED1 = 0;
+            I2C_ReadyToRead = false;
+            //LED1 = 0;
             if (I2C_SlaveReadResult >= I2C_OK) {
-                LED1 = 1;
+                //LED1 = 1;
             } else {
-                LED1 = 1;
+                //LED1 = 1;
                 D_I2C_Reset();
                 DelayUs(10);
-                LED1 = 0;
+                //LED1 = 0;
                 
             }
         }
+        D_ADC_Enable(true);
+        DelayMs(500);
     }
     return 0;
 }

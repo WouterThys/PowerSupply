@@ -44,6 +44,14 @@ struct I2C_Data {
 };
 typedef struct I2C_Data i2cData_t;
 
+struct I2C_AnswerData {
+    int16_t value0;
+    int16_t value1;
+    int16_t value2;
+    int16_t value3;
+};
+typedef struct I2C_AnswerData i2cAnswer_t;
+
 /**
  * 
  */
@@ -53,8 +61,9 @@ void D_I2C_InitMaster();
  * 
  * @param address
  * @param slaveData
+ * @param answerData
  */
-void D_I2C_InitSlave(uint16_t address, i2cData_t * slaveData);
+void D_I2C_InitSlave(uint16_t address, i2cData_t * slaveData, i2cAnswer_t * answerData);
 
 /**
  * 

@@ -42,9 +42,11 @@
 /*******************************************************************************
  *          LOCAL FUNCTION DEFINES
  ******************************************************************************/
-static void lcdDrawField(field_t field);
-static void lcdDrawSubMenu(subMenu_t subMenu);
-static void lcdDrawMenu(menu_t menu);
+static void lcdDrawField(field_t *field);
+static void lcdDrawSubMenu(subMenu_t *subMenu);
+static void lcdDrawMenu(menu_t *menu);
+
+static uint16_t countDigits(int16_t value);
 
 /*******************************************************************************
  *          MACRO FUNCTIONS
@@ -52,7 +54,7 @@ static void lcdDrawMenu(menu_t menu);
 #define clearScreen() D_LCD_ClearSreen()
 #define writeString(x,y,str) D_LCD_Goto(x,y); D_LCD_WriteString(str) 
 #define writeChar(x,y,c) D_LCD_Goto(x,y); D_LCD_WriteChar(c)
-#define writeDouble(x,y,d) D_LCD_Goto(x,y); D_LCD_WriteDouble(d, 2)
+#define writeDouble(x,y,d,p) D_LCD_Goto(x,y); D_LCD_WriteDouble(d, p)
 
 /*******************************************************************************
  *          VARIABLES
@@ -75,7 +77,6 @@ static subMenu_t varSm2 = M0_SM1;
     
 static menu_t varMn = M0;
 
-
 static bool drawing;
 
 const static uint16_t menuCnt = 1;
@@ -94,45 +95,89 @@ static int8_t selectedFieldId;
 /*******************************************************************************
  *          LOCAL FUNCTIONS
  ******************************************************************************/
-void lcdDrawField(field_t field) {
+void lcdDrawField(field_t *field) {
     bool clearDrawing = false;
     if (!drawing) {
         drawing = true;
         clearDrawing = true;
     }
-    // Name, value, units
-    writeString(field.line, 5, field.unit.symbol);
-    writeChar(field.line, 6, ':');
-    uint8_t pos = 0;
-    if (field.value >= 10) {
-        pos = 7;
+    // Name
+    writeString(field->line, 5, field->unit.symbol);
+    writeChar(field->line, 6, ':');
+    
+    // Value and units
+    double val = (double)field->value;
+    uint16_t precision = 0;
+    if (val < 1000) {
+        switch (field->unit.id) {
+            case ID_VOLTAGE:
+                field->unit.units = "mV";
+                break;
+            case ID_CURRENT:
+                field->unit.units = "mA";
+                break;
+            default:
+                break;
+        }
     } else {
-        pos = 8;
+        switch (field->unit.id) {
+            case ID_VOLTAGE:
+                field->unit.units = "V ";
+                val /= 1000;
+                if (val > 99) {
+                    precision = 0;
+                } else {
+                    precision = 2;
+                }
+                break;
+            case ID_CURRENT:
+                field->unit.units = "A ";
+                val /= 1000;
+                if (val > 99) {
+                    precision = 0;
+                } else {
+                    precision = 2;
+                }
+                break;
+            default:
+                break;
+        }
     }
-    writeDouble(field.line, pos, field.value);
-    writeString(field.line, 12, field.unit.units);
+    
+    // Calculate position on screen
+    uint16_t digitsToDisplay = countDigits(val);
+    uint16_t pos = 0;
+    if (precision > 0) {
+        digitsToDisplay += precision + 1; // Digits and ","
+    }
+    pos = (field->pos) - digitsToDisplay + 1;
+    
+    // First clear field
+    writeString(field->line, 7, "     ");
+    writeDouble(field->line, pos, val, precision);
+    writeString(field->line, 12, field->unit.units);
 
     if (clearDrawing) {
         drawing = false;
     }
 }
 
-void lcdDrawSubMenu(subMenu_t subMenu) {
+void lcdDrawSubMenu(subMenu_t *subMenu) {
     bool clearDrawing = false;
     if (!drawing) {
         drawing = true;
         clearDrawing = true;
     }
     // Name and arrow
-    writeString(1, 13, subMenu.name);
-    writeChar(subMenu.arrow->line, subMenu.arrow->pos, subMenu.arrow->arrow);
+    writeString(1, 13, subMenu->name);
+    writeChar(subMenu->arrow->line, subMenu->arrow->pos, subMenu->arrow->arrow);
 
     // Draw fields
-    lcdDrawField(*subMenu.field1);
-    lcdDrawField(*subMenu.field2);
+    lcdDrawField(subMenu->field1);
+    lcdDrawField(subMenu->field2);
 
     // Go to field1 as default 
-    D_LCD_Goto(subMenu.field1->line, subMenu.field1->pos);
+    D_LCD_Goto(subMenu->field1->line, subMenu->field1->pos);
     D_LCD_CursorStyle(true, false);
 
     if (clearDrawing) {
@@ -140,7 +185,7 @@ void lcdDrawSubMenu(subMenu_t subMenu) {
     }
 }
 
-void lcdDrawMenu(menu_t menu) {
+void lcdDrawMenu(menu_t *menu) {
     bool clearDrawing = false;
     if (!drawing) {
         drawing = true;
@@ -148,8 +193,8 @@ void lcdDrawMenu(menu_t menu) {
     }
 
     // Menu name and arrow
-    writeString(0, 0, menu.name);
-    writeChar(menu.arrow->line, menu.arrow->pos, menu.arrow->arrow);
+    writeString(0, 0, menu->name);
+    writeChar(menu->arrow->line, menu->arrow->pos, menu->arrow->arrow);
     writeChar(0, 3, '|');
     writeChar(1, 3, '|');
 
@@ -157,6 +202,20 @@ void lcdDrawMenu(menu_t menu) {
         drawing = false;
     }
 }
+
+uint16_t countDigits(int16_t value) {
+    uint16_t count = 1;
+    if (value < 0) {
+        value *= -1;
+        count++; // Count minus sign as a digit
+    }
+    while (value >= 10) {
+        count++;
+        value /= 10;
+    }
+    return count;
+}
+
 
 /*******************************************************************************
  *          DRIVER FUNCTIONS
@@ -195,14 +254,14 @@ void C_LCD_Init() {
 void C_LCD_DrawMenu(uint8_t id) {
     if (id < menuCnt) {
         selectedMenuId = id;
-        lcdDrawMenu(*menus[id]);
+        lcdDrawMenu(menus[id]);
     }
 }
 
 void C_LCD_DrawSubMenu(uint8_t id) {
     if (id < subMenuCnt) {
         selectedSubMenuId = id;
-        lcdDrawSubMenu(*subMenus[id]);
+        lcdDrawSubMenu(subMenus[id]);
     }
 }
 
@@ -238,17 +297,17 @@ void C_LCD_SetFieldValue(uint8_t id, int16_t value) {
             case ID_VOLTAGE:
                 // Convert to voltage
                 // ...
-                fields[id]->value = (double) value;
+                fields[id]->value = value;
                 break;
             case ID_CURRENT:
                 // Convert to current
                 // ...
-                fields[id]->value = (double) value;
+                fields[id]->value = value;
                 break;
             case ID_TEMPERATURE:
                 // Convert to temperature
                 // ...
-                fields[id]->value = (double) value;
+                fields[id]->value = value;
                 break;
             default:
                 break;
@@ -256,7 +315,7 @@ void C_LCD_SetFieldValue(uint8_t id, int16_t value) {
 
         subMenu_t sm = *subMenus[selectedSubMenuId];
         if (sm.field1->id == id || sm.field2->id == id) {
-            lcdDrawField(*fields[id]);
+            lcdDrawField(fields[id]);
             D_LCD_Goto(fields[id]->line, fields[id]->pos);
         }
 

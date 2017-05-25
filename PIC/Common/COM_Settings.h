@@ -11,12 +11,14 @@
 #define	COM_SETTINGS_H
 
 // Commands for variable controller
+#define COM_VAR_READ         0x01
+#define COM_VAR_WRITE        0x02
+
+// Commands for LCD controller
 #define COM_LCD_COM_NONE     0x00
 #define COM_LCD_COM_DRAW     0x01
 #define COM_LCD_COM_SELECT   0x02
 #define COM_LCD_COM_SET      0x03
-
-// Commands for LCD controller
 
 // Commands for ...
 

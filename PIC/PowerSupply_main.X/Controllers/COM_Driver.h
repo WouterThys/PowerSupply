@@ -59,5 +59,13 @@ int16_t C_COM_LcdSelect(uint8_t what, bool select, uint8_t id);
 int16_t C_COM_LcdSet(uint8_t id, int16_t value);
 
 
+/**
+ * 
+ * @param what Buffer number to read 
+ * @return I2C result code
+ */
+int16_t C_COM_VarRead(uint8_t what);
+
+
 #endif	/* XC_HEADER_TEMPLATE_H */
 
