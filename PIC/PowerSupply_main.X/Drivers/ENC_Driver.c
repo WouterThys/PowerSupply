@@ -26,7 +26,7 @@ static uint16_t encA = 0;       /* Rotary line A                              */
 static uint16_t encB = 0;       /* Rotary line B                              */
 static uint16_t encAcnt = 0;    /* Counts turns in A direction                */
 static uint16_t encBcnt = 0;    /* Counts turns in B direction                */
-static bool encPressed = false;
+static uint16_t encCcnt = 0;    /* */
 
 bool ENC_Change;
 
@@ -44,31 +44,28 @@ void encode() {
         if (ENC_Change == false) {
             ENC_Change = true;
         }
-        encPressed = true;
+        encCcnt++;
     } else {
-        if (encPressed == true) {
-            encPressed = false;
-        } else {
-        
-            encA <<= 1;
-            encA |= A;
 
-            encB <<= 1;
-            encB |= B;
+        encA <<= 1;
+        encA |= A;
 
-            encA &= 0x0003;
-            encB &= 0x0003;
+        encB <<= 1;
+        encB |= B;
 
-            // Compare with expected
-            if (((encA == 0x0003) && (encB == 0x0001)) || ((encA == 0x0000) && (encB == 0x0002))) {
-                ENC_Change = true;
-                encAcnt++;
-            }
-            if (((encA == 0x0001) && (encB == 0x0003)) || ((encA == 0x0002) && (encB == 0x0000))) {
-                ENC_Change = true;
-                encBcnt++;
-            }
+        encA &= 0x0003;
+        encB &= 0x0003;
+
+        // Compare with expected
+        if (((encA == 0x0003) && (encB == 0x0001)) || ((encA == 0x0000) && (encB == 0x0002))) {
+            ENC_Change = true;
+            encAcnt++;
         }
+        if (((encA == 0x0001) && (encB == 0x0003)) || ((encA == 0x0002) && (encB == 0x0000))) {
+            ENC_Change = true;
+            encBcnt++;
+        }
+
     }
 }
 
@@ -78,9 +75,6 @@ void encode() {
 
 void D_ENC_Init() {
     D_ENC_Enable(false);
-
-    /* T2CON register */
-    T2CONbits.TCKPS = 0b00;
 
     /* Interrupts */
     CNENBbits.CNIEB10 = 1;
@@ -105,6 +99,7 @@ void D_ENC_Enable(bool enable) {
         ENC_Dir_3 = 1; // Input
         ENC_Change = false;
         DelayMs(1);
+        encA = encB = 0;
         _CNIE = 1;
     } else {
         ENC_Dir_1 = 0; // Output
@@ -126,15 +121,16 @@ void D_ENC_GetState(enc_t *state) {
         state->turnCount = 0;
     }
 
-    if (encPressed) {
+    if (encCcnt > 0) {
         state->press = PRESS;
     } else {
         state->press = NO_PRESS;
     }
-    state->pressCount = 0;
+    state->pressCount = encCcnt;
 
     encAcnt = 0;
     encBcnt = 0;
+    encCcnt = 0;
     ENC_Change = false;
 }
 

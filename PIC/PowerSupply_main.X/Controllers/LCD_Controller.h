@@ -36,5 +36,12 @@ void C_LCD_Turn(cursor_t *cursor, enc_t encoderValues);
  */
 void C_LCD_Press(cursor_t *cursor);
 
+/**
+ * 
+ * @param fieldId
+ * @param value
+ */
+void C_LCD_SetValue(uint8_t fieldId, cursor_t *cursor, int16_t value);
+
 #endif	/* XC_HEADER_TEMPLATE_H */
 

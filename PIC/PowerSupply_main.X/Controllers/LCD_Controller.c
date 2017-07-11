@@ -70,6 +70,7 @@ static arrow_t arrows[4];
 static void setNext(cursor_t *cursor, enc_t encValue);
 static void setSelected(cursor_t *cursor);
 static void setValueFromTurn(cursor_t *cursor, enc_t encValue);
+static void setValueFromRead(uint8_t fieldId, cursor_t *cursor, int16_t value);
 static void setNewSubMenu(cursor_t *cursor, int8_t newSubMenuId);
 
 static void nextFromArrow(cursor_t *cursor, enc_t encValue);
@@ -174,6 +175,15 @@ void setValueFromTurn(cursor_t *cursor, enc_t encValue) {
     // Actions
     cursor->nextActions[cursor->nextActionCnt] = SET;
     cursor->nextActionCnt++;
+}
+
+static void setValueFromRead(uint8_t fieldId, cursor_t *cursor, int16_t value) {
+    field_t *field = &fields[fieldId];
+    if (field->id == fieldId) {
+        if (value >= field->min && value <= field->max) {
+            field->value = value;
+        }
+    }
 }
 
 void nextFromArrow(cursor_t *cursor, enc_t encValue) {
@@ -305,6 +315,12 @@ void C_LCD_Turn(cursor_t *cursor, enc_t encValues) {
 void C_LCD_Press(cursor_t *cursor) {
     setSelected(cursor);
 }
+
+void C_LCD_SetValue(uint8_t fieldId, cursor_t *cursor, int16_t value) {
+    setValueFromRead(fieldId, cursor, value);
+}
+
+
 
 
 /*******************************************************************************

@@ -44,6 +44,12 @@ else
 COMPARISON_BUILD=
 endif
 
+ifdef SUB_IMAGE_ADDRESS
+SUB_IMAGE_ADDRESS_COMMAND=--image-address $(SUB_IMAGE_ADDRESS)
+else
+SUB_IMAGE_ADDRESS_COMMAND=
+endif
+
 # Object Directory
 OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 
@@ -51,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=Controllers/DAC_Controller.c Controllers/MCP4131_Controller.c Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c ../Common/Drivers/I2C_Driver.c Drivers/SPI2_Driver.c configuration.c main.c Drivers/ADC_Driver.c
+SOURCEFILES_QUOTED_IF_SPACED=Controllers/DAC_Controller.c Controllers/MCP4131_Controller.c Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c ../Common/Drivers/I2C_Driver.c Drivers/SPI2_Driver.c Drivers/ADC_Driver.c configuration.c main.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Controllers/DAC_Controller.o ${OBJECTDIR}/Controllers/MCP4131_Controller.o ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o ${OBJECTDIR}/Drivers/SPI2_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/Drivers/ADC_Driver.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/Controllers/DAC_Controller.o.d ${OBJECTDIR}/Controllers/MCP4131_Controller.o.d ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o.d ${OBJECTDIR}/Drivers/SPI2_Driver.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/Drivers/ADC_Driver.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Controllers/DAC_Controller.o ${OBJECTDIR}/Controllers/MCP4131_Controller.o ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o ${OBJECTDIR}/Drivers/SPI2_Driver.o ${OBJECTDIR}/Drivers/ADC_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/Controllers/DAC_Controller.o.d ${OBJECTDIR}/Controllers/MCP4131_Controller.o.d ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o.d ${OBJECTDIR}/Drivers/SPI2_Driver.o.d ${OBJECTDIR}/Drivers/ADC_Driver.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/main.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/Controllers/DAC_Controller.o ${OBJECTDIR}/Controllers/MCP4131_Controller.o ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o ${OBJECTDIR}/Drivers/SPI2_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/Drivers/ADC_Driver.o
+OBJECTFILES=${OBJECTDIR}/Controllers/DAC_Controller.o ${OBJECTDIR}/Controllers/MCP4131_Controller.o ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o ${OBJECTDIR}/Drivers/SPI2_Driver.o ${OBJECTDIR}/Drivers/ADC_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o
 
 # Source Files
-SOURCEFILES=Controllers/DAC_Controller.c Controllers/MCP4131_Controller.c Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c ../Common/Drivers/I2C_Driver.c Drivers/SPI2_Driver.c configuration.c main.c Drivers/ADC_Driver.c
+SOURCEFILES=Controllers/DAC_Controller.c Controllers/MCP4131_Controller.c Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c ../Common/Drivers/I2C_Driver.c Drivers/SPI2_Driver.c Drivers/ADC_Driver.c configuration.c main.c
 
 
 CFLAGS=
@@ -130,6 +136,13 @@ ${OBJECTDIR}/Drivers/SPI2_Driver.o: Drivers/SPI2_Driver.c  nbproject/Makefile-${
 	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/SPI2_Driver.c  -o ${OBJECTDIR}/Drivers/SPI2_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/SPI2_Driver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/Drivers/SPI2_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/Drivers/ADC_Driver.o: Drivers/ADC_Driver.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Drivers" 
+	@${RM} ${OBJECTDIR}/Drivers/ADC_Driver.o.d 
+	@${RM} ${OBJECTDIR}/Drivers/ADC_Driver.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/ADC_Driver.c  -o ${OBJECTDIR}/Drivers/ADC_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/ADC_Driver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/Drivers/ADC_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 ${OBJECTDIR}/configuration.o: configuration.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/configuration.o.d 
@@ -143,13 +156,6 @@ ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/main.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  main.c  -o ${OBJECTDIR}/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/Drivers/ADC_Driver.o: Drivers/ADC_Driver.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Drivers" 
-	@${RM} ${OBJECTDIR}/Drivers/ADC_Driver.o.d 
-	@${RM} ${OBJECTDIR}/Drivers/ADC_Driver.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/ADC_Driver.c  -o ${OBJECTDIR}/Drivers/ADC_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/ADC_Driver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/Drivers/ADC_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 else
 ${OBJECTDIR}/Controllers/DAC_Controller.o: Controllers/DAC_Controller.c  nbproject/Makefile-${CND_CONF}.mk
@@ -194,6 +200,13 @@ ${OBJECTDIR}/Drivers/SPI2_Driver.o: Drivers/SPI2_Driver.c  nbproject/Makefile-${
 	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/SPI2_Driver.c  -o ${OBJECTDIR}/Drivers/SPI2_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/SPI2_Driver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/Drivers/SPI2_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/Drivers/ADC_Driver.o: Drivers/ADC_Driver.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Drivers" 
+	@${RM} ${OBJECTDIR}/Drivers/ADC_Driver.o.d 
+	@${RM} ${OBJECTDIR}/Drivers/ADC_Driver.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/ADC_Driver.c  -o ${OBJECTDIR}/Drivers/ADC_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/ADC_Driver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/Drivers/ADC_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 ${OBJECTDIR}/configuration.o: configuration.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/configuration.o.d 
@@ -207,13 +220,6 @@ ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/main.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  main.c  -o ${OBJECTDIR}/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/Drivers/ADC_Driver.o: Drivers/ADC_Driver.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Drivers" 
-	@${RM} ${OBJECTDIR}/Drivers/ADC_Driver.o.d 
-	@${RM} ${OBJECTDIR}/Drivers/ADC_Driver.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/ADC_Driver.c  -o ${OBJECTDIR}/Drivers/ADC_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/ADC_Driver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/Drivers/ADC_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
 

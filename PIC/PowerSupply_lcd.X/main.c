@@ -44,16 +44,33 @@
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
+typedef struct {
+    uint8_t command;
+    int16_t extra;
+} action_t;
+
+typedef struct {
+    action_t actions[8];
+    uint8_t actionCnt;
+} actionBuffer_t;
 
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
 static i2cData_t readData;
+static i2cAnswer_t answerData;
+
+static bool receivingLcdCommands;
+static bool executingLcdCommands;
+
+static actionBuffer_t actionBuffer;
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
  ******************************************************************************/
 static void initialize();
+static void fillLcdActionBuffer(i2cData_t * data);
+static void executeLcdAction(uint8_t command, int16_t extra);
 
 void initialize() {
     D_INT_EnableInterrupts(false);
@@ -67,12 +84,55 @@ void initialize() {
     D_INT_Init();
     D_INT_EnableInterrupts(true);
 
-    // LCD
-    C_LCD_Init();
-
-
     // I2C
-    D_I2C_InitSlave(I2C_LCD_ADDRESS, &readData);
+    D_I2C_InitSlave(I2C_LCD_ADDRESS, &readData, &answerData);
+}
+
+void fillLcdActionBuffer(i2cData_t * data) {
+    actionBuffer.actions[actionBuffer.actionCnt].command = data->command;
+    actionBuffer.actions[actionBuffer.actionCnt].extra = ((data->data1 << 8) & 0xFF00) | (data->data2);
+    
+    actionBuffer.actionCnt++;
+    
+    if (actionBuffer.actionCnt >= 8) {
+        // Errors........
+    }
+}
+
+void executeLcdAction(uint8_t command, int16_t extra) {
+    
+    uint8_t com = (command >> 6) & 0x03;
+
+    switch (com) {
+        case COM_LCD_COM_DRAW:
+        {
+            uint8_t menuId = ((command >> 3) & 0x07);
+            uint8_t subMenuId = command & 0x07;
+            C_LCD_DrawMenu(menuId);
+            C_LCD_DrawSubMenu(subMenuId);
+        }
+            break;
+
+        case COM_LCD_COM_SELECT:
+        {
+            uint8_t what = (command >> 5) & 0x01;
+            uint8_t select = (command >> 4) & 0x01;
+            uint8_t id = command & 0x0F;
+            C_LCD_SetSelected(what, id, select);
+        }
+            break;
+
+        case COM_LCD_COM_SET:
+        {
+//            if (I2C_SlaveReadResult == I2C_MWRITE) {
+                uint8_t id = command & 0x3F;
+                C_LCD_SetFieldValue(id, extra);
+//            }
+        }
+            break;
+        default:
+            break;
+    }
 }
 
 /*******************************************************************************
@@ -91,38 +151,47 @@ int main(void) {
 
     while (1) {
         if (I2C_ReadyToRead) {
-            
+
             I2C_ReadyToRead = false;
             if (I2C_SlaveReadResult >= I2C_OK) {
                 
-                uint8_t command = readData.command;
-                uint8_t com = (command >> 6) & 0x03;
+                uint8_t command = (readData.command >> 5) & 0x07;
+                uint8_t commandData = (readData.command) & 0x1F;
                 
-                switch (com) {
-                    case COM_LCD_COM_DRAW: {
-                        uint8_t menuId = ((command >> 3) & 0x07);
-                        uint8_t subMenuId = command & 0x07;
-                        C_LCD_DrawMenu(menuId);
-                        C_LCD_DrawSubMenu(subMenuId);
-                    } break;
-                        
-                    case COM_LCD_COM_SELECT: {
-                        uint8_t what = (command >> 5) & 0x01;
-                        uint8_t select = (command >> 4) & 0x01;
-                        uint8_t id = command & 0x0F;
-                        C_LCD_SetSelected(what, id, select);
-                    } break;
-                        
-                    case COM_LCD_COM_SET: {
-                        if (I2C_SlaveReadResult == I2C_MWRITE) {
-                            uint8_t id = command & 0x3F;
-                            int16_t val = (readData.data2 << 8) | (readData.data1);
-                            C_LCD_SetFieldValue(id, val);
+                if (receivingLcdCommands) {
+                    if (readData.command != 0b10101011) {
+                        fillLcdActionBuffer(&readData);
+                    } 
+                }
+
+                switch (command) {
+                    case COM_INIT:
+                        C_LCD_Init();
+                        receivingLcdCommands = false;
+                        executingLcdCommands = false;
+                        actionBuffer.actionCnt = 0;
+                        readData.status |= STA_INITIALIZED;
+                        break;
+
+                    case COM_ENABLE:
+                        // Set enabled
+                        readData.status |= STA_ENABLED;
+                        break;
+
+                    case COM_LCD:
+                        if (commandData == COM_LCD_START) {
+                            receivingLcdCommands = true;
                         }
-                    } break;
+                        if (commandData == COM_LCD_STOP) {
+                            receivingLcdCommands = false;
+                            executingLcdCommands = true;
+                        }
+                        break;
+
                     default:
                         break;
                 }
+
 
             } else {
                 D_LCD_ClearSreen();
@@ -133,8 +202,75 @@ int main(void) {
             }
 
         }
+        
+        // Execute commands
+        if (executingLcdCommands) {
+                     
+            if (actionBuffer.actionCnt == 0) {
+                executingLcdCommands = false;
+            } else {
+                // Command
+                uint8_t command = actionBuffer.actions[0].command;
+                int16_t extra = actionBuffer.actions[0].extra;
+                executeLcdAction(command, extra);
+
+                // Shift
+                uint16_t i;
+                for (i = 0; i < 7; i++) {
+                    actionBuffer.actions[i] = actionBuffer.actions[i + 1];
+                }
+                actionBuffer.actionCnt--;
+            }
+        }
     }
     return 0;
 }
+
+//while (1) {
+//        if (I2C_ReadyToRead) {
+//            
+//            I2C_ReadyToRead = false;
+//            if (I2C_SlaveReadResult >= I2C_OK) {
+//                
+//                uint8_t command = readData.command;
+//                uint8_t com = (command >> 6) & 0x03;
+//                
+//                switch (com) {
+//                    case COM_LCD_COM_DRAW: {
+//                        uint8_t menuId = ((command >> 3) & 0x07);
+//                        uint8_t subMenuId = command & 0x07;
+//                        C_LCD_DrawMenu(menuId);
+//                        C_LCD_DrawSubMenu(subMenuId);
+//                    } break;
+//                        
+//                    case COM_LCD_COM_SELECT: {
+//                        uint8_t what = (command >> 5) & 0x01;
+//                        uint8_t select = (command >> 4) & 0x01;
+//                        uint8_t id = command & 0x0F;
+//                        C_LCD_SetSelected(what, id, select);
+//                    } break;
+//                        
+//                    case COM_LCD_COM_SET: {
+//                        if (I2C_SlaveReadResult == I2C_MWRITE) {
+//                            uint8_t id = command & 0x3F;
+//                            int16_t val = (readData.data2 << 8) | (readData.data1);
+//                            C_LCD_SetFieldValue(id, val);
+//                        }
+//                    } break;
+//                    default:
+//                        break;
+//                }
+//
+//            } else {
+//                D_LCD_ClearSreen();
+//                D_LCD_WriteString("I2C Error ");
+//                D_LCD_Goto(1, 0);
+//                D_LCD_WriteInt(I2C1STAT);
+//                D_I2C_Reset();
+//            }
+//
+//        }
+//    }
+//    return 0;
 
 

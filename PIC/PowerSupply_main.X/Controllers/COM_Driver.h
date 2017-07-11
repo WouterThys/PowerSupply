@@ -35,6 +35,30 @@ void C_COM_I2CReset();
 
 /**
  * 
+ * @return I2C result code
+ */
+int16_t C_COM_InitAll();
+
+/**
+ * 
+ * @return 
+ */
+int16_t C_COM_EnableAll();
+
+/**
+ * 
+ * @return 
+ */
+int16_t C_COM_LcdStartActions();
+
+/**
+ * 
+ * @return 
+ */
+int16_t C_COM_LcdStopActions();
+
+/**
+ * 
  * @param menuId
  * @param subMenuId
  * @return I2C result code
@@ -61,10 +85,17 @@ int16_t C_COM_LcdSet(uint8_t id, int16_t value);
 
 /**
  * 
- * @param what Buffer number to read 
  * @return I2C result code
  */
-int16_t C_COM_VarRead(uint8_t what);
+int16_t C_COM_VarRead();
+
+/**
+ * 
+ * @param bufferNr
+ * @param value
+ * @return 
+ */
+int16_t C_COM_VarAsk(uint16_t bufferNr, int16_t * value);
 
 
 #endif	/* XC_HEADER_TEMPLATE_H */

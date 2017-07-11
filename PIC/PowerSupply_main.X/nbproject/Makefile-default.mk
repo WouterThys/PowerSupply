@@ -44,6 +44,12 @@ else
 COMPARISON_BUILD=
 endif
 
+ifdef SUB_IMAGE_ADDRESS
+SUB_IMAGE_ADDRESS_COMMAND=--image-address $(SUB_IMAGE_ADDRESS)
+else
+SUB_IMAGE_ADDRESS_COMMAND=
+endif
+
 # Object Directory
 OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 
@@ -51,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=Controllers/COM_Driver.c Controllers/LCD_Controller.c Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c ../Common/Drivers/I2C_Driver.c Drivers/ENC_Driver.c main.c configuration.c Drivers/CLK_Driver.c
+SOURCEFILES_QUOTED_IF_SPACED=Controllers/COM_Driver.c Controllers/LCD_Controller.c Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c ../Common/Drivers/I2C_Driver.c Drivers/ENC_Driver.c Drivers/CLK_Driver.c main.c configuration.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Controllers/COM_Driver.o ${OBJECTDIR}/Controllers/LCD_Controller.o ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/main.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/Drivers/CLK_Driver.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/Controllers/COM_Driver.o.d ${OBJECTDIR}/Controllers/LCD_Controller.o.d ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o.d ${OBJECTDIR}/Drivers/ENC_Driver.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/Drivers/CLK_Driver.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Controllers/COM_Driver.o ${OBJECTDIR}/Controllers/LCD_Controller.o ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/CLK_Driver.o ${OBJECTDIR}/main.o ${OBJECTDIR}/configuration.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/Controllers/COM_Driver.o.d ${OBJECTDIR}/Controllers/LCD_Controller.o.d ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o.d ${OBJECTDIR}/Drivers/ENC_Driver.o.d ${OBJECTDIR}/Drivers/CLK_Driver.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/configuration.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/Controllers/COM_Driver.o ${OBJECTDIR}/Controllers/LCD_Controller.o ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/main.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/Drivers/CLK_Driver.o
+OBJECTFILES=${OBJECTDIR}/Controllers/COM_Driver.o ${OBJECTDIR}/Controllers/LCD_Controller.o ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/_ext/1126785366/I2C_Driver.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/CLK_Driver.o ${OBJECTDIR}/main.o ${OBJECTDIR}/configuration.o
 
 # Source Files
-SOURCEFILES=Controllers/COM_Driver.c Controllers/LCD_Controller.c Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c ../Common/Drivers/I2C_Driver.c Drivers/ENC_Driver.c main.c configuration.c Drivers/CLK_Driver.c
+SOURCEFILES=Controllers/COM_Driver.c Controllers/LCD_Controller.c Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c ../Common/Drivers/I2C_Driver.c Drivers/ENC_Driver.c Drivers/CLK_Driver.c main.c configuration.c
 
 
 CFLAGS=
@@ -130,6 +136,13 @@ ${OBJECTDIR}/Drivers/ENC_Driver.o: Drivers/ENC_Driver.c  nbproject/Makefile-${CN
 	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/ENC_Driver.c  -o ${OBJECTDIR}/Drivers/ENC_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/ENC_Driver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/Drivers/ENC_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/Drivers/CLK_Driver.o: Drivers/CLK_Driver.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Drivers" 
+	@${RM} ${OBJECTDIR}/Drivers/CLK_Driver.o.d 
+	@${RM} ${OBJECTDIR}/Drivers/CLK_Driver.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/CLK_Driver.c  -o ${OBJECTDIR}/Drivers/CLK_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/CLK_Driver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/Drivers/CLK_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main.o.d 
@@ -143,13 +156,6 @@ ${OBJECTDIR}/configuration.o: configuration.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/configuration.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  configuration.c  -o ${OBJECTDIR}/configuration.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/configuration.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/configuration.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/Drivers/CLK_Driver.o: Drivers/CLK_Driver.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Drivers" 
-	@${RM} ${OBJECTDIR}/Drivers/CLK_Driver.o.d 
-	@${RM} ${OBJECTDIR}/Drivers/CLK_Driver.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/CLK_Driver.c  -o ${OBJECTDIR}/Drivers/CLK_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/CLK_Driver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/Drivers/CLK_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 else
 ${OBJECTDIR}/Controllers/COM_Driver.o: Controllers/COM_Driver.c  nbproject/Makefile-${CND_CONF}.mk
@@ -194,6 +200,13 @@ ${OBJECTDIR}/Drivers/ENC_Driver.o: Drivers/ENC_Driver.c  nbproject/Makefile-${CN
 	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/ENC_Driver.c  -o ${OBJECTDIR}/Drivers/ENC_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/ENC_Driver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/Drivers/ENC_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/Drivers/CLK_Driver.o: Drivers/CLK_Driver.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Drivers" 
+	@${RM} ${OBJECTDIR}/Drivers/CLK_Driver.o.d 
+	@${RM} ${OBJECTDIR}/Drivers/CLK_Driver.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/CLK_Driver.c  -o ${OBJECTDIR}/Drivers/CLK_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/CLK_Driver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/Drivers/CLK_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main.o.d 
@@ -207,13 +220,6 @@ ${OBJECTDIR}/configuration.o: configuration.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/configuration.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  configuration.c  -o ${OBJECTDIR}/configuration.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/configuration.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/configuration.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/Drivers/CLK_Driver.o: Drivers/CLK_Driver.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Drivers" 
-	@${RM} ${OBJECTDIR}/Drivers/CLK_Driver.o.d 
-	@${RM} ${OBJECTDIR}/Drivers/CLK_Driver.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/CLK_Driver.c  -o ${OBJECTDIR}/Drivers/CLK_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/CLK_Driver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/Drivers/CLK_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
 

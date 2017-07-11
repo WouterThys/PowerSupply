@@ -12,16 +12,16 @@
 
 #include <xc.h> // include processor files - each processor file is guarded.  
 
-
-#define I2C_MASTER_MODE     1
-#define I2C_SLAVE_MODE      0
-
 #define I2C_MWRITE          3
 #define I2C_MREAD           2
 #define I2C_OK              1
 #define I2C_NOK             -1     
 #define I2C_OVERFLOW        -2
 #define I2C_COLLISION       -3
+#define I2C_NO_ADR_ACK      -4
+#define I2C_NO_DATA_ACK     -5
+#define I2C_UNEXPECTED_DATA -6
+#define I2C_UNEXPECTED_ADR  -7
 
 #define I2C_ADDRESS_MASK    0xFE    /* Mask for fist 7 bits in address byte   */
 #define I2C_RW_MASK         0x01    /* Mask for write or read indicator       */

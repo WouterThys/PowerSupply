@@ -89,25 +89,23 @@ static bool check(uint16_t mask) {
 }
 
 void setI2cData(i2cData_t * data) {
-    if (((data->command >> 6) & 0x03) == COM_VAR_READ) {
-        switch ((data->command) & 0x3F) {
-            case 0:
-                data->data1 = (answerData->value0 >> 8) & 0x00FF;
-                data->data2 = (answerData->value0 >> 0) & 0x00FF;
-                break;
-            case 1:
-                data->data1 = (answerData->value1 >> 8) & 0x00FF;
-                data->data2 = (answerData->value1 >> 0) & 0x00FF;
-                break;
-            case 2:
-                data->data1 = (answerData->value2 >> 8) & 0x00FF;
-                data->data2 = (answerData->value2 >> 0) & 0x00FF;
-                break;
-            case 3:
-                data->data1 = (answerData->value3 >> 8) & 0x00FF;
-                data->data2 = (answerData->value3 >> 0) & 0x00FF;
-                break;
-        }
+    switch ((data->command) & 0x1F) {
+        case 0:
+            data->data1 = (answerData->value0 >> 8) & 0x00FF;
+            data->data2 = (answerData->value0 >> 0) & 0x00FF;
+            break;
+        case 1:
+            data->data1 = (answerData->value1 >> 8) & 0x00FF;
+            data->data2 = (answerData->value1 >> 0) & 0x00FF;
+            break;
+        case 2:
+            data->data1 = (answerData->value2 >> 8) & 0x00FF;
+            data->data2 = (answerData->value2 >> 0) & 0x00FF;
+            break;
+        case 3:
+            data->data1 = (answerData->value3 >> 8) & 0x00FF;
+            data->data2 = (answerData->value3 >> 0) & 0x00FF;
+            break;
     }
 }
 
@@ -122,12 +120,16 @@ void i2cRead() {
                 slaveReadData->address = i2cDataRead(); // Read to clean buffer
                 slaveState = I2C_STATE_COMMAND;
             } else {
-                I2C_SlaveReadResult = I2C_NOK;
+                I2C_SlaveReadResult = I2C_UNEXPECTED_DATA;
                 slaveState = I2C_STATE_STOP;
             }
-
-            if (check(CHECK_BCL) || (check(CHECK_I2COV))) {
-                I2C_SlaveReadResult = I2C_NOK;
+            // Error checks
+            if (check(CHECK_BCL)) {
+                I2C_SlaveReadResult = I2C_COLLISION;
+                slaveState = I2C_STATE_STOP;
+            }
+            if (check(CHECK_I2COV)) {
+                I2C_SlaveReadResult = I2C_OVERFLOW;
                 slaveState = I2C_STATE_STOP;
             }
             break;
@@ -135,15 +137,22 @@ void i2cRead() {
         case I2C_STATE_COMMAND:
             if (check(CHECK_DA)) {
                 slaveReadData->command = i2cDataRead();
-                setI2cData(slaveReadData);
+                if ((((slaveReadData->command) >> 5) & 0x07) == COM_ASK) {
+                    setI2cData(slaveReadData);
+                }
                 slaveState = I2C_STATE_FIRST_DATA;
             } else {
-                I2C_SlaveReadResult = I2C_NOK;
+                I2C_SlaveReadResult = I2C_UNEXPECTED_ADR;
                 slaveState = I2C_STATE_STOP;
             }
 
-            if (check(CHECK_BCL) || (check(CHECK_I2COV))) {
-                I2C_SlaveReadResult = I2C_NOK;
+            // Error checks
+            if (check(CHECK_BCL)) {
+                I2C_SlaveReadResult = I2C_COLLISION;
+                slaveState = I2C_STATE_STOP;
+            }
+            if (check(CHECK_I2COV)) {
+                I2C_SlaveReadResult = I2C_OVERFLOW;
                 slaveState = I2C_STATE_STOP;
             }
 
@@ -152,7 +161,7 @@ void i2cRead() {
         case I2C_STATE_FIRST_DATA:
             if (!check(CHECK_DA)) { // Address, master is asking to send data
                 slaveReadData->address = i2cDataRead(); // Read again to prevent buffer overflow
-
+                slaveReadData->data1 |= ((slaveReadData->status << 4) & 0xF0);
                 i2cDataWrite(slaveReadData->data1);
                 while (!check(CHECK_TBF)); // Wait until buffer is full
                 I2C1CONbits.SCLREL = 1; // Release clock hold
@@ -165,8 +174,13 @@ void i2cRead() {
             }
             slaveState = I2C_STATE_SECOND_DATA;
 
-            if (check(CHECK_BCL) || (check(CHECK_I2COV))) {
-                I2C_SlaveReadResult = I2C_NOK;
+            // Error checks
+            if (check(CHECK_BCL)) {
+                I2C_SlaveReadResult = I2C_COLLISION;
+                slaveState = I2C_STATE_STOP;
+            }
+            if (check(CHECK_I2COV)) {
+                I2C_SlaveReadResult = I2C_OVERFLOW;
                 slaveState = I2C_STATE_STOP;
             }
             break;
@@ -182,8 +196,13 @@ void i2cRead() {
                 slaveReadData->data2 = i2cDataRead(); // Read data
                 slaveState = I2C_STATE_STOP;
             }
-            if (check(CHECK_BCL) || (check(CHECK_I2COV))) {
-                I2C_SlaveReadResult = I2C_NOK;
+            // Error checks
+            if (check(CHECK_BCL)) {
+                I2C_SlaveReadResult = I2C_COLLISION;
+                slaveState = I2C_STATE_STOP;
+            }
+            if (check(CHECK_I2COV)) {
+                I2C_SlaveReadResult = I2C_OVERFLOW;
                 slaveState = I2C_STATE_STOP;
             }
 
@@ -193,8 +212,13 @@ void i2cRead() {
 
             slaveState = I2C_STATE_STOP;
 
-            if (check(CHECK_BCL) || (check(CHECK_I2COV))) {
-                I2C_SlaveReadResult = I2C_NOK;
+            // Error checks
+            if (check(CHECK_BCL)) {
+                I2C_SlaveReadResult = I2C_COLLISION;
+                slaveState = I2C_STATE_STOP;
+            }
+            if (check(CHECK_I2COV)) {
+                I2C_SlaveReadResult = I2C_OVERFLOW;
                 slaveState = I2C_STATE_STOP;
             }
 
@@ -205,13 +229,13 @@ void i2cRead() {
             slaveReady = true;
             if (check(CHECK_RBF) || check(CHECK_I2COV)) {
                 slaveReadData->data1 = i2cDataRead();
-               
+
                 I2C1STATbits.I2COV = 0;
             }
             I2C_ReadyToRead = true;
             break;
     }
-    
+
 }
 
 /*******************************************************************************
@@ -364,7 +388,7 @@ int16_t D_I2C_MasterWrite(i2cData_t *data) {
                     } else {
                         I2C1CONbits.PEN = 1; // Initiate stop event
                         masterState = I2C_STATE_STOP;
-                        result = I2C_NOK; // ACK not received, something went wrong
+                        result = I2C_NO_ADR_ACK; // ACK not received, something went wrong
                     }
                 }
                 break;
@@ -383,7 +407,7 @@ int16_t D_I2C_MasterWrite(i2cData_t *data) {
                     } else {
                         I2C1CONbits.PEN = 1; // Initiate stop event
                         masterState = I2C_STATE_STOP;
-                        result = I2C_NOK; // ACK not received, something went wrong
+                        result = I2C_NO_DATA_ACK; // ACK not received, something went wrong
                     }
                 }
                 break;
@@ -402,7 +426,7 @@ int16_t D_I2C_MasterWrite(i2cData_t *data) {
                     } else {
                         I2C1CONbits.PEN = 1; // Initiate stop event
                         masterState = I2C_STATE_STOP;
-                        result = I2C_NOK; // ACK not received, something went wrong
+                        result = I2C_NO_DATA_ACK; // ACK not received, something went wrong
                     }
                 }
                 break;
@@ -422,7 +446,7 @@ int16_t D_I2C_MasterWrite(i2cData_t *data) {
                     } else {
                         I2C1CONbits.PEN = 1; // Initiate stop event
                         masterState = I2C_STATE_STOP;
-                        result = I2C_NOK; // ACK not received, something went wrong
+                        result = I2C_NO_DATA_ACK; // ACK not received, something went wrong
                     }
                 }
                 break;
@@ -484,7 +508,7 @@ int16_t D_I2C_MasterRead(i2cData_t *data) {
                     } else {
                         I2C1CONbits.PEN = 1; // Initiate stop event
                         masterState = I2C_STATE_STOP;
-                        result = I2C_NOK; // ACK not received, something went wrong
+                        result = I2C_NO_ADR_ACK; // ACK not received, something went wrong
                     }
                 }
                 break;
@@ -498,7 +522,7 @@ int16_t D_I2C_MasterRead(i2cData_t *data) {
                     } else {
                         I2C1CONbits.PEN = 1; // Initiate stop event
                         masterState = I2C_STATE_STOP;
-                        result = I2C_NOK; // ACK not received, something went wrong
+                        result = I2C_NO_DATA_ACK; // ACK not received, something went wrong
                     }
                 }
                 break;
@@ -517,7 +541,7 @@ int16_t D_I2C_MasterRead(i2cData_t *data) {
                     } else {
                         I2C1CONbits.PEN = 1; // Initiate stop event
                         masterState = I2C_STATE_STOP;
-                        result = I2C_NOK; // ACK not received, something went wrong
+                        result = I2C_NO_DATA_ACK; // ACK not received, something went wrong
                     }
                 }
                 break;
@@ -622,14 +646,14 @@ void __attribute__((interrupt, no_auto_psv)) _SI2C1Interrupt(void) {
     if (_SI2C1IF) {
         slaveInterrupt = true;
         _SI2C1IF = 0;
-        
-//        if (!I2C_ReadyToRead) {
-            i2cRead();
-            if (slaveState == I2C_STATE_STOP) {
-                i2cRead(); // Execute one more time
-            }
-//        }
-        
+
+        //        if (!I2C_ReadyToRead) {
+        i2cRead();
+        if (slaveState == I2C_STATE_STOP) {
+            i2cRead(); // Execute one more time
+        }
+        //        }
+
     }
 }
 

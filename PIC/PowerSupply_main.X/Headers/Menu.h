@@ -12,7 +12,7 @@
 
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include "../../Common/MENU_Settings.h"
-
+#include <setjmp.h>
 /**
  * Definitions
  */
