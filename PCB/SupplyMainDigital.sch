@@ -925,11 +925,11 @@ Wire Wire Line
 	6050 2550 6700 2550
 Wire Wire Line
 	6050 2650 6700 2650
-Text Label 6300 2650 0    60   ~ 0
-VSENSE
 Text Label 6300 2050 0    60   ~ 0
-TEMP
+VSENSE
 Text Label 6300 2550 0    60   ~ 0
+TEMP
+Text Label 6300 2650 0    60   ~ 0
 IMON
 Wire Wire Line
 	9000 1200 8800 1200
