@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:SupplyMainDigital-rescue
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -28,17 +29,6 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:dspic33epxxxgp502
-LIBS:mcp1501
-LIBS:max4080
-LIBS:mcp4131
-LIBS:tlc272
-LIBS:tlv5616c
-LIBS:lt3081
-LIBS:sw_push
-LIBS:lt3080
-LIBS:lm334z
-LIBS:heatsink
 LIBS:SupplyMainDigital-cache
 EELAYER 25 0
 EELAYER END

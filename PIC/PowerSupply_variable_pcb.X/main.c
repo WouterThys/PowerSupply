@@ -95,9 +95,17 @@ int main(void) {
 
     initialize();
     
-//    C_DAC_Init(); // DAC and ADC
-//    C_DAC_Enable(true);
-//    C_DAC_Write(2000);
+    
+    C_DAC_Init(); // DAC and ADC
+    C_DAC_Enable(true);
+    
+    C_MCP4131_Init();
+    C_MCP4131_Enable(true);
+    //C_MCP4131_SetR(2000);
+    
+    //C_DAC_Write(200);
+    
+    LED1 = 1;
     
     while(1) {
         

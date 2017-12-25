@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:SupplyMainDigital-rescue
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -28,17 +29,6 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:dspic33epxxxgp502
-LIBS:mcp1501
-LIBS:max4080
-LIBS:mcp4131
-LIBS:tlc272
-LIBS:tlv5616c
-LIBS:lt3081
-LIBS:sw_push
-LIBS:lt3080
-LIBS:lm334z
-LIBS:heatsink
 LIBS:SupplyMainDigital-cache
 EELAYER 25 0
 EELAYER END
@@ -88,7 +78,7 @@ F 3 "" H 7950 5800 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L TLC272 U1
+L TLC272-RESCUE-SupplyMainDigital U1
 U 2 1 59329EA0
 P 2450 7100
 F 0 "U1" H 2750 7000 60  0000 C CNN
@@ -99,7 +89,7 @@ F 3 "" H 2450 7100 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L TLC272 U1
+L TLC272-RESCUE-SupplyMainDigital U1
 U 1 1 59329F5F
 P 1000 7000
 F 0 "U1" H 1300 6900 60  0000 C CNN
@@ -925,11 +915,11 @@ Wire Wire Line
 	6050 2550 6700 2550
 Wire Wire Line
 	6050 2650 6700 2650
-Text Label 6300 2650 0    60   ~ 0
-VSENSE
 Text Label 6300 2050 0    60   ~ 0
-TEMP
+VSENSE
 Text Label 6300 2550 0    60   ~ 0
+TEMP
+Text Label 6300 2650 0    60   ~ 0
 IMON
 Wire Wire Line
 	9000 1200 8800 1200
@@ -1875,7 +1865,7 @@ L R R34
 U 1 1 5935A92C
 P 7750 5100
 F 0 "R34" V 7650 5100 50  0000 C CNN
-F 1 "R" V 7750 5100 50  0000 C CNN
+F 1 "2.2k" V 7750 5100 50  0000 C CNN
 F 2 "Resistors_SMD:R_0603_HandSoldering" V 7680 5100 50  0001 C CNN
 F 3 "" H 7750 5100 50  0000 C CNN
 	1    7750 5100

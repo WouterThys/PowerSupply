@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdint.h>        /* Includes uint16_t definition                    */
 #include <stdbool.h>
-#include <p33EP32MC202.h>       /* Includes true/false definition                  */
 
 #include "../COM_Settings.h"
 #include"../I2C_Settings.h"

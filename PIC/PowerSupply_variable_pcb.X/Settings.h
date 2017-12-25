@@ -78,23 +78,24 @@ extern "C" {
  * SPI 2
  */    
     
-#define SPI2_SCK_Pin    PORTBbits.RB10      /* SCK Pin on RP42-RB10           */
-#define SPI2_SCK_Dir    TRISBbits.TRISB10
+#define SPI2_SCK_Pin    PORTBbits.RB11      /* SCK Pin on RP43-RB11           */
+#define SPI2_SCK_Dir    TRISBbits.TRISB11
     
-#define SPI2_SDO_Pin    PORTBbits.RB11      /* SDO Pin on RP43-RB11           */
-#define SPI2_SDO_Dir    TRISBbits.TRISB11    
+#define SPI2_SDO_Pin    PORTBbits.RB10      /* SDO Pin on RP42-RB10           */
+#define SPI2_SDO_Dir    TRISBbits.TRISB10    
     
 #define SPI2_SDI_Pin    PORTBbits.RB12      /* SDI Pin on RPI44-RB12          */
 #define SPI2_SDI_Dir    TRISBbits.TRISB12    
-    
-#define SPI2_FS_Dir     TRISAbits.TRISA3   /* FS pin on RA3                   */
-#define SPI2_FS_Pin     PORTAbits.RA3          
+  
+#define SPI2_FS_Pin     PORTBbits.RB5       /* FS pin on RB5                  */
+#define SPI2_FS_Dir     TRISBbits.TRISB5   
+        
 
-#define CS_MCP_Pin      PORTBbits.RB13      /* CS MCDP Pin on I/O-RB13        */
-#define CS_MCP_Dir      TRISBbits.TRISB13      
+#define CS_MCP_Pin      PORTBbits.RB4       /* CS MCP Pin on I/O-RB4          */
+#define CS_MCP_Dir      TRISBbits.TRISB4      
     
-#define CS_DAC_Pin      PORTBbits.RB4       /* CS DAC Pin on I/O-RB4          */
-#define CS_DAC_Dir      TRISBbits.TRISB4    
+#define CS_DAC_Pin      PORTAbits.RA4       /* CS DAC Pin on I/O-RA4          */
+#define CS_DAC_Dir      TRISAbits.TRISA4    
     
 #define SPI2_SDO_Map    0b001000
 #define SPI2_SCK_Map    0b001001  
