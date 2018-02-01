@@ -1,4 +1,4 @@
-update=Mon 25 Dec 2017 10:51:20 AM CET
+update=Wed 31 Jan 2018 09:04:06 PM CET
 version=1
 last_client=kicad
 [pcbnew]
@@ -25,9 +25,19 @@ version=1
 NetIExt=net
 [general]
 version=1
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=Pcbnew
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
 [eeschema]
 version=1
-LibDir=/home/wouter/kicad_sources/library-repos
+LibDir=../../../aLibs/KiCad
 [eeschema/libraries]
 LibName1=SupplyMainDigital-rescue
 LibName2=power
@@ -70,13 +80,4 @@ LibName38=C:/Users/Gebruiker/Dropbox/elentrik/projects/pcbs/libs/sw_push
 LibName39=C:/Users/Gebruiker/Dropbox/elentrik/projects/pcbs/libs/lt3080
 LibName40=C:/Users/Gebruiker/Dropbox/elentrik/projects/pcbs/libs/lm334z
 LibName41=C:/Users/Gebruiker/Dropbox/elentrik/projects/pcbs/libs/heatsink
-[schematic_editor]
-version=1
-PageLayoutDescrFile=
-PlotDirectoryName=
-SubpartIdSeparator=0
-SubpartFirstId=65
-NetFmtName=Pcbnew
-SpiceForceRefPrefix=0
-SpiceUseNetNumbers=0
-LabSize=60
+LibName42=/home/wouter/Documents/Geeken/aLibs/KiCad/MyLib

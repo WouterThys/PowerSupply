@@ -1,10 +1,3 @@
-/* 
- * File:   
- * Author: 
- * Comments:
- * Revision history: 
- */
-
 // This is a guard condition so that contents of this file are not included
 // more than once.  
 #ifndef SETTINGS_H
@@ -26,6 +19,7 @@ extern "C" {
 #define SPI2_IP     2
 #define T3_IP       4    
 #define ADC1_IP     3
+#define U1RX_IP     1
 
 
 
@@ -73,6 +67,18 @@ extern "C" {
  */
     
 #define DAC_MODE        (FAST_MODE | PWR_ON)    /* DAC slow mode and power on */    
+    
+/**
+ * UART
+ */      
+#define UART1_BAUD      9600
+#define UART1_ID        2   
+
+#define UART1_RX_Dir    TRISBbits.TRISB6    /* RX Pin on RP38-RB6             */
+#define UART1_TX_Dir    TRISBbits.TRISB7    /* TX Pin on RP39-RB7             */
+
+#define UART1_RX_Map    0b0100110           /* I/O RP38                       */
+#define UART1_TX_Map    0b000001
     
 /**
  * SPI 2

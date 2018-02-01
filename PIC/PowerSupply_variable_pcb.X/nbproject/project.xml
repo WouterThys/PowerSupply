@@ -3,7 +3,7 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>PowerSupply_variable</name>
+            <name>PowerSupply_variable_pcb</name>
             <creation-uuid>6cc5b649-3b43-4d5f-942a-9edecb173851</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>

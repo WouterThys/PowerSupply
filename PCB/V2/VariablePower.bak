@@ -1,0 +1,374 @@
+EESchema Schematic File Version 2
+LIBS:SupplyMainDigital-rescue
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:SupplyMainDigital-cache
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 2 2
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Text HLabel 1650 2250 0    60   Input ~ 0
+Pin
+Text HLabel 3850 2250 2    60   Output ~ 0
+D12V
+Text HLabel 5200 2250 2    60   Output ~ 0
+D5V
+Text HLabel 7200 2250 2    60   Output ~ 0
+D3.3V
+$Comp
+L CP1 C15
+U 1 1 5932BA74
+P 2250 2550
+F 0 "C15" H 2275 2650 50  0000 L CNN
+F 1 "10µ" H 2275 2450 50  0000 L CNN
+F 2 "Capacitors_Tantalum_SMD:CP_Tantalum_Case-A_EIA-3216-18_Hand" H 2250 2550 50  0001 C CNN
+F 3 "" H 2250 2550 50  0000 C CNN
+	1    2250 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Fuse F1
+U 1 1 5932BAA7
+P 1950 2250
+F 0 "F1" V 2030 2250 50  0000 C CNN
+F 1 "Fuse" V 1875 2250 50  0000 C CNN
+F 2 "Fuse_Holders_and_Fuses:Fuseholder5x20_horiz_SemiClosed_Casing10x25mm" V 1880 2250 50  0001 C CNN
+F 3 "" H 1950 2250 50  0000 C CNN
+	1    1950 2250
+	0    1    1    0   
+$EndComp
+$Comp
+L C C16
+U 1 1 5932BB74
+P 2700 2550
+F 0 "C16" H 2725 2650 50  0000 L CNN
+F 1 "100n" H 2725 2450 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0603_HandSoldering" H 2738 2400 50  0001 C CNN
+F 3 "" H 2700 2550 50  0000 C CNN
+	1    2700 2550
+	1    0    0    -1  
+$EndComp
+Text HLabel 1650 2450 0    60   Input ~ 0
+Pgnd
+Wire Wire Line
+	1650 2250 1800 2250
+Wire Wire Line
+	2100 2250 3850 2250
+Wire Wire Line
+	2700 2400 2700 2250
+Connection ~ 2700 2250
+Wire Wire Line
+	1650 2450 1800 2450
+Wire Wire Line
+	1800 2450 1800 2550
+Wire Wire Line
+	2250 2700 2250 2800
+Wire Wire Line
+	2700 2700 2700 2800
+$Comp
+L LT3080 U10
+U 1 1 5932BCE7
+P 3900 2850
+F 0 "U10" H 4150 2700 60  0000 C CNN
+F 1 "LT3080" H 3900 3200 60  0000 C CNN
+F 2 "TO_SOT_Packages_THT:TO-220-5_Pentawatt_Multiwatt-5_Vertical_StaggeredType1" H 3900 2850 60  0001 C CNN
+F 3 "" H 3900 2850 60  0001 C CNN
+	1    3900 2850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3400 2650 3300 2650
+Wire Wire Line
+	3300 2250 3300 2750
+Connection ~ 3300 2250
+Wire Wire Line
+	3300 2750 3400 2750
+Connection ~ 3300 2650
+Wire Wire Line
+	4000 3150 4000 3350
+Wire Wire Line
+	4300 3300 4000 3300
+Connection ~ 4000 3300
+Wire Wire Line
+	4000 3650 4000 3750
+$Comp
+L C C17
+U 1 1 5932C7B8
+P 4300 3500
+F 0 "C17" H 4325 3600 50  0000 L CNN
+F 1 "1µ" H 4325 3400 50  0000 L CNN
+F 2 "Capacitors_Tantalum_SMD:CP_Tantalum_Case-A_EIA-3216-18_Hand" H 4338 3350 50  0001 C CNN
+F 3 "" H 4300 3500 50  0000 C CNN
+	1    4300 3500
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C18
+U 1 1 5932C831
+P 4750 2900
+F 0 "C18" H 4775 3000 50  0000 L CNN
+F 1 "2.2µ " H 4775 2800 50  0000 L CNN
+F 2 "Capacitors_Tantalum_SMD:CP_Tantalum_Case-A_EIA-3216-18_Hand" H 4788 2750 50  0001 C CNN
+F 3 "" H 4750 2900 50  0000 C CNN
+	1    4750 2900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4300 3750 4300 3650
+Wire Wire Line
+	4400 2650 5300 2650
+Wire Wire Line
+	4750 2250 5200 2250
+Connection ~ 4750 2650
+Wire Wire Line
+	4750 3150 4750 3050
+$Comp
+L LT3080 U11
+U 1 1 5932D27C
+P 5800 2850
+F 0 "U11" H 6050 2700 60  0000 C CNN
+F 1 "LT3080" H 5800 3200 60  0000 C CNN
+F 2 "TO_SOT_Packages_THT:TO-220-5_Pentawatt_Multiwatt-5_Vertical_StaggeredType1" H 5800 2850 60  0001 C CNN
+F 3 "" H 5800 2850 60  0001 C CNN
+	1    5800 2850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5200 2750 5300 2750
+$Comp
+L R R33
+U 1 1 5932D286
+P 5900 3500
+F 0 "R33" V 5980 3500 50  0000 C CNN
+F 1 "330k" V 5900 3500 50  0000 C CNN
+F 2 "Resistors_SMD:R_0603_HandSoldering" V 5830 3500 50  0001 C CNN
+F 3 "" H 5900 3500 50  0000 C CNN
+	1    5900 3500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5900 3150 5900 3350
+Wire Wire Line
+	6200 3300 5900 3300
+Connection ~ 5900 3300
+Wire Wire Line
+	5900 3650 5900 3750
+$Comp
+L C C19
+U 1 1 5932D29D
+P 6200 3500
+F 0 "C19" H 6225 3600 50  0000 L CNN
+F 1 "1µ" H 6225 3400 50  0000 L CNN
+F 2 "Capacitors_Tantalum_SMD:CP_Tantalum_Case-A_EIA-3216-18_Hand" H 6238 3350 50  0001 C CNN
+F 3 "" H 6200 3500 50  0000 C CNN
+	1    6200 3500
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C20
+U 1 1 5932D2A3
+P 6650 2900
+F 0 "C20" H 6675 3000 50  0000 L CNN
+F 1 "2.2µ " H 6675 2800 50  0000 L CNN
+F 2 "Capacitors_Tantalum_SMD:CP_Tantalum_Case-A_EIA-3216-18_Hand" H 6688 2750 50  0001 C CNN
+F 3 "" H 6650 2900 50  0000 C CNN
+	1    6650 2900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6200 3750 6200 3650
+Connection ~ 6650 2650
+Wire Wire Line
+	6650 3150 6650 3050
+Wire Wire Line
+	5200 2750 5200 2650
+Connection ~ 5200 2650
+Wire Wire Line
+	6650 2250 7200 2250
+Text Notes 3550 4350 0    60   ~ 0
+10µA ( intern currtent source) \nx\n500K resistor \n= 5V Set Pin 
+Text Notes 5450 4350 0    60   ~ 0
+10µA ( intern currtent source) \nx\n330K resistor \n= 3.3V Set Pin 
+$Comp
+L HEATSINK HS2
+U 1 1 59358429
+P 4450 2450
+F 0 "HS2" H 4450 2650 50  0000 C CNN
+F 1 "HEATSINK" H 4450 2400 50  0000 C CNN
+F 2 "Heatsinks:Heatsink_Fischer_SK104-STCB_35x13mm__2xDrill3.5mm_ScrewM3" H 4450 2450 50  0001 C CNN
+F 3 "" H 4450 2450 50  0000 C CNN
+	1    4450 2450
+	1    0    0    -1  
+$EndComp
+$Comp
+L HEATSINK HS3
+U 1 1 5935848D
+P 6350 2450
+F 0 "HS3" H 6350 2650 50  0000 C CNN
+F 1 "HEATSINK" H 6350 2400 50  0000 C CNN
+F 2 "Heatsinks:Heatsink_Fischer_SK104-STCB_35x13mm__2xDrill3.5mm_ScrewM3" H 6350 2450 50  0001 C CNN
+F 3 "" H 6350 2450 50  0000 C CNN
+	1    6350 2450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4750 2250 4750 2750
+Wire Wire Line
+	6650 2250 6650 2750
+$Comp
+L GND #PWR064
+U 1 1 5A52BB16
+P 1800 2550
+F 0 "#PWR064" H 1800 2300 50  0001 C CNN
+F 1 "GND" H 1800 2400 50  0000 C CNN
+F 2 "" H 1800 2550 50  0001 C CNN
+F 3 "" H 1800 2550 50  0001 C CNN
+	1    1800 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR065
+U 1 1 5A52BC20
+P 2250 2800
+F 0 "#PWR065" H 2250 2550 50  0001 C CNN
+F 1 "GND" H 2250 2650 50  0000 C CNN
+F 2 "" H 2250 2800 50  0001 C CNN
+F 3 "" H 2250 2800 50  0001 C CNN
+	1    2250 2800
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR066
+U 1 1 5A52BC5B
+P 2700 2800
+F 0 "#PWR066" H 2700 2550 50  0001 C CNN
+F 1 "GND" H 2700 2650 50  0000 C CNN
+F 2 "" H 2700 2800 50  0001 C CNN
+F 3 "" H 2700 2800 50  0001 C CNN
+	1    2700 2800
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR067
+U 1 1 5A52BC96
+P 4000 3750
+F 0 "#PWR067" H 4000 3500 50  0001 C CNN
+F 1 "GND" H 4000 3600 50  0000 C CNN
+F 2 "" H 4000 3750 50  0001 C CNN
+F 3 "" H 4000 3750 50  0001 C CNN
+	1    4000 3750
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR068
+U 1 1 5A52BCD1
+P 4300 3750
+F 0 "#PWR068" H 4300 3500 50  0001 C CNN
+F 1 "GND" H 4300 3600 50  0000 C CNN
+F 2 "" H 4300 3750 50  0001 C CNN
+F 3 "" H 4300 3750 50  0001 C CNN
+	1    4300 3750
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR069
+U 1 1 5A52BD0C
+P 5900 3750
+F 0 "#PWR069" H 5900 3500 50  0001 C CNN
+F 1 "GND" H 5900 3600 50  0000 C CNN
+F 2 "" H 5900 3750 50  0001 C CNN
+F 3 "" H 5900 3750 50  0001 C CNN
+	1    5900 3750
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR070
+U 1 1 5A52BD47
+P 6200 3750
+F 0 "#PWR070" H 6200 3500 50  0001 C CNN
+F 1 "GND" H 6200 3600 50  0000 C CNN
+F 2 "" H 6200 3750 50  0001 C CNN
+F 3 "" H 6200 3750 50  0001 C CNN
+	1    6200 3750
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R43
+U 1 1 5A52BE9D
+P 4000 3500
+F 0 "R43" V 4080 3500 50  0000 C CNN
+F 1 "499k" V 4000 3500 50  0000 C CNN
+F 2 "Resistors_SMD:R_0603_HandSoldering" V 3930 3500 50  0001 C CNN
+F 3 "" H 4000 3500 50  0000 C CNN
+	1    4000 3500
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR071
+U 1 1 5A52C002
+P 4750 3150
+F 0 "#PWR071" H 4750 2900 50  0001 C CNN
+F 1 "GND" H 4750 3000 50  0000 C CNN
+F 2 "" H 4750 3150 50  0001 C CNN
+F 3 "" H 4750 3150 50  0001 C CNN
+	1    4750 3150
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR072
+U 1 1 5A52C03D
+P 6650 3150
+F 0 "#PWR072" H 6650 2900 50  0001 C CNN
+F 1 "GND" H 6650 3000 50  0000 C CNN
+F 2 "" H 6650 3150 50  0001 C CNN
+F 3 "" H 6650 3150 50  0001 C CNN
+	1    6650 3150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6300 2650 6650 2650
+Wire Wire Line
+	2250 2400 2250 2250
+Connection ~ 2250 2250
+Wire Wire Line
+	4300 3350 4300 3300
+Wire Wire Line
+	6200 3350 6200 3300
+$EndSCHEMATC

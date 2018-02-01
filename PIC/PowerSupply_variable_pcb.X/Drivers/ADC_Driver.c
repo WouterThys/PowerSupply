@@ -19,7 +19,7 @@
  *          VARIABLES
  ******************************************************************************/
 uint16_t ADC_flag;
-i2cAnswer_t * adcBuffer;
+AdcBuffer_t * adcBuffer;
 
 /*******************************************************************************
  *          BASIC FUNCTIONS
@@ -28,7 +28,7 @@ i2cAnswer_t * adcBuffer;
 /*******************************************************************************
  *          DRIVER FUNCTIONS
  ******************************************************************************/
-void D_ADC_Init(i2cAnswer_t * buffer) {
+void D_ADC_Init(AdcBuffer_t * buffer) {
     /* Variables */
     ADC_flag = false;
     adcBuffer = buffer;
@@ -111,7 +111,7 @@ void __attribute__ ( (interrupt, no_auto_psv) ) _AD1Interrupt(void) {
         adcBuffer->value3 = ADC1BUF3;
         _AD1IF = 0;
         D_ADC_Enable(false);
-        LED1 = !LED1;
+        //LED1 = !LED1;
         ADC_flag = 1;
     }
 }

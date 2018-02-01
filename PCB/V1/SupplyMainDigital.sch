@@ -1812,8 +1812,6 @@ Wire Wire Line
 Wire Wire Line
 	10100 4200 10100 4900
 Wire Wire Line
-	10100 4850 10550 4850
-Wire Wire Line
 	10550 4850 10550 4900
 Wire Wire Line
 	10400 4900 10400 4850
@@ -2244,4 +2242,6 @@ Wire Wire Line
 	7300 1250 7850 1250
 Text Notes 1300 700  0    60   ~ 0
 12V DC input
+Wire Wire Line
+	10100 4850 10550 4850
 $EndSCHEMATC

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="PICUart">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/PICUart.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

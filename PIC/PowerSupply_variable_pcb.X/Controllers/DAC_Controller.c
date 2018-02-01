@@ -45,7 +45,7 @@ void C_DAC_Enable(bool enable) {
 }
 
 void C_DAC_Write(uint16_t data) { 
-    while(CS_MCP_Pin == 0 || CS_DAC_Pin == 0); // Wait while still writing previous data
+    while(CS_DAC_Pin == 0); // Wait while still writing previous data
     CS_DAC_Pin = 0;
     SPI2_FS_Pin = 0;
     

@@ -29,7 +29,6 @@
 #define I2C_STATUS_MASK     0x0F    /* Mask for 4-bit status                  */
 #define I2C_FIRST_DATA_MASK 0x0F    /* Mask for 4-bit first data              */
 /*
-
  */
 
 extern bool I2C_ReadyToRead; /* Flag to indicate a read was performed         */
@@ -100,4 +99,3 @@ int16_t D_I2C_SlaveRead(i2cData_t *data);
 
 
 #endif	/* XC_HEADER_TEMPLATE_H */
-

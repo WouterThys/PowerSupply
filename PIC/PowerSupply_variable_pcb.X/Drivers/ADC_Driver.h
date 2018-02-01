@@ -1,20 +1,22 @@
-/* 
- * File:   UART functions
- * Author: Wouter
- *
- */
-
 #ifndef ADC_DRIVER_H
 #define	ADC_DRIVER_H
 
-#include "../../Common/Drivers/I2C_Driver.h"
     
 extern uint16_t ADC_flag;
+
+
+struct ADC_Buffer {
+    int16_t value0;
+    int16_t value1;
+    int16_t value2;
+    int16_t value3;
+};
+typedef struct ADC_Buffer AdcBuffer_t;
 
 /******************************************************************************/
 /* System Function Prototypes                                                 */
 /******************************************************************************/
-void D_ADC_Init(i2cAnswer_t * buffer);
+void D_ADC_Init(AdcBuffer_t * buffer);
 void D_ADC_Enable(bool enable);
 
 
