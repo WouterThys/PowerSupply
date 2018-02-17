@@ -1,4 +1,4 @@
-update=Sun 28 Jan 2018 02:09:11 PM CET
+update=Fri 09 Feb 2018 07:37:50 PM CET
 version=1
 last_client=kicad
 [pcbnew]
@@ -25,16 +25,6 @@ version=1
 NetIExt=net
 [general]
 version=1
-[schematic_editor]
-version=1
-PageLayoutDescrFile=
-PlotDirectoryName=
-SubpartIdSeparator=0
-SubpartFirstId=65
-NetFmtName=Pcbnew
-SpiceForceRefPrefix=0
-SpiceUseNetNumbers=0
-LabSize=60
 [eeschema]
 version=1
 LibDir=../../../aLibs/KiCad
@@ -81,3 +71,13 @@ LibName39=C:/Users/Gebruiker/Dropbox/elentrik/projects/pcbs/libs/lt3080
 LibName40=C:/Users/Gebruiker/Dropbox/elentrik/projects/pcbs/libs/lm334z
 LibName41=C:/Users/Gebruiker/Dropbox/elentrik/projects/pcbs/libs/heatsink
 LibName42=/home/wouter/Documents/Geeken/aLibs/KiCad/MyLib
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=Pcbnew
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60

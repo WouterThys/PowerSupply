@@ -29,6 +29,7 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
+LIBS:MyLib
 LIBS:SupplyMainDigital-cache
 EELAYER 25 0
 EELAYER END
