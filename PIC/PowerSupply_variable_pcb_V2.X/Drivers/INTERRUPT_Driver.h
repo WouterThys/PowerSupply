@@ -15,17 +15,17 @@ extern "C" {
 /**
  * Initializes the interrupts to the default settings.
  */
-void D_INT_Init(void);
+void intInit(void);
 /**
  * Enable interrupts.
  */
-void D_INT_EnableInterrupts(bool enable);
+void intEnable(bool enable);
 
 /**
  * Enables interrupts for I2C messaging.
  * @param enable
  */
-void D_INT_EnableI2CInterrupts(bool enable);
+void intEnableI2CInterrupts(bool enable);
 
 
 #ifdef	__cplusplus

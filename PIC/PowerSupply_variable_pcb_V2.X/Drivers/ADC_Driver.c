@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>        /* Includes uint16_t definition                    */
 #include <stdbool.h>       /* Includes true/false definition                  */
+#include <math.h>
 
 #include "../Settings.h"
 #include "ADC_Driver.h"
@@ -10,6 +11,9 @@
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
+#define VREF    2.048
+#define n       12
+#define N       pow(2, n)
 
 /*******************************************************************************
  *          MACRO FUNCTIONS
@@ -28,13 +32,13 @@ AdcBuffer_t * adcBuffer;
 /*******************************************************************************
  *          DRIVER FUNCTIONS
  ******************************************************************************/
-void D_ADC_Init(AdcBuffer_t * buffer) {
+void adcInit(AdcBuffer_t * buffer) {
     /* Variables */
     ADC_flag = false;
     adcBuffer = buffer;
     
     /* Disable ADC */
-    D_ADC_Enable(false);
+    adcEnable(false);
     
     /* AD1CON1 Register */
     AD1CON1bits.ADON = 0;       // ADC is off
@@ -74,7 +78,7 @@ void D_ADC_Init(AdcBuffer_t * buffer) {
     _AD1IE = 1; // Enable interrupts
 }
 
-void D_ADC_Enable(bool enable) {
+void adcEnable(bool enable) {
     if (enable) {
         
         ANSELAbits.ANSA0 = 1;
@@ -98,6 +102,10 @@ void D_ADC_Enable(bool enable) {
     }
 }
 
+double adcValueToVolage(uint16_t value) {
+    return value * VREF / N;
+}
+
 /*******************************************************************************
  *          INTERRUPTS
  ******************************************************************************/
@@ -110,7 +118,7 @@ void __attribute__ ( (interrupt, no_auto_psv) ) _AD1Interrupt(void) {
         adcBuffer->value2 = ADC1BUF2;
         adcBuffer->value3 = ADC1BUF3;
         _AD1IF = 0;
-        D_ADC_Enable(false);
+        adcEnable(false);
         //LED1 = !LED1;
         ADC_flag = 1;
     }

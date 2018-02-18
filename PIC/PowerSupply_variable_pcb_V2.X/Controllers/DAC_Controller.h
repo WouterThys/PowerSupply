@@ -23,22 +23,22 @@ typedef struct {
 /**
  * 
  */
-void C_DAC_Init();
+void dacInit();
 
 /**
  * 
  * @param enable
  */
-void C_DAC_Enable(bool enable);
+void dacEnable(bool enable);
 
-void C_DAC_InitDacA(bool buf, uint16_t gain);
-void C_DAC_InitDacB(bool buf, uint16_t gain);
+void dacInitDacA(bool buf, uint16_t gain);
+void dacInitDacB(bool buf, uint16_t gain);
 
-void C_DAC_ShutDownA();
-void C_DAC_ShutDownB();
+void dacShutDownA();
+void dacShutDownB();
 
-void C_DAC_SetVoltageA(float voltage);
-void C_DAC_SetVoltageB(float voltage);
+void dacSetVoltageA(float voltage);
+void dacSetVoltageB(float voltage);
 
 
 

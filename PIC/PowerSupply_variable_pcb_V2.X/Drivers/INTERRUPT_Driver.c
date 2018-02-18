@@ -23,7 +23,7 @@
 /*******************************************************************************
  *          DRIVER FUNCTIONS
  ******************************************************************************/
-void D_INT_Init(void) {
+void intInit(void) {
     INTCON1 = 0x0000;       // Clear all special pending flags
     INTCON3 = 0x0000;
     INTCON4 = 0x0000;
@@ -32,7 +32,7 @@ void D_INT_Init(void) {
     return;
 }
 
-void D_INT_EnableInterrupts(bool enable) {
+void intEnable(bool enable) {
     if(enable) {
         _IPL = 0b000; // Set CPU at Level = 0
         _IPL3 = 0; // Lower priority

@@ -44,15 +44,15 @@ void writeToDac(DAC_Command_t command) {
     d |= command.SHDN << 12;
     d |= command.data;
     
-    D_SPI2_Write(d);
+    spi2Write(d);
 }
 
 /*******************************************************************************
  *          DRIVER FUNCTIONS
  ******************************************************************************/
 
-void C_DAC_Init() {
-    D_SPI2_Init();
+void dacInit() {
+    spi2Init();
     
     // Settings
     DAC_A.A_B = 0; 
@@ -68,8 +68,8 @@ void C_DAC_Init() {
     DAC_B.data = 0x000;
 }
 
-void C_DAC_Enable(bool enable) {
-    D_SPI2_Enable(enable);
+void dacEnable(bool enable) {
+    spi2Enable(enable);
     
     if (enable) {
         DAC_A.SHDN = 1;
@@ -80,27 +80,27 @@ void C_DAC_Enable(bool enable) {
     }
 }
 
-void C_DAC_InitDacA(bool buf, uint16_t gain) {
+void dacInitDacA(bool buf, uint16_t gain) {
     DAC_A.BUF = buf;
     if (gain == 1) DAC_A.GA = 1;
     if (gain == 2) DAC_A.GA = 0;
 }
 
-void C_DAC_InitDacB(bool buf, uint16_t gain) {
+void dacInitDacB(bool buf, uint16_t gain) {
     DAC_B.BUF = buf;
     if (gain == 1) DAC_B.GA = 1;
     if (gain == 2) DAC_B.GA = 0;
 }
 
-void C_DAC_ShutDownA() {
+void dacShutDownA() {
     DAC_A.SHDN = 0;
 }
 
-void C_DAC_ShutDownB() {
+void dacShutDownB() {
     DAC_B.SHDN = 0;
 }
 
-void C_DAC_SetVoltageA(float voltage) {
+void dacSetVoltageA(float voltage) {
     if (DAC_A.GA == 0) {
         DAC_A.data = voltageToDigital(voltage, 2);
     } else {
@@ -110,7 +110,7 @@ void C_DAC_SetVoltageA(float voltage) {
     writeToDac(DAC_A);
 }
 
-void C_DAC_SetVoltageB(float voltage) {
+void dacSetVoltageB(float voltage) {
     if (DAC_B.GA == 0) {
         DAC_B.data = voltageToDigital(voltage, 2);
     } else {

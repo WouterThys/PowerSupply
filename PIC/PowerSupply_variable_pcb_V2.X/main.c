@@ -42,16 +42,16 @@ static AdcBuffer_t adcBuffer;
 static void initialize();
 
 void initialize() {
-    D_INT_EnableInterrupts(false);
+    intEnable(false);
     
     // Initialize system
-    D_SYS_InitPll();
-    D_SYS_InitOscillator();
-    D_SYS_InitPorts();
+    sysInitPll();
+    sysInitOscillator();
+    sysInitPorts();
     
     // Interrupts
-    D_INT_Init();
-    D_INT_EnableInterrupts(true);
+    intInit();
+    intEnable(true);
 }
 
 /*******************************************************************************
@@ -68,19 +68,19 @@ int main(void) {
     TRISBbits.TRISB5 = 1;
     
     // Initialize
-    C_DAC_Init();
+    dacInit();
     D_UART_Init(UART_MODULE_1, UART1_BAUD);
-    D_ADC_Init(&adcBuffer);
+    adcInit(&adcBuffer);
     
     // Enable
-    C_DAC_Enable(true);
+    dacEnable(true);
     D_UART_Enable(UART_MODULE_1, true);
-    D_ADC_Enable(true);
+    adcEnable(true);
 
     DelayMs(1000);
     
-    C_DAC_SetVoltageA(1);
-    C_DAC_SetVoltageB(2);
+    dacSetVoltageA(1.5);
+    dacSetVoltageB(0);
     
     printf("start\n");
     
@@ -108,17 +108,17 @@ int main(void) {
 //        }
 //        
         if (ADC_flag) {
-            printf("A0: %d\n", adcBuffer.value0);
+            printf("ISense: %e\n", adcValueToVolage(adcBuffer.value0));
             DelayMs(10);
-            printf("A1: %d\n", adcBuffer.value1);
+            printf("VSense: %e\n", adcValueToVolage(adcBuffer.value1));
             DelayMs(10);
-            printf("A2: %d\n", adcBuffer.value2);
+            printf("Temp: %e\n", adcValueToVolage(adcBuffer.value2));
             DelayMs(10);
-            printf("A3, %d\n\n", adcBuffer.value3);
+            printf("IMon, %e\n\n", adcValueToVolage(adcBuffer.value3));
 
             
             ADC_flag = false;
-            D_ADC_Enable(true);
+            adcEnable(true);
         }
         
     }

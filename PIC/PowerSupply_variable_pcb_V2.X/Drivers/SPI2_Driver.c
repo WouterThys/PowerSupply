@@ -27,9 +27,9 @@ uint16_t SPI2_ReadData;
 /*******************************************************************************
  *          DRIVER FUNCTIONS
  ******************************************************************************/
-void D_SPI2_Init() {
+void spi2Init() {
     /* Disable SPI */
-    D_SPI2_Enable(false);
+    spi2Enable(false);
 
     /* SPI2CON1 Register */
     SPI2CON1bits.DISSCK = 0;        // Internal SPI clock is enabled
@@ -51,7 +51,7 @@ void D_SPI2_Init() {
     _SPI2IE = 1; // Enable interrupt
 }
 
-void D_SPI2_Enable(bool enable) {
+void spi2Enable(bool enable) {
     if (enable) {
         // Ports
         SPI2_SDO_Dir = 0;           // SDO output   (RB10)
@@ -71,7 +71,7 @@ void D_SPI2_Enable(bool enable) {
     }
 }
 
-void D_SPI2_Write(uint16_t data) {
+void spi2Write(uint16_t data) {
     while (SPI2_CS_Pin == 0);
     
     SPI2_CS_Pin = 0;

@@ -19,7 +19,7 @@
 /*******************************************************************************
  *          DRIVER FUNCTIONS
  ******************************************************************************/
-void D_SYS_InitOscillator(void) {
+void sysInitOscillator(void) {
     /* Disable Watch Dog Timer */
     RCONbits.SWDTEN = 0;
 
@@ -36,7 +36,7 @@ void D_SYS_InitOscillator(void) {
     REFOCONbits.RODIV = 0b0000; // Reference clock not divided
 }
 
-void D_SYS_InitPll(void) {
+void sysInitPll(void) {
     CLKDIVbits.ROI = 0; //bit 15 ROI: Recover on Interrupt bit
     CLKDIVbits.DOZE0 = 0;
     CLKDIVbits.DOZE1 = 0;
@@ -55,7 +55,7 @@ void D_SYS_InitPll(void) {
     PLLFBDbits.PLLDIV = 74;
 }
 
-void D_SYS_InitPorts(void) {
+void sysInitPorts(void) {
     TRISA = 0x0000;
     ANSELA = 0x0000;
     PORTA = 0x0000;

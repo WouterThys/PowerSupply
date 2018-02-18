@@ -17,8 +17,9 @@ typedef struct ADC_Buffer AdcBuffer_t;
 /* System Function Prototypes                                                 */
 /******************************************************************************/
 
-void D_ADC_Init(AdcBuffer_t * buffer);
-void D_ADC_Enable(bool enable);
+void adcInit(AdcBuffer_t * buffer);
+void adcEnable(bool enable);
+double adcValueToVolage(uint16_t value);
 
 
 #endif

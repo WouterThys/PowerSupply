@@ -30,15 +30,15 @@ extern "C" {
 /**
  * Configure oscillator settings.
  */
-void D_SYS_InitOscillator(void); 
+void sysInitOscillator(void); 
 /**
  * Configure PLL settings.
  */
-void D_SYS_InitPll(void); 
+void sysInitPll(void); 
 /**
  * Initialize the ports all as output, clear analog selections.
  */
-void D_SYS_InitPorts(void);
+void sysInitPorts(void);
 
 
 #endif

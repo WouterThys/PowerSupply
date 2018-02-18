@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+  <executable name="dist/default/production/PowerSupply_lcd_V2.production.elf">
+    <memory name="data">
+      <units>bytes</units>
+      <length>4096</length>
+      <used>568</used>
+      <free>3528</free>
+    </memory>
+    <memory name="program">
+      <units>bytes</units>
+      <length>32994</length>
+      <used>20790</used>
+      <free>12204</free>
+    </memory>
+  </executable>
+</project>
