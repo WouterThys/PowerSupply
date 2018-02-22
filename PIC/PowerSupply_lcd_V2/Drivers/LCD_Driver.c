@@ -65,6 +65,11 @@ void lcdWriteChar(char c) {
     DelayUs(100);
 }
 
+void lcdWriteDigit(uint16_t d) {
+    D_SPI_Write(d + 0x30);
+    DelayUs(100);
+}
+
 void lcdWriteString(const char *str) {
     uint16_t c = 0;
     while (c < strlen(str)) {

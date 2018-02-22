@@ -17,6 +17,8 @@ void lcdInit();
  */
 void lcdWriteChar(char c);
 
+void lcdWriteDigit(uint16_t d);
+
 /**
  * 
  * @param str

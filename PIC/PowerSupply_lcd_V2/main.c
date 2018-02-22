@@ -18,7 +18,6 @@
 
 #include "Drivers/INTERRUPT_Driver.h"
 #include "Drivers/SYSTEM_Driver.h"
-#include "Drivers/UART_Driver.h"
 #include "Drivers/SPI_Driver.h"
 #include "Drivers/LCD_Driver.h"
 #include "Drivers/ENC_Driver.h"
@@ -41,7 +40,7 @@
 
 // Encoder
 int16_t encLast = -1;
-int16_t encValue = 0;
+int16_t turns = 0;
 Button_t encButton;
 bool updateMenu = false;
 
@@ -116,33 +115,44 @@ void setMenuTimer() {
 
 void encLogic() {
     encService();
-    encValue = encGetValue();
+    int16_t encValue = encGetValue();
     encButton = encGetButton();
         
     if (encValue != encLast) {
         encLast = encValue;
+        turns += encValue;
         if (encValue != 0) {
-            //printf("E:%d\n", encValue);
-            varVoltage += (VOLTAGE_STEP * encValue);
             updateMenu = true;
         }
     }
-//
-//    if (encButton != Open) {
-//        switch(encButton) {
-//            default:
-//            case Closed: printf("B:C\n"); break;
-//            case Pressed: printf("B:P\n"); break;
-//            case Held: printf("B:H\n"); break;
-//            case Released: printf("B:R\n"); break;
-//            case Clicked: printf("B:L\n"); break;
-//            case DoubleClicked: printf("B:D\n"); break;
-//        }
-//    }
+    
+    if (encButton != Open) {
+        switch(encButton) {
+            default:
+            case Open: break;
+            case Closed: ; break;
+            case Pressed: ; break;
+            case Held: ; break;
+            case Released: ; break;
+            case Clicked: menuClicked(); break;
+            case DoubleClicked: ; break;
+        }
+    }
 }
 
 void menuLogic() {
-    
+    if (updateMenu) {
+        while (turns != 0) {
+            if (turns > 0) {
+                menuTurn(-1);
+                turns--;
+            } else {
+                menuTurn(1);
+                turns++;
+            }
+        }
+        updateMenu = false;
+    }
 }
 
 /*******************************************************************************
@@ -153,23 +163,17 @@ int main(void) {
 
     initialize();
     
-    D_UART_Init(UART_MODULE_1, 57600);
-    D_UART_Enable(UART_MODULE_1, true);
-    
     DelayMs(1);
     menuInit();
     encInit();
     
     DelayMs(1);
     setEncTimer();
-    //setMenuTimer();
+    setMenuTimer();
    
     
     while (1) {
-        if (updateMenu) {
-            updateMenu = false;
-            menuSetFieldValue(ID_VOLTAGE, varVoltage);
-        }
+       
         
     }
     return 0;
@@ -178,7 +182,6 @@ int main(void) {
 
 void __attribute__ ( (interrupt, no_auto_psv) ) _T2Interrupt(void) {
     if (_T2IF) {
-        LED1 = !LED1;
         encLogic();
         _T2IF = 0; // Clear interrupt
     }

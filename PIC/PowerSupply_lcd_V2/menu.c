@@ -11,41 +11,57 @@
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
-/**
- * Initial values
- */  
 
-// Units
-#define VOLTAGE     {ID_VOLTAGE,     "V", "mV"}
-#define CURRENT     {ID_CURRENT,     "I", "mA"}
-#define TEMPERATURE {ID_TEMPERATURE, "T", "°C"}
+#define M1_LINE1 " |     V       V"
+#define M1_LINE2 " |     I C     A"
+#define M1_varVPOS {0,7}
+#define M1_varIPOS {1,7}
+#define M1_msrVPOS {0,10}
+#define M1_msrIPOS {1,10}
+#define M1_NPOS {1,0}
 
-// Arrows 
-#define M0_SM0_AR   {ID_M0_SM0_AR,  126, 0, 15}  /* 127 is right arrow  */     
-#define M0_SM1_AR   {ID_M0_SM1_AR,  127, 0, 15}  /* 126 is left arrow   */     
-#define M0_AR       {ID_M0_AR,      126, 1, 1}  
+typedef enum {
+    SELECTING,
+    CHANGING        
+} CursorMode_t;
 
-// Fields:           id,            units,       value, line, position
-#define M0_SM0_F0   {ID_M0_SM0_F0,  VOLTAGE,     0.0,   0,    11} 
-#define M0_SM0_F1   {ID_M0_SM0_F1,  CURRENT,     0.0,   1,    11}
-#define M0_SM1_F0   {ID_M0_SM1_F0,  TEMPERATURE, 0.0,   0,    11} 
-#define M0_SM1_F1   {ID_M0_SM1_F1,  CURRENT,     0.0,   1,    11} 
+typedef struct {
+    uint16_t line;
+    uint16_t pos;
+} Position_t;
 
-// Sub menus:    id,         name, field1,           field2,          arrow      
-#define M0_SM0  {ID_M0_SM0,  "",   &voltageFld,      &currentFld,     &sm0Arw}
-#define M0_SM1  {ID_M0_SM1,  "",   &loadCurrentFld,  &temperatureFld, &sm1Arw}
+typedef struct {
+    uint16_t value;
+    Position_t position;
+} Value_t;
 
-// Menus:    id,     name,  arrow
-#define M0  {ID_M0,  "VAR", &m0Arw}
+typedef struct CursorPos {
+    Position_t pos;
+    struct CursorPos * next;
+    struct CursorPos * prev;
+    Value_t * value;
+} CursorPosition_t;
+
+typedef struct {
+    CursorPosition_t * position;
+    CursorMode_t mode; 
+} Cursor_t;
+
+
+
+typedef struct {
+    const char * line1;
+    const char * line2;
+    Value_t variable1;
+    Value_t variable2;
+    Value_t measure1;
+    Value_t measure2;
+} Menu_t;
 
 /*******************************************************************************
  *          LOCAL FUNCTION DEFINES
  ******************************************************************************/
-static void drawField(field_t *field);
-static void drawSubMenu(subMenu_t *subMenu);
-static void drawMenu(menu_t *menu);
 
-static uint16_t countDigits(int16_t value);
 
 /*******************************************************************************
  *          MACRO FUNCTIONS
@@ -53,166 +69,77 @@ static uint16_t countDigits(int16_t value);
 #define clearScreen() lcdClearScreen()
 #define writeString(x,y,str) lcdSetCursorPosition(x,y); lcdWriteString(str) 
 #define writeChar(x,y,c) lcdSetCursorPosition(x,y); lcdWriteChar(c)
-#define writeDouble(x,y,d,p) lcdSetCursorPosition(x,y); lcdWriteDouble(d, p)
+#define writeDigit(x,y,d) lcdSetCursorPosition(x,y); lcdWriteDigit(d)
 
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
+Value_t voltage = {5000, {0,2}};
+Value_t current = {1000, {1,2}};
+Value_t msrVoltage = {0, {0,10}};
+Value_t msrCurrent = {0, {1,10}};
+CursorPosition_t vcp = {M1_varVPOS};
+CursorPosition_t icp = {M1_varIPOS};
+CursorPosition_t ncp = {M1_NPOS};
 
-/**
- * Assign
- */
-static arrow_t sm0Arw = M0_SM0_AR;
-static arrow_t sm1Arw = M0_SM1_AR;
-static arrow_t m0Arw = M0_AR;
-    
-static field_t voltageFld = M0_SM0_F0;
-static field_t currentFld = M0_SM0_F1;
-static field_t loadCurrentFld = M0_SM1_F0;
-static field_t temperatureFld = M0_SM1_F1;
-    
-static subMenu_t varSm1 = M0_SM0;
-static subMenu_t varSm2 = M0_SM1;
-    
-static menu_t varMn = M0;
 
-static bool drawing;
+Menu_t varMenu;
+Cursor_t cursor;
 
-const static uint16_t menuCnt = 1;
-const static uint16_t subMenuCnt = 2;
-const static uint16_t fieldCnt = 4;
-
-static menu_t    *menus[1];
-static subMenu_t *subMenus[2];
-static field_t   *fields[4];
-static arrow_t   *arrows[3];
-
-static int8_t selectedMenuId;
-static int8_t selectedSubMenuId;
-static int8_t selectedFieldId;
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
  ******************************************************************************/
-void drawField(field_t *field) {
-    bool clearDrawing = false;
-    if (!drawing) {
-        drawing = true;
-        clearDrawing = true;
-    }
-    // Name
-    writeString(field->line, 5, field->unit.symbol);
-    writeChar(field->line, 6, ':');
+static void drawMenu(Menu_t menu);
+static void drawCursor(Cursor_t cursor);
+static void drawValue(Value_t value);
+
+
+
+void drawMenu(Menu_t menu) {
+    writeString(0,0, menu.line1);
+    writeString(1,0, menu.line2);
     
-    // Value and units
-    double val = (double)field->value;
-    uint16_t precision = 0;
-    if (val < 1000) {
-        switch (field->unit.id) {
-            case ID_VOLTAGE:
-                field->unit.units = "mV";
-                break;
-            case ID_CURRENT:
-                field->unit.units = "mA";
-                break;
-            default:
-                break;
-        }
+    drawValue(menu.variable1);
+    drawValue(menu.variable2);
+    drawValue(menu.measure1);
+    drawValue(menu.measure2);
+}
+
+void drawCursor(Cursor_t cursor) {
+    Position_t p = cursor.position->pos;
+    lcdSetCursorPosition(p.line, p.pos);
+    
+    switch(cursor.mode) {
+        default:
+        case SELECTING: lcdTurnOnBlinkingCursor(false); break;
+        case CHANGING: lcdTurnOnBlinkingCursor(true); break;
+    }
+}
+
+// d0 d1 , d2 d3
+void drawValue(Value_t value) {
+    uint16_t p = value.position.pos;
+    uint16_t l = value.position.line;
+    uint16_t v = value.value / 10;
+    
+    uint16_t d3 = v % 10;
+    v /= 10;
+    uint16_t d2 = v % 10;
+    v /= 10;
+    uint16_t d1 = v % 10;
+    v /= 10;
+    uint16_t d0 = v % 10;
+    
+    if (d0 > 0) {
+        writeDigit(l, p, d0);
     } else {
-        switch (field->unit.id) {
-            case ID_VOLTAGE:
-                field->unit.units = "V ";
-                val /= 1000;
-                if (val > 99) {
-                    precision = 0;
-                } else {
-                    precision = 2;
-                }
-                break;
-            case ID_CURRENT:
-                field->unit.units = "A ";
-                val /= 1000;
-                if (val > 99) {
-                    precision = 0;
-                } else {
-                    precision = 2;
-                }
-                break;
-            default:
-                break;
-        }
+        writeChar(l, p, ' ');
     }
-    
-    // Calculate position on screen
-    uint16_t digitsToDisplay = countDigits(val);
-    uint16_t pos = 0;
-    if (precision > 0) {
-        digitsToDisplay += precision + 1; // Digits and ","
-    }
-    pos = (field->pos) - digitsToDisplay + 1;
-    
-    // First clear field
-    writeString(field->line, 7, "     ");
-    writeDouble(field->line, pos, val, precision);
-    writeString(field->line, 12, field->unit.units);
-
-    if (clearDrawing) {
-        drawing = false;
-    }
-}
-
-void drawSubMenu(subMenu_t *subMenu) {
-    bool clearDrawing = false;
-    if (!drawing) {
-        drawing = true;
-        clearDrawing = true;
-    }
-    // Name and arrow
-    writeString(1, 13, subMenu->name);
-    writeChar(subMenu->arrow->line, subMenu->arrow->pos, subMenu->arrow->arrow);
-
-    // Draw fields
-    drawField(subMenu->field1);
-    drawField(subMenu->field2);
-
-    // Go to field1 as default 
-    lcdSetCursorPosition(subMenu->field1->line, subMenu->field1->pos);
-    //TODO D_LCD_CursorStyle(true, false);
-
-    if (clearDrawing) {
-        drawing = false;
-    }
-}
-
-void drawMenu(menu_t *menu) {
-    bool clearDrawing = false;
-    if (!drawing) {
-        drawing = true;
-        clearDrawing = true;
-    }
-
-    // Menu name and arrow
-    writeString(0, 0, menu->name);
-    writeChar(menu->arrow->line, menu->arrow->pos, menu->arrow->arrow);
-    writeChar(0, 3, '|');
-    writeChar(1, 3, '|');
-
-    if (clearDrawing) {
-        drawing = false;
-    }
-}
-
-uint16_t countDigits(int16_t value) {
-    uint16_t count = 1;
-    if (value < 0) {
-        value *= -1;
-        count++; // Count minus sign as a digit
-    }
-    while (value >= 10) {
-        count++;
-        value /= 10;
-    }
-    return count;
+    p++; writeDigit(l, p, d1);
+    p++;  writeChar(l, p, ',');
+    p++; writeDigit(l, p, d2);
+    p++; writeDigit(l, p, d3);
 }
 
 
@@ -220,116 +147,64 @@ uint16_t countDigits(int16_t value) {
  *          DRIVER FUNCTIONS
  ******************************************************************************/
 
-const char test[] = {
-    0x09,
-    0x19,
-    0x09,
-    0x09,
-    0x1D,
-    0x01,
-    0x1D,
-    0x09
-};
-
 void menuInit() {
     lcdInit();
+    lcdCursorUnderlineOn(true);
     
-    lcdLoadCustomChar(1, test);
-
-    drawing = false;
-
-    menus[varMn.id] = &varMn;
-
-    subMenus[varSm1.id] = &varSm1;
-    subMenus[varSm2.id] = &varSm2;
-
-    fields[voltageFld.id]     = &voltageFld;
-    fields[currentFld.id]     = &currentFld;
-    fields[temperatureFld.id] = &temperatureFld;
-    fields[loadCurrentFld.id] = &loadCurrentFld;
+    // Menus
+    varMenu.line1 = M1_LINE1;
+    varMenu.line2 = M1_LINE2;
+    varMenu.variable1 = voltage;
+    varMenu.variable2 = current;
+    varMenu.measure1 = msrVoltage;
+    varMenu.measure2 = msrCurrent;
     
-    arrows[sm0Arw.id] = &sm0Arw;
-    arrows[sm1Arw.id] = &sm1Arw;
-    arrows[m0Arw.id]  = &m0Arw;
-
-    selectedMenuId = -1;
-    selectedSubMenuId = -1;
-    selectedFieldId = -1;
-
-    menuDrawMenu(varMn.id);
-    menuDrawSubMenu(varSm1.id);
-    menuSetSelected(1, voltageFld.id, false);
+    drawMenu(varMenu);
     
-    writeChar(0,0,1);
+    // Cursor
+    vcp.next = &icp;
+    vcp.prev = &ncp;
+    vcp.value = &voltage;
+    
+    icp.next = &ncp;
+    icp.prev = &vcp;
+    icp.value = &current;
+    
+    ncp.next = &vcp;
+    ncp.prev = &icp;
+    
+    cursor.mode = SELECTING;
+    cursor.position = &vcp;
+    drawCursor(cursor);
 }
 
-void menuDrawMenu(uint16_t id) {
-    if (id < menuCnt) {
-        selectedMenuId = id;
-        drawMenu(menus[id]);
-    }
-}
-
-void menuDrawSubMenu(uint16_t id) {
-    if (id < subMenuCnt) {
-        selectedSubMenuId = id;
-        drawSubMenu(subMenus[id]);
-    }
-}
-
-void menuSetSelected(uint16_t what, uint16_t id, bool select) {
-
-    menu_t m = *menus[selectedMenuId];
-    subMenu_t sm = *subMenus[selectedSubMenuId];
-    
-    switch (what) {
-        case TYPE_ARROW: {
-            // If arrow is visible
-            if (sm.arrow->id == id || m.arrow->id == id) {
-                lcdSetCursorPosition(arrows[id]->line, arrows[id]->pos);
-                //D_LCD_CursorStyle(true, select);
+void menuTurn(int16_t positions) {
+    if (positions != 0) {
+        if (cursor.mode == SELECTING) {
+            if (positions > 0) {
+                cursor.position = cursor.position->prev;
+            } else {
+                cursor.position = cursor.position->next;
             }
-        } break;
-        case TYPE_FIELD: {
-            // If field is visible
-            if (sm.field1->id == id || sm.field2->id == id) {
-                //D_LCD_CursorStyle(true, select);
-                lcdSetCursorPosition(fields[id]->line, fields[id]->pos);
+        } else {
+            if (positions > 0) {
+                cursor.position->value->value -= 100;
+            } else {
+                cursor.position->value->value += 100;
             }
-        } break;
-        default:
-            break;
-    }
-
-}
-
-void menuSetFieldValue(uint16_t id, int16_t value) {
-    if (id < fieldCnt) {
-        switch (fields[id]->unit.id) {
-            case ID_VOLTAGE:
-                // Convert to voltage
-                // ...
-                fields[id]->value = value;
-                break;
-            case ID_CURRENT:
-                // Convert to current
-                // ...
-                fields[id]->value = value;
-                break;
-            case ID_TEMPERATURE:
-                // Convert to temperature
-                // ...
-                fields[id]->value = value;
-                break;
-            default:
-                break;
+            drawValue(*cursor.position->value);
         }
-
-        subMenu_t sm = *subMenus[selectedSubMenuId];
-        if (sm.field1->id == id || sm.field2->id == id) {
-            drawField(fields[id]);
-            lcdSetCursorPosition(fields[id]->line, fields[id]->pos);
-        }
-
+        drawCursor(cursor);
     }
 }
+
+void menuClicked() {
+    if (cursor.mode == SELECTING) {
+        cursor.mode = CHANGING;
+    } else {
+        cursor.mode = SELECTING;
+    }
+    
+    drawCursor(cursor);
+}
+
