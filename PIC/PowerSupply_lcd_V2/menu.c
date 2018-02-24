@@ -178,16 +178,16 @@ void menuInit() {
     drawCursor(cursor);
 }
 
-void menuTurn(int16_t positions) {
-    if (positions != 0) {
+void menuTurn(int16_t turns) {
+    if (turns != 0) {
         if (cursor.mode == SELECTING) {
-            if (positions > 0) {
+            if (turns > 0) {
                 cursor.position = cursor.position->prev;
             } else {
                 cursor.position = cursor.position->next;
             }
         } else {
-            if (positions > 0) {
+            if (turns > 0) {
                 cursor.position->value->value -= 100;
             } else {
                 cursor.position->value->value += 100;

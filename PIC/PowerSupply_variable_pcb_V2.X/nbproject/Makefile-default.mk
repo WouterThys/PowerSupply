@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=Controllers/DAC_Controller.c Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c Drivers/SPI2_Driver.c Drivers/ADC_Driver.c Drivers/UART_Driver.c configuration.c main.c
+SOURCEFILES_QUOTED_IF_SPACED=Controllers/DAC_Controller.c Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c Drivers/SPI2_Driver.c Drivers/ADC_Driver.c Drivers/UART_Driver.c Drivers/I2C_Driver.c configuration.c main.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Controllers/DAC_Controller.o ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/SPI2_Driver.o ${OBJECTDIR}/Drivers/ADC_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/Controllers/DAC_Controller.o.d ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/Drivers/SPI2_Driver.o.d ${OBJECTDIR}/Drivers/ADC_Driver.o.d ${OBJECTDIR}/Drivers/UART_Driver.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/main.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Controllers/DAC_Controller.o ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/SPI2_Driver.o ${OBJECTDIR}/Drivers/ADC_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/Controllers/DAC_Controller.o.d ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/Drivers/SPI2_Driver.o.d ${OBJECTDIR}/Drivers/ADC_Driver.o.d ${OBJECTDIR}/Drivers/UART_Driver.o.d ${OBJECTDIR}/Drivers/I2C_Driver.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/main.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/Controllers/DAC_Controller.o ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/SPI2_Driver.o ${OBJECTDIR}/Drivers/ADC_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o
+OBJECTFILES=${OBJECTDIR}/Controllers/DAC_Controller.o ${OBJECTDIR}/Drivers/INTERRUPT_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/SPI2_Driver.o ${OBJECTDIR}/Drivers/ADC_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o
 
 # Source Files
-SOURCEFILES=Controllers/DAC_Controller.c Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c Drivers/SPI2_Driver.c Drivers/ADC_Driver.c Drivers/UART_Driver.c configuration.c main.c
+SOURCEFILES=Controllers/DAC_Controller.c Drivers/INTERRUPT_Driver.c Drivers/SYSTEM_Driver.c Drivers/SPI2_Driver.c Drivers/ADC_Driver.c Drivers/UART_Driver.c Drivers/I2C_Driver.c configuration.c main.c
 
 
 CFLAGS=
@@ -136,6 +136,13 @@ ${OBJECTDIR}/Drivers/UART_Driver.o: Drivers/UART_Driver.c  nbproject/Makefile-${
 	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/UART_Driver.c  -o ${OBJECTDIR}/Drivers/UART_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/UART_Driver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/Drivers/UART_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/Drivers/I2C_Driver.o: Drivers/I2C_Driver.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Drivers" 
+	@${RM} ${OBJECTDIR}/Drivers/I2C_Driver.o.d 
+	@${RM} ${OBJECTDIR}/Drivers/I2C_Driver.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/I2C_Driver.c  -o ${OBJECTDIR}/Drivers/I2C_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/I2C_Driver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/Drivers/I2C_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 ${OBJECTDIR}/configuration.o: configuration.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/configuration.o.d 
@@ -192,6 +199,13 @@ ${OBJECTDIR}/Drivers/UART_Driver.o: Drivers/UART_Driver.c  nbproject/Makefile-${
 	@${RM} ${OBJECTDIR}/Drivers/UART_Driver.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/UART_Driver.c  -o ${OBJECTDIR}/Drivers/UART_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/UART_Driver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/Drivers/UART_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/Drivers/I2C_Driver.o: Drivers/I2C_Driver.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Drivers" 
+	@${RM} ${OBJECTDIR}/Drivers/I2C_Driver.o.d 
+	@${RM} ${OBJECTDIR}/Drivers/I2C_Driver.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/I2C_Driver.c  -o ${OBJECTDIR}/Drivers/I2C_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/I2C_Driver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/Drivers/I2C_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/configuration.o: configuration.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 

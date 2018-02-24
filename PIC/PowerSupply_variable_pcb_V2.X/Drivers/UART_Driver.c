@@ -118,7 +118,7 @@ void initUart_1(uint16_t baud, bool interrupts) {
         _U1RXIE = 1; // Enable interrupts
     }
     
-    D_UART_Enable(UART_MODULE_1, true);
+    uartEnable(UART_MODULE_1, true);
 }
 
 void initUart_2(uint16_t baud) {
@@ -243,17 +243,17 @@ void fillDataBuffer(uint8_t data){
 }
 
 void acknowledge(uint8_t ackId) {
-    D_UART_WriteByte(START_CHAR);
-    D_UART_WriteByte(ACK_CHAR);
-    D_UART_WriteByte(ackId);
-    D_UART_WriteByte(STOP_CHAR);
+    uartWriteByte(START_CHAR);
+    uartWriteByte(ACK_CHAR);
+    uartWriteByte(ackId);
+    uartWriteByte(STOP_CHAR);
     canWrite = true;
 }
 
 /*******************************************************************************
  *          DRIVER FUNCTIONS
  ******************************************************************************/
-void D_UART_Init(uint16_t which, uint16_t baud) {
+void uartInit(uint16_t which, uint16_t baud) {
     // Register initializes
     if(which == UART_MODULE_1) {
         initUart_1(baud, true);
@@ -267,7 +267,7 @@ void D_UART_Init(uint16_t which, uint16_t baud) {
     setUartPorts(which);
 }
 
-void D_UART_Enable(uint16_t which, bool enable) {
+void uartEnable(uint16_t which, bool enable) {
     if (which == UART_MODULE_1) {
         if(enable) {
             U1MODEbits.UARTEN = 1; // UARTx is enabled
@@ -287,71 +287,71 @@ void D_UART_Enable(uint16_t which, bool enable) {
     }
 }
 
-void D_UART_WriteByte(uint8_t data) {
+void uartWriteByte(uint8_t data) {
     U1TXREG = data;
     while(U1STAbits.TRMT == 0);
 }
 
-uint8_t D_UART_ReadByte() {
+uint8_t uartReadByte() {
     return U1RXREG;
 }
 
 void putch(char data) {
-    D_UART_WriteByte(data);
+    uartWriteByte(data);
 }
 
 
-void C_UART_Write(const char* command, const char* data) {
+void uartWrite(const char* command, const char* data) {
 //    if (!canWrite) {
 //        return;
 //    }
-    D_UART_WriteByte(START_CHAR); 
+    uartWriteByte(START_CHAR); 
     
     // Id
-    D_UART_WriteByte(0x30 + deviceId); 
+    uartWriteByte(0x30 + deviceId); 
     // Length
-    D_UART_WriteByte(SEP_CHAR); D_UART_WriteByte(0x31); // TODO
+    uartWriteByte(SEP_CHAR); uartWriteByte(0x31); // TODO
     // Command
-    D_UART_WriteByte(SEP_CHAR); printf(command);
+    uartWriteByte(SEP_CHAR); printf(command);
     // Message
-    D_UART_WriteByte(SEP_CHAR); printf(data);
+    uartWriteByte(SEP_CHAR); printf(data);
     
     // Acknowledge id
-    D_UART_WriteByte(SEP_CHAR); D_UART_WriteByte(0x32); // TODO
+    uartWriteByte(SEP_CHAR); uartWriteByte(0x32); // TODO
     // Check
-    D_UART_WriteByte(SEP_CHAR); D_UART_WriteByte(0x33); // TODO
+    uartWriteByte(SEP_CHAR); uartWriteByte(0x33); // TODO
     
-    D_UART_WriteByte(STOP_CHAR); 
+    uartWriteByte(STOP_CHAR); 
 }
 
-void C_UART_WriteInt(const char* command, int data) {
+void uartWriteInt(const char* command, int data) {
 //    if (!canWrite) {
 //        return;
 //    }
-    D_UART_WriteByte(START_CHAR); 
+    uartWriteByte(START_CHAR); 
     
     // Id
-    D_UART_WriteByte(0x30 + deviceId); 
+    uartWriteByte(0x30 + deviceId); 
     // Length
-    D_UART_WriteByte(SEP_CHAR); D_UART_WriteByte(0x31); // TODO
+    uartWriteByte(SEP_CHAR); uartWriteByte(0x31); // TODO
     // Command
-    D_UART_WriteByte(SEP_CHAR); printf(command);
+    uartWriteByte(SEP_CHAR); printf(command);
     // Message
-    D_UART_WriteByte(SEP_CHAR); printf("%d", data);
+    uartWriteByte(SEP_CHAR); printf("%d", data);
     
     // Acknowledge id
-    D_UART_WriteByte(SEP_CHAR); D_UART_WriteByte(0x32); // TODO
+    uartWriteByte(SEP_CHAR); uartWriteByte(0x32); // TODO
     // Check
-    D_UART_WriteByte(SEP_CHAR); D_UART_WriteByte(0x33); // TODO
+    uartWriteByte(SEP_CHAR); uartWriteByte(0x33); // TODO
     
-    D_UART_WriteByte(STOP_CHAR); 
+    uartWriteByte(STOP_CHAR); 
 }
 
-void C_UART_NewData(uint8_t data) {
+void uartNewData(uint8_t data) {
     fillDataBuffer(data);
 }
 
-READ_Data_t C_UART_Read(){
+READ_Data_t uartRead(){
     READ_ComMes cm = readBuffer.comMes[0];
     readData.sender = readBuffer.id;
     uint16_t i = 0;
@@ -364,7 +364,7 @@ READ_Data_t C_UART_Read(){
     return readData;
 }
 
-READ_Data_t C_UART_ReadBlock(uint8_t cnt) {
+READ_Data_t uartReadBlock(uint8_t cnt) {
     READ_ComMes cm = readBuffer.comMes[cnt];
     readData.sender = readBuffer.id;
     uint16_t i = 0;
@@ -378,7 +378,7 @@ READ_Data_t C_UART_ReadBlock(uint8_t cnt) {
     return readData;
 }
 
-uint8_t C_UART_BlockLength() {
+uint8_t uartBlockLength() {
     return readBuffer.blockLength;
 }
 
@@ -392,14 +392,14 @@ void __attribute__ ( (interrupt, no_auto_psv) ) _U1RXInterrupt(void) {
             return;
         } 
         if(U1STAbits.OERR == 1) {
-            D_UART_Enable(UART_MODULE_1, false);
+            uartEnable(UART_MODULE_1, false);
             DelayUs(10);
-            D_UART_Enable(UART_MODULE_1, true);
+            uartEnable(UART_MODULE_1, true);
             LED2 = 1;
             return;
         } 
         
-        C_UART_NewData(D_UART_ReadByte());
+        uartNewData(uartReadByte());
         _U1RXIF = 0; // Clear interrupt
     }
 }

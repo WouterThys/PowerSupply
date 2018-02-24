@@ -10,6 +10,7 @@
         <itemPath>Drivers/INTERRUPT_Driver.h</itemPath>
         <itemPath>Drivers/LCD_Driver.h</itemPath>
         <itemPath>Drivers/ENC_Driver.h</itemPath>
+        <itemPath>Drivers/I2C_Driver.h</itemPath>
       </logicalFolder>
       <itemPath>Settings.h</itemPath>
       <itemPath>utils.h</itemPath>
@@ -28,6 +29,7 @@
         <itemPath>Drivers/INTERRUPT_Driver.c</itemPath>
         <itemPath>Drivers/LCD_Driver.c</itemPath>
         <itemPath>Drivers/ENC_Driver.c</itemPath>
+        <itemPath>Drivers/I2C_Driver.c</itemPath>
       </logicalFolder>
       <itemPath>configuration.c</itemPath>
       <itemPath>main.c</itemPath>

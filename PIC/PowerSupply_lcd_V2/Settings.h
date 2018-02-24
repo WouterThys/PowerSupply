@@ -50,12 +50,28 @@
  *  SPI
  */
     
-#define SPI1_SCK_Dir    TRISBbits.TRISB7        /* SCK pin on RB7             */
-#define SPI1_SDO_Dir    TRISBbits.TRISB8        /* SDO pin on RB8             */
-#define SPI1_SDI_Dir    TRISBbits.TRISB9        /* SDI pin on RB9             */
+#define SPI2_SCK_Dir    TRISBbits.TRISB10       /* SCK pin on RB7             */
+#define SPI2_SDO_Dir    TRISBbits.TRISB11       /* SDO pin on RB8             */
+#define SPI2_SDI_Dir    TRISBbits.TRISB12       /* SDI pin on RB9             */
 
-#define SPI1_SS_Dir     TRISBbits.TRISB10       /* SS on pin RB10             */
-#define SPI1_SS_Pin     PORTBbits.RB10          /* SS pin                     */
+#define SPI2_SS_Dir     TRISBbits.TRISB13       /* SS on pin RB10             */
+#define SPI2_SS_Pin     PORTBbits.RB13          /* SS pin                     */
+
+#define SPI2_SCK_Map    RPOR4bits.RP42R         /* RP42 Pin Assignment  SCK   */
+#define SPI2_SDO_Map    RPOR4bits.RP43R         /* RP43 Pin Assignment  SDO   */
+#define SPI2_SDI_Map    0b0101100               /* RPI44 Pin Assignment SDI   */
+
+/**
+ * I²C
+ */
+#define I2C_ADDRESS     0x03
+
+#define I2C_SCL_Dir     TRISBbits.TRISB8        /* SCL Direction              */
+#define I2C_SDA_Dir     TRISBbits.TRISB9        /* SDA Direction              */
+
+#define I2C_SCL_Odc     ODCBbits.ODCB8          /* Open drain config for SCL  */
+#define I2C_SDA_Odc     ODCBbits.ODCB9          /* Open drain config for SDA  */
+
 
 
 /**

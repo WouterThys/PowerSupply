@@ -13,6 +13,7 @@
         <itemPath>Drivers/SPI2_Driver.h</itemPath>
         <itemPath>Drivers/ADC_Driver.h</itemPath>
         <itemPath>Drivers/UART_Driver.h</itemPath>
+        <itemPath>Drivers/I2C_Driver.h</itemPath>
       </logicalFolder>
       <itemPath>Settings.h</itemPath>
     </logicalFolder>
@@ -32,6 +33,7 @@
         <itemPath>Drivers/SPI2_Driver.c</itemPath>
         <itemPath>Drivers/ADC_Driver.c</itemPath>
         <itemPath>Drivers/UART_Driver.c</itemPath>
+        <itemPath>Drivers/I2C_Driver.c</itemPath>
       </logicalFolder>
       <itemPath>configuration.c</itemPath>
       <itemPath>main.c</itemPath>

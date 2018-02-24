@@ -2,12 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/home/wouter/Documents/Geeken/PowerSupply/PIC/PowerSupply_lcd_V2/menu.c</file>
-            <file>file:/home/wouter/Documents/Geeken/PowerSupply/PIC/PowerSupply_lcd_V2/main.c</file>
-            <file>file:/home/wouter/Documents/Geeken/PowerSupply/PIC/PowerSupply_lcd_V2/Drivers/LCD_Driver.c</file>
-            <file>file:/home/wouter/Documents/Geeken/PowerSupply/PIC/PowerSupply_lcd_V2/menu.h</file>
-            <file>file:/home/wouter/Documents/Geeken/PowerSupply/PIC/PowerSupply_lcd_V2/Drivers/LCD_Driver.h</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

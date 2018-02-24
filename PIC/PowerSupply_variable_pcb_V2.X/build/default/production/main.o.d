@@ -6,4 +6,5 @@ Settings.h  \
  Drivers/INTERRUPT_Driver.h  \
 Drivers/SYSTEM_Driver.h  \
 Drivers/ADC_Driver.h  \
- Drivers/UART_Driver.h 
+ Drivers/UART_Driver.h  \
+Drivers/I2C_Driver.h 

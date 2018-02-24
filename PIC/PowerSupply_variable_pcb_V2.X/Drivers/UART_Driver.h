@@ -40,26 +40,26 @@ typedef struct {
  * @param which: UART_MODULE_1 or UART_MODULE_2
  * @param baud: Baud rate of the UART 
  */
-void D_UART_Init(uint16_t which, uint16_t baud);
+void uartInit(uint16_t which, uint16_t baud);
 
 /**
  * Enable the UART module
  * @param which: UART_MODULE_1 or UART_MODULE_2
  * @param enable Enable or disable UART.
  */
-void D_UART_Enable(uint16_t which, bool enable);
+void uartEnable(uint16_t which, bool enable);
 
 /**
  * 
  * @param data
  */
-void D_UART_WriteByte(uint8_t data);
+void uartWriteByte(uint8_t data);
 
 /**
  * 
  * @return 
  */
-uint8_t D_UART_ReadByte(void);
+uint8_t uartReadByte(void);
 
 
 
@@ -72,42 +72,42 @@ uint8_t D_UART_ReadByte(void);
  * @param command: Command
  * @param data: Data string to write
  */
-void C_UART_Write(const char* command, const char* data);
+void uartWrite(const char* command, const char* data);
 
 /**
  * Write data to the TX pin of UART module. 
  * @param command: Command
  * @param data: Data integer to write
  */
-void C_UART_WriteInt(const char* command, int data);
+void uartWriteInt(const char* command, int data);
 
 /**
  * Read data from the RX pin of UART module.
  * @return data: returns the data struct.
  */
-READ_Data_t C_UART_Read();
+READ_Data_t uartRead();
 
 /**
  * New data available
  * @param data
  */
-void C_UART_NewData(uint8_t data);
+void uartNewData(uint8_t data);
 
 /**
  * 
  * @return 
  */
-READ_Data_t C_UART_ReadBlock(uint8_t cnt);
-uint8_t C_UART_BlockLength();
-uint8_t C_UART_MessageType();
+READ_Data_t uartReadBlock(uint8_t cnt);
+uint8_t uartBlockLength();
+uint8_t uartMessageType();
 
-void C_UART_Acknowledge(uint16_t val);
+void uartAcknowledge(uint16_t val);
 
 /**
  * Get the device name.
  * @return const char* device name
  */
-const char* C_UART_GetDeviceName();
+const char* uartGetDeviceName();
 
 
 #endif

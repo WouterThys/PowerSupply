@@ -14,6 +14,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "../Common/COM_Settings.h"
 #include "Settings.h"
 
 #include "Drivers/INTERRUPT_Driver.h"
@@ -23,6 +24,7 @@
 #include "Drivers/ENC_Driver.h"
 #include "menu.h"
 #include "utils.h"
+#include "Drivers/I2C_Driver.h"
 
 /*******************************************************************************
  *          DEFINES
@@ -44,15 +46,19 @@ int16_t turns = 0;
 Button_t encButton;
 bool updateMenu = false;
 
-// Variables
+// I²C
+i2cData_t i2cData;
+i2cAnswer_t i2cAnswer;
+
+// Regulator variables
 int16_t varVoltage = 0;
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
  ******************************************************************************/
 static void initialize();
-static void setEncTimer(); 
-static void setMenuTimer();
+static void encTimerEnable(bool enable); 
+static void menuTimerEnable(bool enable);
 
 static void encLogic();
 static void menuLogic();
@@ -74,7 +80,7 @@ void initialize() {
 /**
  * Timer which updates encoder every 1ms
  */
-void setEncTimer() {
+void encTimerEnable(bool enable) {
     T2CONbits.TON = 0; // Disable
     T2CONbits.TCS = 0; // Internal clock (Fp)
     T2CONbits.T32 = 0; // 16-bit timer
@@ -89,13 +95,15 @@ void setEncTimer() {
     _T2IF = 0; // Clear
     _T2IE = 1; // Enable
     
-    T2CONbits.TON = 1; // Enable
+    if (enable) {
+        T2CONbits.TON = 1; // Enable
+    } 
 }
 
 /**
  * Timer which updates LCD every 10ms
  */
-void setMenuTimer() {
+void menuTimerEnable(bool enable) {
     T4CONbits.TON = 0; // Disable
     T4CONbits.TCS = 0; // Internal clock (Fp)
     T4CONbits.T32 = 0; // 16-bit timer
@@ -110,7 +118,9 @@ void setMenuTimer() {
     _T4IF = 0; // Clear
     _T4IE = 1; // Enable
     
-    T4CONbits.TON = 1; // Enable
+    if (enable) {
+        T4CONbits.TON = 1; // Enable
+    }
 }
 
 void encLogic() {
@@ -166,14 +176,25 @@ int main(void) {
     DelayMs(1);
     menuInit();
     encInit();
+    i2cInitMaster();
     
     DelayMs(1);
-    setEncTimer();
-    setMenuTimer();
+    encTimerEnable(true);
+    menuTimerEnable(true);
+    i2cEnable(true);
    
+    i2cData.address = VARIABLE_ADDRESS;
+    i2cData.command = 1;
+    i2cData.data1 = 1;
+    i2cData.data2 = 2;
     
     while (1) {
+        
+        i2cData.data1++;
+        i2cData.data2--;
+        i2cMasterWrite(&i2cData);
        
+        DelayMs(2000);
         
     }
     return 0;

@@ -21,6 +21,7 @@ Command:
   build/default/production/Drivers/INTERRUPT_Driver.o \
   build/default/production/Drivers/LCD_Driver.o \
   build/default/production/Drivers/ENC_Driver.o \
+  build/default/production/Drivers/I2C_Driver.o \
   build/default/production/configuration.o \
   build/default/production/main.o \
   build/default/production/utils.o \
@@ -112,14 +113,14 @@ Program Memory  [Origin = 0x200, Length = 0x55ec]
 
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
-.text                        0x200               0x476           0x6b1  (1713)
-.const                       0x676                0x24            0x36  (54)
-.text                        0x69a               0xa08           0xf0c  (3852)
-.dinit                      0x10a2                0x54            0x7e  (126)
-.text                       0x10f6                0x34            0x4e  (78)
-.init.delay32               0x112a                0x1c            0x2a  (42)
+.text                        0x200               0x4be           0x71d  (1821)
+.const                       0x6be                0x24            0x36  (54)
+.text                        0x6e2              0x11a2          0x1a73  (6771)
+.dinit                      0x1884                0x5a            0x87  (135)
+.text                       0x18de                0x34            0x4e  (78)
+.init.delay32               0x1912                0x1c            0x2a  (42)
 
-                 Total program memory used (bytes):         0x16e9  (5865) 17%
+                 Total program memory used (bytes):         0x22c5  (8901) 26%
 
 
 Ivt Memory  [Origin = 0x4, Length = 0x1fc]
@@ -127,8 +128,10 @@ Ivt Memory  [Origin = 0x4, Length = 0x1fc]
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .ivt._T2Interrupt             0x22                 0x2             0x3  (3)
-.ivt._SPI1Interrupt           0x28                 0x2             0x3  (3)
+.ivt._SI2C1Interrupt          0x34                 0x2             0x3  (3)
+.ivt._MI2C1Interrupt          0x36                 0x2             0x3  (3)
 .ivt._T4Interrupt             0x4a                 0x2             0x3  (3)
+.ivt._SPI2Interrupt           0x56                 0x2             0x3  (3)
 
 
 Data Memory  [Origin = 0x1000, Length = 0x1000]
@@ -136,10 +139,10 @@ Data Memory  [Origin = 0x1000, Length = 0x1000]
 section                    address      alignment gaps    total length  (dec)
 -------                    -------      --------------    -------------------
 .ndata                      0x1000                   0            0x36  (54)
-.nbss                       0x1036                   0            0x3e  (62)
-.ndata                      0x1074                   0             0x4  (4)
+.nbss                       0x1036                   0            0x60  (96)
+.ndata                      0x1096                   0             0x4  (4)
 
-                 Total data memory used (bytes):           0x78  (120) 2%
+                 Total data memory used (bytes):           0x9a  (154) 3%
 
 
 Dynamic Memory Usage
@@ -147,9 +150,9 @@ Dynamic Memory Usage
 region                     address                      maximum length  (dec)
 ------                     -------                      ---------------------
 heap                             0                                   0  (0)
-stack                       0x1078                               0xf88  (3976)
+stack                       0x109a                               0xf66  (3942)
 
-                 Maximum dynamic memory (bytes):          0xf88  (3976)
+                 Maximum dynamic memory (bytes):          0xf66  (3942)
 
 
 External Symbols in Data Memory (by address):
@@ -163,26 +166,36 @@ External Symbols in Data Memory (by address):
                     0x102c                  _ncp
                     0x1036                  _varMenu
                     0x1052                  _cursor
-                    0x106a                  _turns
-                    0x106c                  _encButton
-                    0x106e                  _updateMenu
-                    0x1070                  _varVoltage
-                    0x1076                  _encLast
+                    0x1056                  _turns
+                    0x1058                  _encButton
+                    0x105a                  _updateMenu
+                    0x105c                  _i2cData
+                    0x1062                  _i2cAnswer
+                    0x106a                  _varVoltage
+                    0x108e                  _i2cReadyToRead
+                    0x1090                  _i2cInterruptCnt
+                    0x1092                  _i2cTestCnt
+                    0x1098                  _encLast
 
 External Symbols in Data Memory (by name):
 
                     0x1006                  _current
                     0x1052                  _cursor
-                    0x106c                  _encButton
-                    0x1076                  _encLast
+                    0x1058                  _encButton
+                    0x1098                  _encLast
+                    0x1062                  _i2cAnswer
+                    0x105c                  _i2cData
+                    0x1090                  _i2cInterruptCnt
+                    0x108e                  _i2cReadyToRead
+                    0x1092                  _i2cTestCnt
                     0x1022                  _icp
                     0x1012                  _msrCurrent
                     0x100c                  _msrVoltage
                     0x102c                  _ncp
-                    0x106a                  _turns
-                    0x106e                  _updateMenu
+                    0x1056                  _turns
+                    0x105a                  _updateMenu
                     0x1036                  _varMenu
-                    0x1070                  _varVoltage
+                    0x106a                  _varVoltage
                     0x1018                  _vcp
                     0x1000                  _voltage
 
@@ -192,151 +205,167 @@ External Symbols in Program Memory (by address):
                   0x00023c                  __psv_init
                   0x000248                  __data_init_extended
                   0x000248                  __data_init
-                  0x0002fa                  __SPI1Interrupt
-                  0x000316                  __T2Interrupt
-                  0x00033e                  __T4Interrupt
-                  0x000366                  __DefaultInterrupt
-                  0x00036c                  ___subsf3
-                  0x00036e                  ___addsf3
-                  0x000428                  ___lesf2
-                  0x000428                  ___eqsf2
-                  0x000428                  ___ltsf2
-                  0x00042c                  ___fixsfsi
-                  0x00046e                  ___fixunssfsi
-                  0x0004a4                  ___floatunsisf
-                  0x0004a8                  __fpack
-                  0x0004f4                  __funpack
-                  0x00051e                  __funpack2
-                  0x00052e                  __fPropagateNaN
-                  0x000540                  __fbopExit
-                  0x000548                  __fbopReturnNaN
-                  0x00054e                  ___mulsf3
-                  0x0005b6                  __fcompare
-                  0x0005ec                  ___floatundisf
-                  0x00064a                  _strcmp
-                  0x00066a                  _strlen
-                  0x00069a                  _lcdInit
-                  0x0006ac                  _lcdWriteChar
-                  0x0006be                  _lcdWriteDigit
-                  0x0006d4                  _lcdWriteString
-                  0x0006f4                  _lcdWriteInt
-                  0x00076e                  _lcdWriteDouble
-                  0x000800                  _lcdChangeI2CAddress
-                  0x00081a                  _lcdChangeBaudRate
-                  0x000834                  _lcdTurnDisplayOn
-                  0x000856                  _lcdSetCursorPosition
-                  0x000894                  _lcdSetCursorHome
-                  0x0008a8                  _lcdCursorUnderlineOn
-                  0x0008ca                  _lcdMoveCursorLeft
-                  0x0008de                  _lcdMoveCursorRight
-                  0x0008f2                  _lcdTurnOnBlinkingCursor
-                  0x000914                  _lcdBackspace
-                  0x000928                  _lcdClearScreen
-                  0x00093c                  _lcdSetDisplayContrast
-                  0x000956                  _lcdSetDisplayBrightness
-                  0x00096c                  _lcdLoadCustomChar
-                  0x0009a0                  _lcdShiftDisplayLeft
-                  0x0009b4                  _lcdShiftDisplayRight
-                  0x0009c8                  _lcdDisplayFirmwareVersion
-                  0x0009dc                  _lcdDisplayBaudRate
-                  0x0009f0                  _lcdDisplayI2CAddress
-                  0x000b42                  _menuInit
-                  0x000bc2                  _menuTurn
-                  0x000c22                  _menuClicked
-                  0x000c3c                  _encInit
-                  0x000c62                  _encService
-                  0x000d74                  _encGetValue
-                  0x000de2                  _encGetButton
-                  0x000ee0                  _main
-                  0x000efa                  _stringEquals
-                  0x000f14                  _stringToInt
-                  0x000f5a                  _minimumValue
-                  0x000fb6                  _D_SYS_InitOscillator
-                  0x000fe8                  _D_SYS_InitPll
-                  0x00101e                  _D_SYS_InitPorts
-                  0x001030                  _D_SPI_Init
-                  0x00106a                  _D_SPI_Enable
-                  0x001088                  _D_SPI_Write
-                  0x0010f6                  _D_INT_Init
-                  0x001104                  _D_INT_EnableInterrupts
-                  0x00112a                  ___delay32
+                  0x0002fa                  __SPI2Interrupt
+                  0x000314                  __MI2C1Interrupt
+                  0x00032c                  __SI2C1Interrupt
+                  0x00035e                  __T2Interrupt
+                  0x000386                  __T4Interrupt
+                  0x0003ae                  __DefaultInterrupt
+                  0x0003b4                  ___subsf3
+                  0x0003b6                  ___addsf3
+                  0x000470                  ___lesf2
+                  0x000470                  ___eqsf2
+                  0x000470                  ___ltsf2
+                  0x000474                  ___fixsfsi
+                  0x0004b6                  ___fixunssfsi
+                  0x0004ec                  ___floatunsisf
+                  0x0004f0                  __fpack
+                  0x00053c                  __funpack
+                  0x000566                  __funpack2
+                  0x000576                  __fPropagateNaN
+                  0x000588                  __fbopExit
+                  0x000590                  __fbopReturnNaN
+                  0x000596                  ___mulsf3
+                  0x0005fe                  __fcompare
+                  0x000634                  ___floatundisf
+                  0x000692                  _strcmp
+                  0x0006b2                  _strlen
+                  0x000970                  _i2cInitMaster
+                  0x0009a0                  _i2cInitSlave
+                  0x0009e0                  _i2cEnable
+                  0x0009f4                  _i2cReset
+                  0x000a28                  _i2cMasterWrite
+                  0x000c12                  _i2cMasterRead
+                  0x000e1c                  _lcdInit
+                  0x000e2e                  _lcdWriteChar
+                  0x000e40                  _lcdWriteDigit
+                  0x000e56                  _lcdWriteString
+                  0x000e76                  _lcdWriteInt
+                  0x000ef0                  _lcdWriteDouble
+                  0x000f82                  _lcdChangeI2CAddress
+                  0x000f9c                  _lcdChangeBaudRate
+                  0x000fb6                  _lcdTurnDisplayOn
+                  0x000fd8                  _lcdSetCursorPosition
+                  0x001016                  _lcdSetCursorHome
+                  0x00102a                  _lcdCursorUnderlineOn
+                  0x00104c                  _lcdMoveCursorLeft
+                  0x001060                  _lcdMoveCursorRight
+                  0x001074                  _lcdTurnOnBlinkingCursor
+                  0x001096                  _lcdBackspace
+                  0x0010aa                  _lcdClearScreen
+                  0x0010be                  _lcdSetDisplayContrast
+                  0x0010d8                  _lcdSetDisplayBrightness
+                  0x0010ee                  _lcdLoadCustomChar
+                  0x001122                  _lcdShiftDisplayLeft
+                  0x001136                  _lcdShiftDisplayRight
+                  0x00114a                  _lcdDisplayFirmwareVersion
+                  0x00115e                  _lcdDisplayBaudRate
+                  0x001172                  _lcdDisplayI2CAddress
+                  0x0012c4                  _menuInit
+                  0x001344                  _menuTurn
+                  0x0013a4                  _menuClicked
+                  0x0013be                  _encInit
+                  0x0013e4                  _encService
+                  0x0014f6                  _encGetValue
+                  0x001564                  _encGetButton
+                  0x001672                  _main
+                  0x0016bc                  _stringEquals
+                  0x0016d6                  _stringToInt
+                  0x00171c                  _minimumValue
+                  0x001778                  _D_SPI_Init
+                  0x0017d2                  _D_SPI_Enable
+                  0x0017f0                  _D_SPI_Write
+                  0x00180a                  _D_SYS_InitOscillator
+                  0x00183c                  _D_SYS_InitPll
+                  0x001872                  _D_SYS_InitPorts
+                  0x0018de                  _D_INT_Init
+                  0x0018ec                  _D_INT_EnableInterrupts
+                  0x001912                  ___delay32
                   0x0057fa                  __FGS.sec
 
 External Symbols in Program Memory (by name):
 
-                  0x001104                  _D_INT_EnableInterrupts
-                  0x0010f6                  _D_INT_Init
-                  0x00106a                  _D_SPI_Enable
-                  0x001030                  _D_SPI_Init
-                  0x001088                  _D_SPI_Write
-                  0x000fb6                  _D_SYS_InitOscillator
-                  0x000fe8                  _D_SYS_InitPll
-                  0x00101e                  _D_SYS_InitPorts
-                  0x000366                  __DefaultInterrupt
+                  0x0018ec                  _D_INT_EnableInterrupts
+                  0x0018de                  _D_INT_Init
+                  0x0017d2                  _D_SPI_Enable
+                  0x001778                  _D_SPI_Init
+                  0x0017f0                  _D_SPI_Write
+                  0x00180a                  _D_SYS_InitOscillator
+                  0x00183c                  _D_SYS_InitPll
+                  0x001872                  _D_SYS_InitPorts
+                  0x0003ae                  __DefaultInterrupt
                   0x0057fa                  __FGS.sec
-                  0x0002fa                  __SPI1Interrupt
-                  0x000316                  __T2Interrupt
-                  0x00033e                  __T4Interrupt
-                  0x00036e                  ___addsf3
-                  0x00112a                  ___delay32
-                  0x000428                  ___eqsf2
-                  0x00042c                  ___fixsfsi
-                  0x00046e                  ___fixunssfsi
-                  0x0005ec                  ___floatundisf
-                  0x0004a4                  ___floatunsisf
-                  0x000428                  ___lesf2
-                  0x000428                  ___ltsf2
-                  0x00054e                  ___mulsf3
-                  0x00036c                  ___subsf3
+                  0x000314                  __MI2C1Interrupt
+                  0x00032c                  __SI2C1Interrupt
+                  0x0002fa                  __SPI2Interrupt
+                  0x00035e                  __T2Interrupt
+                  0x000386                  __T4Interrupt
+                  0x0003b6                  ___addsf3
+                  0x001912                  ___delay32
+                  0x000470                  ___eqsf2
+                  0x000474                  ___fixsfsi
+                  0x0004b6                  ___fixunssfsi
+                  0x000634                  ___floatundisf
+                  0x0004ec                  ___floatunsisf
+                  0x000470                  ___lesf2
+                  0x000470                  ___ltsf2
+                  0x000596                  ___mulsf3
+                  0x0003b4                  ___subsf3
                   0x000248                  __data_init
                   0x000248                  __data_init_extended
-                  0x00052e                  __fPropagateNaN
-                  0x000540                  __fbopExit
-                  0x000548                  __fbopReturnNaN
-                  0x0005b6                  __fcompare
-                  0x0004a8                  __fpack
-                  0x0004f4                  __funpack
-                  0x00051e                  __funpack2
+                  0x000576                  __fPropagateNaN
+                  0x000588                  __fbopExit
+                  0x000590                  __fbopReturnNaN
+                  0x0005fe                  __fcompare
+                  0x0004f0                  __fpack
+                  0x00053c                  __funpack
+                  0x000566                  __funpack2
                   0x00023c                  __psv_init
                   0x000200                  __resetPRI
-                  0x000de2                  _encGetButton
-                  0x000d74                  _encGetValue
-                  0x000c3c                  _encInit
-                  0x000c62                  _encService
-                  0x000914                  _lcdBackspace
-                  0x00081a                  _lcdChangeBaudRate
-                  0x000800                  _lcdChangeI2CAddress
-                  0x000928                  _lcdClearScreen
-                  0x0008a8                  _lcdCursorUnderlineOn
-                  0x0009dc                  _lcdDisplayBaudRate
-                  0x0009c8                  _lcdDisplayFirmwareVersion
-                  0x0009f0                  _lcdDisplayI2CAddress
-                  0x00069a                  _lcdInit
-                  0x00096c                  _lcdLoadCustomChar
-                  0x0008ca                  _lcdMoveCursorLeft
-                  0x0008de                  _lcdMoveCursorRight
-                  0x000894                  _lcdSetCursorHome
-                  0x000856                  _lcdSetCursorPosition
-                  0x000956                  _lcdSetDisplayBrightness
-                  0x00093c                  _lcdSetDisplayContrast
-                  0x0009a0                  _lcdShiftDisplayLeft
-                  0x0009b4                  _lcdShiftDisplayRight
-                  0x000834                  _lcdTurnDisplayOn
-                  0x0008f2                  _lcdTurnOnBlinkingCursor
-                  0x0006ac                  _lcdWriteChar
-                  0x0006be                  _lcdWriteDigit
-                  0x00076e                  _lcdWriteDouble
-                  0x0006f4                  _lcdWriteInt
-                  0x0006d4                  _lcdWriteString
-                  0x000ee0                  _main
-                  0x000c22                  _menuClicked
-                  0x000b42                  _menuInit
-                  0x000bc2                  _menuTurn
-                  0x000f5a                  _minimumValue
-                  0x00064a                  _strcmp
-                  0x000efa                  _stringEquals
-                  0x000f14                  _stringToInt
-                  0x00066a                  _strlen
+                  0x001564                  _encGetButton
+                  0x0014f6                  _encGetValue
+                  0x0013be                  _encInit
+                  0x0013e4                  _encService
+                  0x0009e0                  _i2cEnable
+                  0x000970                  _i2cInitMaster
+                  0x0009a0                  _i2cInitSlave
+                  0x000c12                  _i2cMasterRead
+                  0x000a28                  _i2cMasterWrite
+                  0x0009f4                  _i2cReset
+                  0x001096                  _lcdBackspace
+                  0x000f9c                  _lcdChangeBaudRate
+                  0x000f82                  _lcdChangeI2CAddress
+                  0x0010aa                  _lcdClearScreen
+                  0x00102a                  _lcdCursorUnderlineOn
+                  0x00115e                  _lcdDisplayBaudRate
+                  0x00114a                  _lcdDisplayFirmwareVersion
+                  0x001172                  _lcdDisplayI2CAddress
+                  0x000e1c                  _lcdInit
+                  0x0010ee                  _lcdLoadCustomChar
+                  0x00104c                  _lcdMoveCursorLeft
+                  0x001060                  _lcdMoveCursorRight
+                  0x001016                  _lcdSetCursorHome
+                  0x000fd8                  _lcdSetCursorPosition
+                  0x0010d8                  _lcdSetDisplayBrightness
+                  0x0010be                  _lcdSetDisplayContrast
+                  0x001122                  _lcdShiftDisplayLeft
+                  0x001136                  _lcdShiftDisplayRight
+                  0x000fb6                  _lcdTurnDisplayOn
+                  0x001074                  _lcdTurnOnBlinkingCursor
+                  0x000e2e                  _lcdWriteChar
+                  0x000e40                  _lcdWriteDigit
+                  0x000ef0                  _lcdWriteDouble
+                  0x000e76                  _lcdWriteInt
+                  0x000e56                  _lcdWriteString
+                  0x001672                  _main
+                  0x0013a4                  _menuClicked
+                  0x0012c4                  _menuInit
+                  0x001344                  _menuTurn
+                  0x00171c                  _minimumValue
+                  0x000692                  _strcmp
+                  0x0016bc                  _stringEquals
+                  0x0016d6                  _stringToInt
+                  0x0006b2                  _strlen
 
 Memory Configuration
 
@@ -365,6 +394,7 @@ LOAD build/default/production/Drivers/SYSTEM_Driver.o
 LOAD build/default/production/Drivers/INTERRUPT_Driver.o
 LOAD build/default/production/Drivers/LCD_Driver.o
 LOAD build/default/production/Drivers/ENC_Driver.o
+LOAD build/default/production/Drivers/I2C_Driver.o
 LOAD build/default/production/configuration.o
 LOAD build/default/production/main.o
 LOAD build/default/production/utils.o
@@ -396,7 +426,7 @@ LOAD /opt/microchip/xc16/v1.33/bin/bin/../../lib/libfx-elf.a
                   0x000002          0x2 SHORT 0x0 ((ABSOLUTE (__reset) >> 0x10) & 0x7f)
                   0x000003          0x2 SHORT 0x0
 
-.text             0x000200        0x476
+.text             0x000200        0x4be
  *(.init)
  .init            0x000200         0x48 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-pic30-elf.a(crt0_extendedep.o)
                   0x000200                  __reset
@@ -408,64 +438,67 @@ LOAD /opt/microchip/xc16/v1.33/bin/bin/../../lib/libfx-elf.a
  *(.user_init)
  *(.handle)
  *(.isr*)
- .isr.text        0x0002fa         0x1c build/default/production/Drivers/SPI_Driver.o
-                  0x0002fa                  __SPI1Interrupt
- .isr.text        0x000316         0x50 build/default/production/main.o
-                  0x000316                  __T2Interrupt
-                  0x00033e                  __T4Interrupt
- .isr             0x000366          0x4 default_isr
-                  0x000366                  __DefaultInterrupt
+ .isr.text        0x0002fa         0x1a build/default/production/Drivers/SPI_Driver.o
+                  0x0002fa                  __SPI2Interrupt
+ .isr.text        0x000314         0x4a build/default/production/Drivers/I2C_Driver.o
+                  0x000314                  __MI2C1Interrupt
+                  0x00032c                  __SI2C1Interrupt
+ .isr.text        0x00035e         0x50 build/default/production/main.o
+                  0x00035e                  __T2Interrupt
+                  0x000386                  __T4Interrupt
+ .isr             0x0003ae          0x4 default_isr
+                  0x0003ae                  __DefaultInterrupt
  *(.libc)
  *(.libm)
  *(.libdsp)
  *(.lib*)
  .libpic30_crt_start_mode
-                  0x00036a          0x2 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-pic30-elf.a(crt_start_mode_normalep.Leo)
-                  0x00036a                  __crt_start_mode_normal
-                  0x00036a                  __crt_start_mode
- .libm.subsf3     0x00036c         0xbc /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(addsf3.epeo)
-                  0x00036c                  ___subsf3
-                  0x00036e                  ___addsf3
- .libm.eqsf2      0x000428          0x4 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(feqltle.epeo)
-                  0x000428                  ___lesf2
-                  0x000428                  ___eqsf2
-                  0x000428                  ___ltsf2
- .libm.fixsfsi    0x00042c         0x42 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fixsfsi.epeo)
-                  0x00042c                  _(float, int, long long, short, float, short, int)
+                  0x0003b2          0x2 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-pic30-elf.a(crt_start_mode_normalep.Leo)
+                  0x0003b2                  __crt_start_mode_normal
+                  0x0003b2                  __crt_start_mode
+ .libm.subsf3     0x0003b4         0xbc /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(addsf3.epeo)
+                  0x0003b4                  ___subsf3
+                  0x0003b6                  ___addsf3
+ .libm.eqsf2      0x000470          0x4 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(feqltle.epeo)
+                  0x000470                  ___lesf2
+                  0x000470                  ___eqsf2
+                  0x000470                  ___ltsf2
+ .libm.fixsfsi    0x000474         0x42 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fixsfsi.epeo)
+                  0x000474                  _(float, int, long long, short, float, short, int)
  .libm.fixunssfsi
-                  0x00046e         0x36 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fixunssfsi.epeo)
-                  0x00046e                  ___fixunssfsi
+                  0x0004b6         0x36 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fixunssfsi.epeo)
+                  0x0004b6                  ___fixunssfsi
  .libm.floatunsisf
-                  0x0004a4          0x4 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(floatunsisf.epeo)
-                  0x0004a4                  ___floatunsisf
- .libm.fpack      0x0004a8         0x4c /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fpack.epeo)
-                  0x0004a8                  __fpack
- .libm.funpack    0x0004f4         0x2a /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(funpack.epeo)
-                  0x0004f4                  __funpack
+                  0x0004ec          0x4 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(floatunsisf.epeo)
+                  0x0004ec                  ___floatunsisf
+ .libm.fpack      0x0004f0         0x4c /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fpack.epeo)
+                  0x0004f0                  __fpack
+ .libm.funpack    0x00053c         0x2a /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(funpack.epeo)
+                  0x00053c                  __funpack
  .libm.funpack2
-                  0x00051e         0x10 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(funpack2.epeo)
-                  0x00051e                  __funpack2
+                  0x000566         0x10 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(funpack2.epeo)
+                  0x000566                  __funpack2
  .libm.fPropagateNaN
-                  0x00052e         0x12 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(futil.epeo)
-                  0x00052e                  __fPropagateNaN
+                  0x000576         0x12 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(futil.epeo)
+                  0x000576                  __fPropagateNaN
  .libm.fbobExit
-                  0x000540          0x8 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(futil.epeo)
-                  0x000540                  __fbopExit
+                  0x000588          0x8 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(futil.epeo)
+                  0x000588                  __fbopExit
  .libm.fbopReturnNaN
-                  0x000548          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(futil.epeo)
-                  0x000548                  __fbopReturnNaN
- .libm.mulsf3     0x00054e         0x68 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(mulsf3.epeo)
-                  0x00054e                  ___mulsf3
+                  0x000590          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(futil.epeo)
+                  0x000590                  __fbopReturnNaN
+ .libm.mulsf3     0x000596         0x68 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(mulsf3.epeo)
+                  0x000596                  ___mulsf3
  .libm.fcompare
-                  0x0005b6         0x36 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fcompare.epeo)
-                  0x0005b6                  __fcompare
+                  0x0005fe         0x36 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fcompare.epeo)
+                  0x0005fe                  __fcompare
  .libm.floatundisf
-                  0x0005ec         0x5e /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(floatundisf.epeo)
-                  0x0005ec                  ___floatundisf
- .libc.strcmp     0x00064a         0x20 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-c-elf.a(strcmp.EP_eo)
-                  0x00064a                  _strcmp
- .libc.strlen     0x00066a          0xc /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-c-elf.a(strlen.EP_eo)
-                  0x00066a                  _strlen
+                  0x000634         0x5e /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(floatundisf.epeo)
+                  0x000634                  ___floatundisf
+ .libc.strcmp     0x000692         0x20 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-c-elf.a(strcmp.EP_eo)
+                  0x000692                  _strcmp
+ .libc.strlen     0x0006b2          0xc /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-c-elf.a(strlen.EP_eo)
+                  0x0006b2                  _strlen
 
 usercode
  *(usercode)
@@ -505,62 +538,67 @@ __FUID3
 .comment
  *(.comment)
 
-.debug_info       0x000000       0x4701
+.debug_info       0x000000       0x5ab1
  *(.debug_info)
- .debug_info      0x000000        0xe38 build/default/production/Drivers/SPI_Driver.o
- .debug_info      0x000e38        0x9d5 build/default/production/Drivers/SYSTEM_Driver.o
- .debug_info      0x00180d        0x7b1 build/default/production/Drivers/INTERRUPT_Driver.o
- .debug_info      0x001fbe        0x6a9 build/default/production/Drivers/LCD_Driver.o
- .debug_info      0x002667        0x814 build/default/production/Drivers/ENC_Driver.o
- .debug_info      0x002e7b        0x12e build/default/production/configuration.o
- .debug_info      0x002fa9        0xf15 build/default/production/main.o
- .debug_info      0x003ebe        0x287 build/default/production/utils.o
- .debug_info      0x004145        0x5bc build/default/production/menu.o
+ .debug_info      0x000000        0xf6a build/default/production/Drivers/SPI_Driver.o
+ .debug_info      0x000f6a        0x9d5 build/default/production/Drivers/SYSTEM_Driver.o
+ .debug_info      0x00193f        0x7b1 build/default/production/Drivers/INTERRUPT_Driver.o
+ .debug_info      0x0020f0        0x6a9 build/default/production/Drivers/LCD_Driver.o
+ .debug_info      0x002799        0x814 build/default/production/Drivers/ENC_Driver.o
+ .debug_info      0x002fad       0x110b build/default/production/Drivers/I2C_Driver.o
+ .debug_info      0x0040b8        0x12e build/default/production/configuration.o
+ .debug_info      0x0041e6       0x108c build/default/production/main.o
+ .debug_info      0x005272        0x287 build/default/production/utils.o
+ .debug_info      0x0054f9        0x5b8 build/default/production/menu.o
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev     0x000000        0x7cb
+.debug_abbrev     0x000000        0x9c2
  *(.debug_abbrev)
  .debug_abbrev    0x000000        0x10d build/default/production/Drivers/SPI_Driver.o
  .debug_abbrev    0x00010d         0xc5 build/default/production/Drivers/SYSTEM_Driver.o
  .debug_abbrev    0x0001d2        0x131 build/default/production/Drivers/INTERRUPT_Driver.o
  .debug_abbrev    0x000303         0xb2 build/default/production/Drivers/LCD_Driver.o
  .debug_abbrev    0x0003b5         0xdd build/default/production/Drivers/ENC_Driver.o
- .debug_abbrev    0x000492         0x1f build/default/production/configuration.o
- .debug_abbrev    0x0004b1        0x16b build/default/production/main.o
- .debug_abbrev    0x00061c         0x73 build/default/production/utils.o
- .debug_abbrev    0x00068f        0x13c build/default/production/menu.o
+ .debug_abbrev    0x000492        0x1b5 build/default/production/Drivers/I2C_Driver.o
+ .debug_abbrev    0x000647         0x1f build/default/production/configuration.o
+ .debug_abbrev    0x000666        0x1ad build/default/production/main.o
+ .debug_abbrev    0x000813         0x73 build/default/production/utils.o
+ .debug_abbrev    0x000886        0x13c build/default/production/menu.o
 
-.debug_line       0x000000        0x7e4
+.debug_line       0x000000        0xabc
  *(.debug_line)
- .debug_line      0x000000        0x106 build/default/production/Drivers/SPI_Driver.o
- .debug_line      0x000106         0xee build/default/production/Drivers/SYSTEM_Driver.o
- .debug_line      0x0001f4         0xe4 build/default/production/Drivers/INTERRUPT_Driver.o
- .debug_line      0x0002d8        0x133 build/default/production/Drivers/LCD_Driver.o
- .debug_line      0x00040b        0x12b build/default/production/Drivers/ENC_Driver.o
- .debug_line      0x000536         0x1a build/default/production/configuration.o
- .debug_line      0x000550        0x13c build/default/production/main.o
- .debug_line      0x00068c         0x97 build/default/production/utils.o
- .debug_line      0x000723         0xc1 build/default/production/menu.o
+ .debug_line      0x000000        0x10a build/default/production/Drivers/SPI_Driver.o
+ .debug_line      0x00010a         0xee build/default/production/Drivers/SYSTEM_Driver.o
+ .debug_line      0x0001f8         0xe4 build/default/production/Drivers/INTERRUPT_Driver.o
+ .debug_line      0x0002dc        0x133 build/default/production/Drivers/LCD_Driver.o
+ .debug_line      0x00040f        0x12b build/default/production/Drivers/ENC_Driver.o
+ .debug_line      0x00053a        0x2b7 build/default/production/Drivers/I2C_Driver.o
+ .debug_line      0x0007f1         0x1a build/default/production/configuration.o
+ .debug_line      0x00080b        0x159 build/default/production/main.o
+ .debug_line      0x000964         0x97 build/default/production/utils.o
+ .debug_line      0x0009fb         0xc1 build/default/production/menu.o
 
-.debug_frame      0x000000        0x70e
+.debug_frame      0x000000        0x882
  *(.debug_frame)
  .debug_frame     0x000000         0x8c build/default/production/Drivers/SPI_Driver.o
  .debug_frame     0x00008c         0x68 build/default/production/Drivers/SYSTEM_Driver.o
  .debug_frame     0x0000f4         0x4c build/default/production/Drivers/INTERRUPT_Driver.o
  .debug_frame     0x000140        0x2d6 build/default/production/Drivers/LCD_Driver.o
  .debug_frame     0x000416         0x84 build/default/production/Drivers/ENC_Driver.o
- .debug_frame     0x00049a        0x13c build/default/production/main.o
- .debug_frame     0x0005d6         0x6e build/default/production/utils.o
- .debug_frame     0x000644         0xca build/default/production/menu.o
+ .debug_frame     0x00049a        0x174 build/default/production/Drivers/I2C_Driver.o
+ .debug_frame     0x00060e        0x13c build/default/production/main.o
+ .debug_frame     0x00074a         0x6e build/default/production/utils.o
+ .debug_frame     0x0007b8         0xca build/default/production/menu.o
 
-.debug_str        0x000000        0x15c
+.debug_str        0x000000        0x1ec
  *(.debug_str)
- .debug_str       0x000000         0x56 build/default/production/Drivers/SPI_Driver.o
- .debug_str       0x000056         0x36 build/default/production/Drivers/SYSTEM_Driver.o
- .debug_str       0x00008c         0x23 build/default/production/Drivers/INTERRUPT_Driver.o
- .debug_str       0x0000af         0x28 build/default/production/Drivers/ENC_Driver.o
- .debug_str       0x0000d7         0x5f build/default/production/main.o
- .debug_str       0x000136         0x26 build/default/production/menu.o
+ .debug_str       0x000000         0x6c build/default/production/Drivers/SPI_Driver.o
+ .debug_str       0x00006c         0x36 build/default/production/Drivers/SYSTEM_Driver.o
+ .debug_str       0x0000a2         0x23 build/default/production/Drivers/INTERRUPT_Driver.o
+ .debug_str       0x0000c5         0x28 build/default/production/Drivers/ENC_Driver.o
+ .debug_str       0x0000ed         0x7a build/default/production/Drivers/I2C_Driver.o
+ .debug_str       0x000167         0x5f build/default/production/main.o
+ .debug_str       0x0001c6         0x26 build/default/production/menu.o
 
 .debug_loc
  *(.debug_loc)
@@ -569,7 +607,7 @@ __FUID3
  *(.debug_macinfo)
 
 .debug_pubnames
-                  0x000000        0x4cd
+                  0x000000        0x5ba
  *(.debug_pubnames)
  .debug_pubnames
                   0x000000         0x55 build/default/production/Drivers/SPI_Driver.o
@@ -582,16 +620,18 @@ __FUID3
  .debug_pubnames
                   0x00031b         0x4e build/default/production/Drivers/ENC_Driver.o
  .debug_pubnames
-                  0x000369         0x7f build/default/production/main.o
+                  0x000369         0xd3 build/default/production/Drivers/I2C_Driver.o
  .debug_pubnames
-                  0x0003e8         0x44 build/default/production/utils.o
+                  0x00043c         0x99 build/default/production/main.o
  .debug_pubnames
-                  0x00042c         0xa1 build/default/production/menu.o
+                  0x0004d5         0x44 build/default/production/utils.o
+ .debug_pubnames
+                  0x000519         0xa1 build/default/production/menu.o
 
 .debug_ranges
  *(.debug_ranges)
 
-.debug_aranges    0x000000         0xc0
+.debug_aranges    0x000000         0xd8
  *(.debug_aranges)
  .debug_aranges
                   0x000000         0x18 build/default/production/Drivers/SPI_Driver.o
@@ -604,11 +644,13 @@ __FUID3
  .debug_aranges
                   0x000060         0x18 build/default/production/Drivers/ENC_Driver.o
  .debug_aranges
-                  0x000078         0x18 build/default/production/main.o
+                  0x000078         0x18 build/default/production/Drivers/I2C_Driver.o
  .debug_aranges
-                  0x000090         0x18 build/default/production/utils.o
+                  0x000090         0x18 build/default/production/main.o
  .debug_aranges
-                  0x0000a8         0x18 build/default/production/menu.o
+                  0x0000a8         0x18 build/default/production/utils.o
+ .debug_aranges
+                  0x0000c0         0x18 build/default/production/menu.o
                     0x0000                  WREG0 = 0x0
                     0x0000                  _WREG0 = 0x0
                     0x0002                  WREG1 = 0x2
@@ -1708,80 +1750,84 @@ LOAD default_isr
 LOAD data_init
 
 .debug_pubtypes
-                  0x0000c0        0x593
+                  0x0000d8        0x785
  .debug_pubtypes
-                  0x0000c0        0x12f build/default/production/Drivers/SPI_Driver.o
+                  0x0000d8        0x171 build/default/production/Drivers/SPI_Driver.o
  .debug_pubtypes
-                  0x0001ef         0xc2 build/default/production/Drivers/SYSTEM_Driver.o
+                  0x000249         0xc2 build/default/production/Drivers/SYSTEM_Driver.o
  .debug_pubtypes
-                  0x0002b1         0x9f build/default/production/Drivers/INTERRUPT_Driver.o
+                  0x00030b         0x9f build/default/production/Drivers/INTERRUPT_Driver.o
  .debug_pubtypes
-                  0x000350         0x37 build/default/production/Drivers/LCD_Driver.o
+                  0x0003aa         0x37 build/default/production/Drivers/LCD_Driver.o
  .debug_pubtypes
-                  0x000387         0xd8 build/default/production/Drivers/ENC_Driver.o
+                  0x0003e1         0xd8 build/default/production/Drivers/ENC_Driver.o
  .debug_pubtypes
-                  0x00045f         0x12 build/default/production/configuration.o
+                  0x0004b9        0x15b build/default/production/Drivers/I2C_Driver.o
  .debug_pubtypes
-                  0x000471        0x131 build/default/production/main.o
+                  0x000614         0x12 build/default/production/configuration.o
  .debug_pubtypes
-                  0x0005a2         0x1f build/default/production/utils.o
+                  0x000626        0x186 build/default/production/main.o
  .debug_pubtypes
-                  0x0005c1         0x92 build/default/production/menu.o
+                  0x0007ac         0x1f build/default/production/utils.o
+ .debug_pubtypes
+                  0x0007cb         0x92 build/default/production/menu.o
 
 __c30_signature
-                  0x000653         0x9c
+                  0x00085d         0xa2
  __c30_signature
-                  0x000653          0x6 build/default/production/Drivers/SPI_Driver.o
+                  0x00085d          0x6 build/default/production/Drivers/SPI_Driver.o
  __c30_signature
-                  0x000659          0x6 build/default/production/Drivers/SYSTEM_Driver.o
+                  0x000863          0x6 build/default/production/Drivers/SYSTEM_Driver.o
  __c30_signature
-                  0x00065f          0x6 build/default/production/Drivers/INTERRUPT_Driver.o
+                  0x000869          0x6 build/default/production/Drivers/INTERRUPT_Driver.o
  __c30_signature
-                  0x000665          0x6 build/default/production/Drivers/LCD_Driver.o
+                  0x00086f          0x6 build/default/production/Drivers/LCD_Driver.o
  __c30_signature
-                  0x00066b          0x6 build/default/production/Drivers/ENC_Driver.o
+                  0x000875          0x6 build/default/production/Drivers/ENC_Driver.o
  __c30_signature
-                  0x000671          0x6 build/default/production/configuration.o
+                  0x00087b          0x6 build/default/production/Drivers/I2C_Driver.o
  __c30_signature
-                  0x000677          0x6 build/default/production/main.o
+                  0x000881          0x6 build/default/production/configuration.o
  __c30_signature
-                  0x00067d          0x6 build/default/production/utils.o
+                  0x000887          0x6 build/default/production/main.o
  __c30_signature
-                  0x000683          0x6 build/default/production/menu.o
+                  0x00088d          0x6 build/default/production/utils.o
  __c30_signature
-                  0x000689          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-pic30-elf.a(crt0_extendedep.o)
+                  0x000893          0x6 build/default/production/menu.o
  __c30_signature
-                  0x00068f          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-pic30-elf.a(data_init_extended.o)
+                  0x000899          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-pic30-elf.a(crt0_extendedep.o)
  __c30_signature
-                  0x000695          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-pic30-elf.a(delay32ep.Leo)
+                  0x00089f          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-pic30-elf.a(data_init_extended.o)
  __c30_signature
-                  0x00069b          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(addsf3.epeo)
+                  0x0008a5          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-pic30-elf.a(delay32ep.Leo)
  __c30_signature
-                  0x0006a1          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(feqltle.epeo)
+                  0x0008ab          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(addsf3.epeo)
  __c30_signature
-                  0x0006a7          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fixsfsi.epeo)
+                  0x0008b1          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(feqltle.epeo)
  __c30_signature
-                  0x0006ad          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fixunssfsi.epeo)
+                  0x0008b7          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fixsfsi.epeo)
  __c30_signature
-                  0x0006b3          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(floatunsisf.epeo)
+                  0x0008bd          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fixunssfsi.epeo)
  __c30_signature
-                  0x0006b9          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fpack.epeo)
+                  0x0008c3          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(floatunsisf.epeo)
  __c30_signature
-                  0x0006bf          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(funpack.epeo)
+                  0x0008c9          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fpack.epeo)
  __c30_signature
-                  0x0006c5          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(funpack2.epeo)
+                  0x0008cf          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(funpack.epeo)
  __c30_signature
-                  0x0006cb          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(futil.epeo)
+                  0x0008d5          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(funpack2.epeo)
  __c30_signature
-                  0x0006d1          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(mulsf3.epeo)
+                  0x0008db          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(futil.epeo)
  __c30_signature
-                  0x0006d7          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fcompare.epeo)
+                  0x0008e1          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(mulsf3.epeo)
  __c30_signature
-                  0x0006dd          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(floatundisf.epeo)
+                  0x0008e7          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(fcompare.epeo)
  __c30_signature
-                  0x0006e3          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-c-elf.a(strcmp.EP_eo)
+                  0x0008ed          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/libm-elf.a(floatundisf.epeo)
  __c30_signature
-                  0x0006e9          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-c-elf.a(strlen.EP_eo)
+                  0x0008f3          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-c-elf.a(strcmp.EP_eo)
+ __c30_signature
+                  0x0008f9          0x6 /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-c-elf.a(strlen.EP_eo)
 
 .ndata              0x1000         0x36
  .ndata             0x1000         0x36 build/default/production/menu.o
@@ -1793,27 +1839,43 @@ __c30_signature
                     0x1022                  _icp
                     0x102c                  _ncp
 
-.nbss               0x1036         0x3e
+.nbss               0x1036         0x60
  .nbss              0x1036         0x20 build/default/production/menu.o
                     0x1036                  _varMenu
                     0x1052                  _cursor
- .nbss              0x1056         0x14 build/default/production/Drivers/ENC_Driver.o
- .nbss              0x106a          0x8 build/default/production/main.o
-                    0x106a                  _turns
-                    0x106c                  _encButton
-                    0x106e                  _updateMenu
-                    0x1070                  _varVoltage
- .nbss              0x1072          0x2 build/default/production/Drivers/SPI_Driver.o
+ .nbss              0x1056         0x16 build/default/production/main.o
+                    0x1056                  _turns
+                    0x1058                  _encButton
+                    0x105a                  _updateMenu
+                    0x105c                  _i2cData
+                    0x1062                  _i2cAnswer
+                    0x106a                  _varVoltage
+ .nbss              0x106c         0x14 build/default/production/Drivers/ENC_Driver.o
+ .nbss              0x1080         0x14 build/default/production/Drivers/I2C_Driver.o
+                    0x108e                  _i2cReadyToRead
+                    0x1090                  _i2cInterruptCnt
+                    0x1092                  _i2cTestCnt
+ .nbss              0x1094          0x2 build/default/production/Drivers/SPI_Driver.o
 
-.ndata              0x1074          0x4
- .ndata             0x1074          0x2 build/default/production/Drivers/ENC_Driver.o
- .ndata             0x1076          0x2 build/default/production/main.o
-                    0x1076                  _encLast
+.ndata              0x1096          0x4
+ .ndata             0x1096          0x2 build/default/production/Drivers/ENC_Driver.o
+ .ndata             0x1098          0x2 build/default/production/main.o
+                    0x1098                  _encLast
 
-.ivt._SPI1Interrupt
-                  0x000028          0x2
- .ivt._SPI1Interrupt
-                  0x000028          0x2 build/default/production/Drivers/SPI_Driver.o
+.ivt._SPI2Interrupt
+                  0x000056          0x2
+ .ivt._SPI2Interrupt
+                  0x000056          0x2 build/default/production/Drivers/SPI_Driver.o
+
+.ivt._MI2C1Interrupt
+                  0x000036          0x2
+ .ivt._MI2C1Interrupt
+                  0x000036          0x2 build/default/production/Drivers/I2C_Driver.o
+
+.ivt._SI2C1Interrupt
+                  0x000034          0x2
+ .ivt._SI2C1Interrupt
+                  0x000034          0x2 build/default/production/Drivers/I2C_Driver.o
 
 .config_IESO      0x0057f8          0x2
  .config_IESO     0x0057f8          0x2 build/default/production/configuration.o
@@ -1843,69 +1905,76 @@ __c30_signature
  .ivt._T4Interrupt
                   0x00004a          0x2 build/default/production/main.o
 
-.const              0x8676         0x24 load address 0x000676  
- .const             0x8676         0x22 build/default/production/menu.o
- .const             0x8698          0x2 build/default/production/Drivers/LCD_Driver.o
+.const              0x86be         0x24 load address 0x0006be  
+ .const             0x86be         0x22 build/default/production/menu.o
+ .const             0x86e0          0x2 build/default/production/Drivers/LCD_Driver.o
 
-.text             0x00069a        0xa08
- .text            0x00069a        0x36a build/default/production/Drivers/LCD_Driver.o
-                  0x00069a                  _lcdInit
-                  0x0006ac                  _lcdWriteChar
-                  0x0006be                  _lcdWriteDigit
-                  0x0006d4                  _lcdWriteString
-                  0x0006f4                  _lcdWriteInt
-                  0x00076e                  _lcdWriteDouble
-                  0x000800                  _lcdChangeI2CAddress
-                  0x00081a                  _lcdChangeBaudRate
-                  0x000834                  _lcdTurnDisplayOn
-                  0x000856                  _lcdSetCursorPosition
-                  0x000894                  _lcdSetCursorHome
-                  0x0008a8                  _lcdCursorUnderlineOn
-                  0x0008ca                  _lcdMoveCursorLeft
-                  0x0008de                  _lcdMoveCursorRight
-                  0x0008f2                  _lcdTurnOnBlinkingCursor
-                  0x000914                  _lcdBackspace
-                  0x000928                  _lcdClearScreen
-                  0x00093c                  _lcdSetDisplayContrast
-                  0x000956                  _lcdSetDisplayBrightness
-                  0x00096c                  _lcdLoadCustomChar
-                  0x0009a0                  _lcdShiftDisplayLeft
-                  0x0009b4                  _lcdShiftDisplayRight
-                  0x0009c8                  _lcdDisplayFirmwareVersion
-                  0x0009dc                  _lcdDisplayBaudRate
-                  0x0009f0                  _lcdDisplayI2CAddress
- .text            0x000a04        0x238 build/default/production/menu.o
-                  0x000b42                  _menuInit
-                  0x000bc2                  _menuTurn
-                  0x000c22                  _menuClicked
- .text            0x000c3c        0x1ba build/default/production/Drivers/ENC_Driver.o
-                  0x000c3c                  _encInit
-                  0x000c62                  _encService
-                  0x000d74                  _encGetValue
-                  0x000de2                  _encGetButton
- .text            0x000df6        0x104 build/default/production/main.o
-                  0x000ee0                  _main
- .text            0x000efa         0xbc build/default/production/utils.o
-                  0x000efa                  _stringEquals
-                  0x000f14                  _stringToInt
-                  0x000f5a                  _minimumValue
- .text            0x000fb6         0x7a build/default/production/Drivers/SYSTEM_Driver.o
-                  0x000fb6                  _D_SYS_InitOscillator
-                  0x000fe8                  _D_SYS_InitPll
-                  0x00101e                  _D_SYS_InitPorts
- .text            0x001030         0x72 build/default/production/Drivers/SPI_Driver.o
-                  0x001030                  _D_SPI_Init
-                  0x00106a                  _D_SPI_Enable
-                  0x001088                  _D_SPI_Write
+.text             0x0006e2       0x11a2
+ .text            0x0006e2        0x73a build/default/production/Drivers/I2C_Driver.o
+                  0x000970                  _i2cInitMaster
+                  0x0009a0                  _i2cInitSlave
+                  0x0009e0                  _i2cEnable
+                  0x0009f4                  _i2cReset
+                  0x000a28                  _i2cMasterWrite
+                  0x000c12                  _i2cMasterRead
+ .text            0x000e1c        0x36a build/default/production/Drivers/LCD_Driver.o
+                  0x000e1c                  _lcdInit
+                  0x000e2e                  _lcdWriteChar
+                  0x000e40                  _lcdWriteDigit
+                  0x000e56                  _lcdWriteString
+                  0x000e76                  _lcdWriteInt
+                  0x000ef0                  _lcdWriteDouble
+                  0x000f82                  _lcdChangeI2CAddress
+                  0x000f9c                  _lcdChangeBaudRate
+                  0x000fb6                  _lcdTurnDisplayOn
+                  0x000fd8                  _lcdSetCursorPosition
+                  0x001016                  _lcdSetCursorHome
+                  0x00102a                  _lcdCursorUnderlineOn
+                  0x00104c                  _lcdMoveCursorLeft
+                  0x001060                  _lcdMoveCursorRight
+                  0x001074                  _lcdTurnOnBlinkingCursor
+                  0x001096                  _lcdBackspace
+                  0x0010aa                  _lcdClearScreen
+                  0x0010be                  _lcdSetDisplayContrast
+                  0x0010d8                  _lcdSetDisplayBrightness
+                  0x0010ee                  _lcdLoadCustomChar
+                  0x001122                  _lcdShiftDisplayLeft
+                  0x001136                  _lcdShiftDisplayRight
+                  0x00114a                  _lcdDisplayFirmwareVersion
+                  0x00115e                  _lcdDisplayBaudRate
+                  0x001172                  _lcdDisplayI2CAddress
+ .text            0x001186        0x238 build/default/production/menu.o
+                  0x0012c4                  _menuInit
+                  0x001344                  _menuTurn
+                  0x0013a4                  _menuClicked
+ .text            0x0013be        0x1ba build/default/production/Drivers/ENC_Driver.o
+                  0x0013be                  _encInit
+                  0x0013e4                  _encService
+                  0x0014f6                  _encGetValue
+                  0x001564                  _encGetButton
+ .text            0x001578        0x144 build/default/production/main.o
+                  0x001672                  _main
+ .text            0x0016bc         0xbc build/default/production/utils.o
+                  0x0016bc                  _stringEquals
+                  0x0016d6                  _stringToInt
+                  0x00171c                  _minimumValue
+ .text            0x001778         0x92 build/default/production/Drivers/SPI_Driver.o
+                  0x001778                  _D_SPI_Init
+                  0x0017d2                  _D_SPI_Enable
+                  0x0017f0                  _D_SPI_Write
+ .text            0x00180a         0x7a build/default/production/Drivers/SYSTEM_Driver.o
+                  0x00180a                  _D_SYS_InitOscillator
+                  0x00183c                  _D_SYS_InitPll
+                  0x001872                  _D_SYS_InitPorts
 
-.dinit            0x0010a2         0x54
- .dinit           0x0010a2         0x54 data_init
+.dinit            0x001884         0x5a
+ .dinit           0x001884         0x5a data_init
 
-.text             0x0010f6         0x34
- .text            0x0010f6         0x34 build/default/production/Drivers/INTERRUPT_Driver.o
-                  0x0010f6                  _D_INT_Init
-                  0x001104                  _D_INT_EnableInterrupts
+.text             0x0018de         0x34
+ .text            0x0018de         0x34 build/default/production/Drivers/INTERRUPT_Driver.o
+                  0x0018de                  _D_INT_Init
+                  0x0018ec                  _D_INT_EnableInterrupts
 
-.init.delay32     0x00112a         0x1c
- .init.delay32    0x00112a         0x1c /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-pic30-elf.a(delay32ep.Leo)
-                  0x00112a                  ___delay32
+.init.delay32     0x001912         0x1c
+ .init.delay32    0x001912         0x1c /opt/microchip/xc16/v1.33/bin/bin/../../lib/liblega-pic30-elf.a(delay32ep.Leo)
+                  0x001912                  ___delay32

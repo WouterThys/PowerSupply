@@ -15,6 +15,7 @@
 #include "Drivers/ADC_Driver.h"
 
 #include "Drivers/UART_Driver.h"
+#include "Drivers/I2C_Driver.h"
 
 
 
@@ -35,6 +36,9 @@
  *          VARIABLES
  ******************************************************************************/
 static AdcBuffer_t adcBuffer;
+
+i2cData_t i2cData;
+i2cAnswer_t i2cAnswer;
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
@@ -69,32 +73,31 @@ int main(void) {
     
     // Initialize
     dacInit();
-    D_UART_Init(UART_MODULE_1, UART1_BAUD);
+    uartInit(UART_MODULE_1, UART1_BAUD);
+    i2cInitSlave(VARIABLE_ADDRESS, &i2cData, &i2cAnswer);
     adcInit(&adcBuffer);
     
     // Enable
     dacEnable(true);
-    D_UART_Enable(UART_MODULE_1, true);
-    adcEnable(true);
-
-    DelayMs(1000);
+    uartEnable(UART_MODULE_1, true);
+    i2cEnable(true);
+    //adcEnable(true);
     
-    dacSetVoltageA(1.5);
-    dacSetVoltageB(0);
+    //dacSetVoltageA(1.5);
+    //dacSetVoltageB(0);
     
     printf("start\n");
     
     while(1) {
         
-        LED1 = !LED1;
-        DelayMs(200);
-        
-        LED2 = !LED2;
-        DelayMs(200);
-        
-        LED3 = !LED3;
-        DelayMs(200);
-    
+        if (i2cReadyToRead) {
+            i2cReadyToRead = false;
+            
+            printf("C: %d\n", i2cData.command);
+            printf("S: %d\n", i2cData.status);
+            printf("D0: %d\n", i2cData.data1);
+            printf("D1: %d\n\n", i2cData.data2);
+        }
 //        if (UART_flag) {
 //            LED1 = 1;
 //            UART_flag = false;
@@ -108,17 +111,17 @@ int main(void) {
 //        }
 //        
         if (ADC_flag) {
-            printf("ISense: %e\n", adcValueToVolage(adcBuffer.value0));
-            DelayMs(10);
-            printf("VSense: %e\n", adcValueToVolage(adcBuffer.value1));
-            DelayMs(10);
-            printf("Temp: %e\n", adcValueToVolage(adcBuffer.value2));
-            DelayMs(10);
-            printf("IMon, %e\n\n", adcValueToVolage(adcBuffer.value3));
+//            printf("ISense: %e\n", adcValueToVolage(adcBuffer.value0));
+//            DelayMs(10);
+//            printf("VSense: %e\n", adcValueToVolage(adcBuffer.value1));
+//            DelayMs(10);
+//            printf("Temp: %e\n", adcValueToVolage(adcBuffer.value2));
+//            DelayMs(10);
+//            printf("IMon, %e\n\n", adcValueToVolage(adcBuffer.value3));
 
             
             ADC_flag = false;
-            adcEnable(true);
+//            adcEnable(true);
         }
         
     }

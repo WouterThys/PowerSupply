@@ -66,7 +66,7 @@ extern "C" {
  * UART
  */    
     
-#define UART1_BAUD      9600                /* 9600 Baud rate                 */
+#define UART1_BAUD      57600               /* 9600 Baud rate                 */
 #define UART1_ID        2   
 
 #define UART1_RX_Dir    TRISBbits.TRISB6    /* RX Pin on RP38-RB6             */
@@ -94,6 +94,18 @@ extern "C" {
 #define SPI2_SDO_Map    0b001000
 #define SPI2_SCK_Map    0b001001  
 #define SPI2_SDI_Map    44
+    
+    
+/**
+ * I²C
+ */
+#define I2C_ADDRESS     0x03
+
+#define I2C_SCL_Dir     TRISBbits.TRISB8        /* SCL Direction              */
+#define I2C_SDA_Dir     TRISBbits.TRISB9        /* SDA Direction              */
+
+#define I2C_SCL_Odc     ODCBbits.ODCB8          /* Open drain config for SCL  */
+#define I2C_SDA_Odc     ODCBbits.ODCB9          /* Open drain config for SDA  */
     
 
 #ifdef	__cplusplus
