@@ -7,7 +7,6 @@
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/SPI_Driver.h</itemPath>
         <itemPath>Drivers/SYSTEM_Driver.h</itemPath>
-        <itemPath>Drivers/INTERRUPT_Driver.h</itemPath>
         <itemPath>Drivers/LCD_Driver.h</itemPath>
         <itemPath>Drivers/ENC_Driver.h</itemPath>
         <itemPath>Drivers/I2C_Driver.h</itemPath>
@@ -26,7 +25,6 @@
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/SPI_Driver.c</itemPath>
         <itemPath>Drivers/SYSTEM_Driver.c</itemPath>
-        <itemPath>Drivers/INTERRUPT_Driver.c</itemPath>
         <itemPath>Drivers/LCD_Driver.c</itemPath>
         <itemPath>Drivers/ENC_Driver.c</itemPath>
         <itemPath>Drivers/I2C_Driver.c</itemPath>

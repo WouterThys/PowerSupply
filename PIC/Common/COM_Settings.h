@@ -24,11 +24,15 @@
 //#define COM_LCD              0x05
 //#define COM_STATUS           0x06
 
-#define COM_1   0x01    
-#define COM_2   0x02
-#define COM_3   0x03
-#define COM_4   0x04
-//...
+#define COM_A0   0x01    
+#define COM_A1   0x02
+#define COM_A2   0x03
+#define COM_A3   0x04
+
+
+#define COM_SET_V   0x08
+#define COM_SET_I   0x09
+
 
 
 

@@ -4,7 +4,6 @@
 #include <stdbool.h>       /* Includes true/false definition                  */
 
 #include "../Settings.h"
-#include "INTERRUPT_Driver.h"
 #include "SPI_Driver.h"
 #include "SYSTEM_Driver.h"
 
@@ -41,8 +40,8 @@ void D_SPI_Init() {
     SPI2CON1bits.CKP = 1;           // Idle state for clock is a low level; active state is a high level
     SPI2CON1bits.SSEN = 0;          // SS2 pin is not used by module. Pin is controlled by port function
     SPI2CON1bits.MSTEN = 1;         // Master mode
-    SPI2CON1bits.SPRE = 0;       // Secondary pre-scale 8:1
-    SPI2CON1bits.PPRE = 0;       // Primary pre-scale 64:1
+    SPI2CON1bits.SPRE = 0;          // Secondary pre-scale 8:1
+    SPI2CON1bits.PPRE = 0;          // Primary pre-scale 64:1
     
     /* SPI2CON2 Register */
     SPI2CON2bits.FRMEN = 0;         // Framed SPI2 support is disabled 

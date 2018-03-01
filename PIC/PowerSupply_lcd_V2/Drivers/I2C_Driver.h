@@ -10,7 +10,7 @@
 #ifndef I2C_DRIVER_H
 #define	I2C_DRIVER_H
 
-#include <xc.h> // include processor files - each processor file is guarded.  
+#include <xc.h> // include processor files - each processor file is guarded. 
 
 #define I2C_MWRITE          3
 #define I2C_MREAD           2
@@ -24,16 +24,6 @@
 #define I2C_UNEXPECTED_ADR  -7
 #define I2C_STILL_BUSY      -8
 
-#define I2C_ADDRESS_MASK    0xFE    /* Mask for fist 7 bits in address byte   */
-#define I2C_RW_MASK         0x01    /* Mask for write or read indicator       */
-
-//#define I2C_STATUS_MASK     0x0F    /* Mask for 4-bit status                  */
-//#define I2C_FIRST_DATA_MASK 0x0F    /* Mask for 4-bit first data              */
-/*
- */
-
-extern bool i2cReadyToRead; /* Flag to indicate a read was performed          */
-
 struct I2C_Data {
     uint8_t address;    /* Address (7-bit) of the slave                       */
     uint8_t command;    /* Command (8-bit) send from M -> S                   */
@@ -43,14 +33,6 @@ struct I2C_Data {
 };
 typedef struct I2C_Data i2cData_t;
 
-struct I2C_AnswerData {
-    int16_t value0;
-    int16_t value1;
-    int16_t value2;
-    int16_t value3;
-};
-typedef struct I2C_AnswerData i2cAnswer_t;
-
 /**
  * 
  */
@@ -59,10 +41,10 @@ void i2cInitMaster();
 /**
  * 
  * @param address
- * @param slaveData
- * @param answerData
+ * @param onI2cAnswer
+ * @param onI2cReadDone
  */
-void i2cInitSlave(uint16_t address, i2cData_t * slaveData, i2cAnswer_t * answerData);
+void i2cInitSlave(uint16_t address, void (*onI2cAnswer)(i2cData_t * data), void (*onI2cReadDone)(i2cData_t data));
 
 /**
  * 

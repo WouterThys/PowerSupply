@@ -9,13 +9,13 @@
       </logicalFolder>
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/SYSTEM_Driver.h</itemPath>
-        <itemPath>Drivers/INTERRUPT_Driver.h</itemPath>
         <itemPath>Drivers/SPI2_Driver.h</itemPath>
         <itemPath>Drivers/ADC_Driver.h</itemPath>
         <itemPath>Drivers/UART_Driver.h</itemPath>
         <itemPath>Drivers/I2C_Driver.h</itemPath>
       </logicalFolder>
       <itemPath>Settings.h</itemPath>
+      <itemPath>utils.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -28,7 +28,6 @@
         <itemPath>Controllers/DAC_Controller.c</itemPath>
       </logicalFolder>
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
-        <itemPath>Drivers/INTERRUPT_Driver.c</itemPath>
         <itemPath>Drivers/SYSTEM_Driver.c</itemPath>
         <itemPath>Drivers/SPI2_Driver.c</itemPath>
         <itemPath>Drivers/ADC_Driver.c</itemPath>
@@ -37,6 +36,7 @@
       </logicalFolder>
       <itemPath>configuration.c</itemPath>
       <itemPath>main.c</itemPath>
+      <itemPath>utils.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -220,6 +220,7 @@
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
         <property key="UART 1" value="true"/>
         <property key="UART 2" value="true"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>

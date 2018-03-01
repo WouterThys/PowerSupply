@@ -5,6 +5,7 @@
 
 #include "../../Common/COM_Settings.h"  /* Common communication variables     */
 #include "../Settings.h"
+#include "../utils.h"
 #include "I2C_Driver.h"
 
 /*******************************************************************************
@@ -25,6 +26,9 @@
 #define I2C_CHECK_FIRST_DATA     12
 #define I2C_CHECK_SECOND_DATA    13
 #define I2C_CHECK_REP_START      14
+
+#define I2C_ADDRESS_MASK    0xFE    /* Mask for fist 7 bits in address byte   */
+#define I2C_RW_MASK         0x01    /* Mask for write or read indicator       */
 
 #define CHECK_ACKSTAT 0x8000 /* Mask for ACKSTAT. ACK = 0, NACK = 1           */
 #define CHECK_BCL     0x0400 /* Mask for Bus Collision Detect                 */
@@ -60,10 +64,8 @@ static bool masterInterrupt;
 static bool firstTime;
 static bool masterWrite;
 
-static i2cData_t *slaveReadData;
-static i2cAnswer_t *answerData;
+static i2cData_t slaveReadData;
 
-bool i2cReadyToRead;
 uint16_t i2cInterruptCnt;
 uint16_t i2cTestCnt;
 
@@ -80,74 +82,56 @@ uint16_t i2cTestCnt;
 static bool check(uint16_t mask);
 static void i2cRead();
 
-static void setI2cData(i2cData_t * data);
+static void (*onI2cAnswer)(i2cData_t  * data);
+static void (*onI2cReadDone)(i2cData_t data);
 
 static bool check(uint16_t mask) {
     return ((I2C1STAT & mask) > 0);
 }
 
-void setI2cData(i2cData_t * data) {
-    switch ((data->command)) {
-        case COM_1:
-            data->data1 = (answerData->value0 >> 8) & 0x00FF;
-            data->data2 = (answerData->value0 >> 0) & 0x00FF;
-            break;
-        case COM_2:
-            data->data1 = (answerData->value1 >> 8) & 0x00FF;
-            data->data2 = (answerData->value1 >> 0) & 0x00FF;
-            break;
-        case COM_3:
-            data->data1 = (answerData->value2 >> 8) & 0x00FF;
-            data->data2 = (answerData->value2 >> 0) & 0x00FF;
-            break;
-        case COM_4:
-            data->data1 = (answerData->value3 >> 8) & 0x00FF;
-            data->data2 = (answerData->value3 >> 0) & 0x00FF;
-            break;
-    }
-}
+
 
 void i2cRead() {
     switch (slaveState) {
             // This slaves address is detected
         case I2C_STATE_IDLE:
             slaveReady = false;
-            slaveReadData->status = I2C_OK;
+            slaveReadData.status = I2C_OK;
 
             if (check(CHECK_S) && !check(CHECK_DA)) {
-                slaveReadData->address = i2cDataRead(); // Read to clean buffer
+                slaveReadData.address = i2cDataRead(); // Read to clean buffer
                 slaveState = I2C_STATE_COMMAND;
             } else {
-                slaveReadData->status = I2C_UNEXPECTED_DATA;
+                slaveReadData.status = I2C_UNEXPECTED_DATA;
                 slaveState = I2C_STATE_STOP;
             }
             // Error checks
             if (check(CHECK_BCL)) {
-                slaveReadData->status = I2C_COLLISION;
+                slaveReadData.status = I2C_COLLISION;
                 slaveState = I2C_STATE_STOP;
             }
             if (check(CHECK_I2COV)) {
-                slaveReadData->status = I2C_OVERFLOW;
+                slaveReadData.status = I2C_OVERFLOW;
                 slaveState = I2C_STATE_STOP;
             }
             break;
             // Receive command
         case I2C_STATE_COMMAND:
             if (check(CHECK_DA)) {
-                slaveReadData->command = i2cDataRead();
+                slaveReadData.command = i2cDataRead();
                 slaveState = I2C_STATE_FIRST_DATA;
             } else {
-                slaveReadData->status = I2C_UNEXPECTED_ADR;
+                slaveReadData.status = I2C_UNEXPECTED_ADR;
                 slaveState = I2C_STATE_STOP;
             }
 
             // Error checks
             if (check(CHECK_BCL)) {
-                slaveReadData->status = I2C_COLLISION;
+                slaveReadData.status = I2C_COLLISION;
                 slaveState = I2C_STATE_STOP;
             }
             if (check(CHECK_I2COV)) {
-                slaveReadData->status = I2C_OVERFLOW;
+                slaveReadData.status = I2C_OVERFLOW;
                 slaveState = I2C_STATE_STOP;
             }
 
@@ -155,49 +139,49 @@ void i2cRead() {
             // Write/Read first data byte    
         case I2C_STATE_FIRST_DATA:
             if (!check(CHECK_DA)) { // Address, master is asking to send data
-                slaveReadData->address = i2cDataRead(); // Read again to prevent buffer overflow
-                setI2cData(slaveReadData); 
-                i2cDataWrite(slaveReadData->data1);
+                slaveReadData.address = i2cDataRead(); // Read again to prevent buffer overflow
+                (*onI2cAnswer)(&slaveReadData);
+                i2cDataWrite(slaveReadData.data1);
                 while (!check(CHECK_TBF)); // Wait until buffer is full
                 I2C1CONbits.SCLREL = 1; // Release clock hold
                 masterWrite = false;
-                slaveReadData->status = I2C_MREAD;
+                slaveReadData.status = I2C_MREAD;
             } else {
-                slaveReadData->data1 = i2cDataRead(); // Read data
+                slaveReadData.data1 = i2cDataRead(); // Read data
                 masterWrite = true;
-                slaveReadData->status = I2C_MWRITE;
+                slaveReadData.status = I2C_MWRITE;
             }
             slaveState = I2C_STATE_SECOND_DATA;
 
             // Error checks
             if (check(CHECK_BCL)) {
-                slaveReadData->status = I2C_COLLISION;
+                slaveReadData.status = I2C_COLLISION;
                 slaveState = I2C_STATE_STOP;
             }
             if (check(CHECK_I2COV)) {
-                slaveReadData->status = I2C_OVERFLOW;
+                slaveReadData.status = I2C_OVERFLOW;
                 slaveState = I2C_STATE_STOP;
             }
             break;
             // Write second data
         case I2C_STATE_SECOND_DATA:
             if (!masterWrite) { // Master wanted to read, send second data
-                i2cDataWrite(slaveReadData->data2);
+                i2cDataWrite(slaveReadData.data2);
                 while (!check(CHECK_TBF)); // Wait until buffer is full
                 I2C1CONbits.SCLREL = 1; // Release clock hold
 
                 slaveState = I2C_CHECK_SECOND_DATA;
             } else {
-                slaveReadData->data2 = i2cDataRead(); // Read data
+                slaveReadData.data2 = i2cDataRead(); // Read data
                 slaveState = I2C_STATE_STOP;
             }
             // Error checks
             if (check(CHECK_BCL)) {
-                slaveReadData->status = I2C_COLLISION;
+                slaveReadData.status = I2C_COLLISION;
                 slaveState = I2C_STATE_STOP;
             }
             if (check(CHECK_I2COV)) {
-                slaveReadData->status = I2C_OVERFLOW;
+                slaveReadData.status = I2C_OVERFLOW;
                 slaveState = I2C_STATE_STOP;
             }
 
@@ -209,11 +193,11 @@ void i2cRead() {
 
             // Error checks
             if (check(CHECK_BCL)) {
-                slaveReadData->status = I2C_COLLISION;
+                slaveReadData.status = I2C_COLLISION;
                 slaveState = I2C_STATE_STOP;
             }
             if (check(CHECK_I2COV)) {
-                slaveReadData->status = I2C_OVERFLOW;
+                slaveReadData.status = I2C_OVERFLOW;
                 slaveState = I2C_STATE_STOP;
             }
 
@@ -223,11 +207,11 @@ void i2cRead() {
             slaveState = I2C_STATE_IDLE;
             slaveReady = true;
             if (check(CHECK_RBF) || check(CHECK_I2COV)) {
-                slaveReadData->data1 = i2cDataRead();
+                slaveReadData.data1 = i2cDataRead();
 
                 I2C1STATbits.I2COV = 0;
             }
-            i2cReadyToRead = true;
+            (*onI2cReadDone)(slaveReadData);
             break;
     }
 
@@ -262,9 +246,9 @@ void i2cInitMaster() {
     _MI2C1IE = 1; // Enable
 }
 
-void i2cInitSlave(uint16_t address, i2cData_t * slaveData, i2cAnswer_t * answer) {
+void i2cInitSlave(uint16_t address, void (*answer)(i2cData_t * data), void (*readDone)(i2cData_t data)) {
     i2cEnable(false);
-
+    
     /* Ports */
     I2C_SCL_Odc = 0;    // Open drain
     I2C_SDA_Odc = 0;    // Open drain
@@ -279,11 +263,12 @@ void i2cInitSlave(uint16_t address, i2cData_t * slaveData, i2cAnswer_t * answer)
 
     /* Variables */
     slaveState = I2C_STATE_IDLE;
-    i2cReadyToRead = false;
     slaveReady = true;
     firstTime = true;
-    slaveReadData = slaveData;
-    answerData = answer;
+    
+    /* Event function pointers */
+    onI2cAnswer = answer;
+    onI2cReadDone = readDone;
 
     /* Interrupts master */
     _SI2C1IF = 0; // Clear flag
@@ -313,7 +298,6 @@ void i2cReset() {
     slaveState = I2C_STATE_IDLE;
     slaveReady = true;
     firstTime = true;
-    i2cReadyToRead = false;
     i2cInterruptCnt = 0;
     i2cTestCnt = 0;
 

@@ -16,7 +16,7 @@ extern "C" {
 #include <stdbool.h>
 
 /* Microcontroller MIPs (FCY) */
-#define SYS_FREQ        36850000L
+#define SYS_FREQ        140000000L
 #define FCY             SYS_FREQ/2
 
 #define DelayMs(d) \
@@ -27,18 +27,32 @@ extern "C" {
 /******************************************************************************/
 /* System Function Prototypes                                                 */
 /******************************************************************************/
+    
 /**
  * Configure oscillator settings.
  */
-void D_SYS_InitOscillator(void); 
+void sysInitOscillator(void); 
+
 /**
  * Configure PLL settings.
  */
-void D_SYS_InitPll(void); 
+void sysInitPll(void); 
+
 /**
  * Initialize the ports all as output, clear analog selections.
  */
-void D_SYS_InitPorts(void);
+void sysInitPorts(void);
+
+/**
+ * Initializes the interrupts to the default settings.
+ */
+void sysInitInterrupts(void);
+
+/**
+ * Enable all interrupts
+ * @param enable
+ */
+void sysInterruptEnable(bool enable);
 
 
 #endif

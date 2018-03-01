@@ -64,3 +64,23 @@ void sysInitPorts(void) {
     ANSELB = 0x0000;
     PORTB = 0x0000;
 }
+
+void sysInitInterrupts(void) {
+    INTCON1 = 0x0000;       // Clear all special pending flags
+    INTCON3 = 0x0000;
+    INTCON4 = 0x0000;
+
+    _NSTDIS = 0; // Enable Interrupt Nesting   MUST !!!!
+    return;
+}
+
+void sysInterruptEnable(bool enable) {
+    if(enable) {
+        _IPL = 0b000; // Set CPU at Level = 0
+        _IPL3 = 0; // Lower priority
+        _GIE = 1; // Global interrupt enable
+    } else {    
+        _IPL = 0b111; // Set CPU at Level = 7  (DISABLE ALL INTERRUPTS)
+        _GIE = 0; // Global interrupt disable
+    }
+}

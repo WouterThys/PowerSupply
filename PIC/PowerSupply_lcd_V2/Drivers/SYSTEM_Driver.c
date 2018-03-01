@@ -15,11 +15,11 @@
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-// f_FRC ~ 7.37 MHz
+
 /*******************************************************************************
  *          DRIVER FUNCTIONS
  ******************************************************************************/
-void D_SYS_InitOscillator(void) {
+void sysInitOscillator(void) {
     /* Disable Watch Dog Timer */
     RCONbits.SWDTEN = 0;
 
@@ -36,7 +36,7 @@ void D_SYS_InitOscillator(void) {
     REFOCONbits.RODIV = 0b0000; // Reference clock not divided
 }
 
-void D_SYS_InitPll(void) {
+void sysInitPll(void) {
     CLKDIVbits.ROI = 0; //bit 15 ROI: Recover on Interrupt bit
     CLKDIVbits.DOZE = 0;
     CLKDIVbits.FRCDIV = 0;
@@ -45,12 +45,32 @@ void D_SYS_InitPll(void) {
     PLLFBDbits.PLLDIV = 38;
 }
 
-void D_SYS_InitPorts(void) {
-    TRISA = 0x0000;     // All outputs
-    ANSELA = 0x0000;    // All digital
-    PORTA = 0x0000;     // All '0'
+void sysInitPorts(void) {
+    TRISA = 0x0000;
+    ANSELA = 0x0000;
+    PORTA = 0x0000;
 
     TRISB = 0x0000;
     ANSELB = 0x0000;
     PORTB = 0x0000;
+}
+
+void sysInitInterrupts(void) {
+    INTCON1 = 0x0000;       // Clear all special pending flags
+    INTCON3 = 0x0000;
+    INTCON4 = 0x0000;
+
+    _NSTDIS = 0; // Enable Interrupt Nesting   MUST !!!!
+    return;
+}
+
+void sysInterruptEnable(bool enable) {
+    if(enable) {
+        _IPL = 0b000; // Set CPU at Level = 0
+        _IPL3 = 0; // Lower priority
+        _GIE = 1; // Global interrupt enable
+    } else {    
+        _IPL = 0b111; // Set CPU at Level = 7  (DISABLE ALL INTERRUPTS)
+        _GIE = 0; // Global interrupt disable
+    }
 }

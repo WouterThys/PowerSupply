@@ -12,15 +12,15 @@
  *          DEFINES
  ******************************************************************************/
 
-#define M1_LINE1 " |     V       V"
-#define M1_LINE2 " |     I C     A"
-#define M1_varVPOS {0,7}
-#define M1_varIPOS {1,7}
+#define M1_LINE1 "V:     V |     V"
+#define M1_LINE2 "I:     A |     A"
+#define M1_varVPOS {0,0}
+#define M1_varIPOS {1,0}
 #define M1_msrVPOS {0,10}
 #define M1_msrIPOS {1,10}
-#define M1_NPOS {1,0}
 
 typedef enum {
+    OFF,
     SELECTING,
     CHANGING        
 } CursorMode_t;
@@ -74,17 +74,16 @@ typedef struct {
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-Value_t voltage = {5000, {0,2}};
-Value_t current = {1000, {1,2}};
-Value_t msrVoltage = {0, {0,10}};
-Value_t msrCurrent = {0, {1,10}};
-CursorPosition_t vcp = {M1_varVPOS};
-CursorPosition_t icp = {M1_varIPOS};
-CursorPosition_t ncp = {M1_NPOS};
+static Value_t voltage = {0,    {0,2}};
+static Value_t current = {1000, {1,2}};
+static Value_t msrVoltage = {0, {0,10}};
+static Value_t msrCurrent = {0, {1,10}};
+static CursorPosition_t vcp = {M1_varVPOS};
+static CursorPosition_t icp = {M1_varIPOS};
 
 
-Menu_t varMenu;
-Cursor_t cursor;
+static Menu_t varMenu;
+static Cursor_t cursor;
 
 
 /*******************************************************************************
@@ -112,8 +111,18 @@ void drawCursor(Cursor_t cursor) {
     
     switch(cursor.mode) {
         default:
-        case SELECTING: lcdTurnOnBlinkingCursor(false); break;
-        case CHANGING: lcdTurnOnBlinkingCursor(true); break;
+        case OFF: 
+            lcdCursorUnderlineOn(false);
+            lcdTurnOnBlinkingCursor(false);
+            break;
+        case SELECTING: 
+            lcdCursorUnderlineOn(true);
+            lcdTurnOnBlinkingCursor(false); 
+            break;
+        case CHANGING: 
+            lcdCursorUnderlineOn(true);
+            lcdTurnOnBlinkingCursor(true); 
+            break;
     }
 }
 
@@ -149,7 +158,6 @@ void drawValue(Value_t value) {
 
 void menuInit() {
     lcdInit();
-    lcdCursorUnderlineOn(true);
     
     // Menus
     varMenu.line1 = M1_LINE1;
@@ -163,23 +171,20 @@ void menuInit() {
     
     // Cursor
     vcp.next = &icp;
-    vcp.prev = &ncp;
+    vcp.prev = &vcp;
     vcp.value = &voltage;
     
-    icp.next = &ncp;
-    icp.prev = &vcp;
+    icp.next = &vcp;
+    icp.prev = &icp;
     icp.value = &current;
     
-    ncp.next = &vcp;
-    ncp.prev = &icp;
-    
-    cursor.mode = SELECTING;
+    cursor.mode = OFF;
     cursor.position = &vcp;
     drawCursor(cursor);
 }
 
 void menuTurn(int16_t turns) {
-    if (turns != 0) {
+    if ((turns != 0) && (cursor.mode != OFF)) {
         if (cursor.mode == SELECTING) {
             if (turns > 0) {
                 cursor.position = cursor.position->prev;
@@ -187,10 +192,11 @@ void menuTurn(int16_t turns) {
                 cursor.position = cursor.position->next;
             }
         } else {
+            uint16_t * val = &cursor.position->value->value;
             if (turns > 0) {
-                cursor.position->value->value -= 100;
+                if (*val > 100) *val -= 100;
             } else {
-                cursor.position->value->value += 100;
+                *val += 100;
             }
             drawValue(*cursor.position->value);
         }
@@ -199,12 +205,63 @@ void menuTurn(int16_t turns) {
 }
 
 void menuClicked() {
-    if (cursor.mode == SELECTING) {
-        cursor.mode = CHANGING;
-    } else {
-        cursor.mode = SELECTING;
+    switch(cursor.mode) {
+        default:
+        case OFF:
+            break;
+        case SELECTING:
+            cursor.mode = CHANGING;
+            drawCursor(cursor);
+            break;
+        case CHANGING:
+            cursor.mode = SELECTING;
+            drawCursor(cursor);
+            break;
     }
+}
+
+void menuTurnOnCursor(bool on) {
+    switch(cursor.mode) {
+        default:
+        case OFF:
+            if (on) { 
+                cursor.mode = SELECTING;
+                drawCursor(cursor);
+            }
+            break;
+        case CHANGING:    
+        case SELECTING:
+            if (!on) {
+                cursor.mode = OFF;
+                drawCursor(cursor);   
+            }
+            break;
+    }
+}
+
+void menuGetVoltage(uint16_t * v) {
+    *v = voltage.value;
+}
+
+void menuGetCurrent(uint16_t * c) {
+    *c = current.value;
+}
+
+void menuSetMeasuredVoltage(uint16_t voltage) {
+    Position_t p = cursor.position->pos;
     
-    drawCursor(cursor);
+    msrVoltage.value = voltage;
+    drawValue(msrVoltage);
+    
+    lcdSetCursorPosition(p.line, p.pos);
+}
+
+void menuSetMeasuredCurrent(uint16_t current) {
+    Position_t p = cursor.position->pos;
+    
+    msrCurrent.value = current;
+    drawValue(msrCurrent); 
+    
+    lcdSetCursorPosition(p.line, p.pos);
 }
 

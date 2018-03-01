@@ -4,7 +4,6 @@
 #include <stdbool.h>       /* Includes true/false definition                  */
 
 #include "../Settings.h"
-#include "INTERRUPT_Driver.h"
 #include "SPI2_Driver.h"
 
 /*******************************************************************************

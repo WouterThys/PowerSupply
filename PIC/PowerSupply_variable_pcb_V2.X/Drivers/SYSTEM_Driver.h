@@ -27,18 +27,32 @@ extern "C" {
 /******************************************************************************/
 /* System Function Prototypes                                                 */
 /******************************************************************************/
+    
 /**
  * Configure oscillator settings.
  */
 void sysInitOscillator(void); 
+
 /**
  * Configure PLL settings.
  */
 void sysInitPll(void); 
+
 /**
  * Initialize the ports all as output, clear analog selections.
  */
 void sysInitPorts(void);
+
+/**
+ * Initializes the interrupts to the default settings.
+ */
+void sysInitInterrupts(void);
+
+/**
+ * Enable all interrupts
+ * @param enable
+ */
+void sysInterruptEnable(bool enable);
 
 
 #endif

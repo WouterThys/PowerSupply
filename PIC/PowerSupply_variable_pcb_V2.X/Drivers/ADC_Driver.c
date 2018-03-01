@@ -22,20 +22,20 @@
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-uint16_t ADC_flag;
-AdcBuffer_t * adcBuffer;
+AdcBuffer_t adcBuffer;
 
 /*******************************************************************************
  *          BASIC FUNCTIONS
  ******************************************************************************/
+static void (*readDone)(AdcBuffer_t data);
 
 /*******************************************************************************
  *          DRIVER FUNCTIONS
  ******************************************************************************/
-void adcInit(AdcBuffer_t * buffer) {
-    /* Variables */
-    ADC_flag = false;
-    adcBuffer = buffer;
+void adcInit(void (*onAdcReadDone)(AdcBuffer_t data)) {
+
+    /* Event function pointer */
+    readDone = onAdcReadDone;
     
     /* Disable ADC */
     adcEnable(false);
@@ -70,7 +70,7 @@ void adcInit(AdcBuffer_t * buffer) {
     
     /* Timer 3*/
     T3CONbits.TON = 0;          // Disable timer
-    T3CONbits.TCKPS = 0b11; // 1:256 pre-scale
+    T3CONbits.TCKPS = 0b10;     // 1:64 pre-scale
     
     /* Enable interrupts for ADC */
     _AD1IF = 0; // Clear flag
@@ -113,13 +113,13 @@ double adcValueToVolage(uint16_t value) {
 //  ADC conversion done
 void __attribute__ ( (interrupt, no_auto_psv) ) _AD1Interrupt(void) {
     if (_AD1IF) {
-        adcBuffer->value0 = ADC1BUF0;
-        adcBuffer->value1 = ADC1BUF1;
-        adcBuffer->value2 = ADC1BUF2;
-        adcBuffer->value3 = ADC1BUF3;
+        adcBuffer.value0 = ADC1BUF0;
+        adcBuffer.value1 = ADC1BUF1;
+        adcBuffer.value2 = ADC1BUF2;
+        adcBuffer.value3 = ADC1BUF3;
         _AD1IF = 0;
         adcEnable(false);
-        //LED1 = !LED1;
-        ADC_flag = 1;
+        
+        (*readDone)(adcBuffer);
     }
 }

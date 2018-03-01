@@ -1,12 +1,4 @@
-#if defined(__XC16__)
 #include <xc.h>
-#elif defined(__C30__)
-#if defined(__dsPIC33E__)
-#include <p33Exxxx.h>
-#elif defined(__dsPIC33F__)
-#include <p33Fxxxx.h>
-#endif
-#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>        /* Includes uint16_t definition                    */
@@ -17,20 +9,20 @@
 #include "../Common/COM_Settings.h"
 #include "Settings.h"
 
-#include "Drivers/INTERRUPT_Driver.h"
 #include "Drivers/SYSTEM_Driver.h"
+#include "Drivers/I2C_Driver.h"
 #include "Drivers/SPI_Driver.h"
 #include "Drivers/LCD_Driver.h"
 #include "Drivers/ENC_Driver.h"
 #include "menu.h"
 #include "utils.h"
-#include "Drivers/I2C_Driver.h"
+
 
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
 #define VOLTAGE_STEP 100
-
+#define MENU_MAX_ON 1000
 
 /*******************************************************************************
  *          MACRO FUNCTIONS
@@ -40,18 +32,23 @@
  *          VARIABLES
  ******************************************************************************/
 
+// Menu
+static uint16_t menuOnCount = 0;
+
 // Encoder
-int16_t encLast = -1;
-int16_t turns = 0;
-Button_t encButton;
-bool updateMenu = false;
+static int16_t encLast = -1;
+static int16_t turns = 0;
+static Button_t encButton;
+static bool updateMenu = false;
 
 // I²C
-i2cData_t i2cData;
-i2cAnswer_t i2cAnswer;
+static i2cData_t i2cData;
 
 // Regulator variables
-int16_t varVoltage = 0;
+static uint16_t varVoltage = 0;
+static uint16_t varCurrent = 0;
+static uint16_t msrVoltage = 0;
+static uint16_t msrCurrent = 0;
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
@@ -60,21 +57,48 @@ static void initialize();
 static void encTimerEnable(bool enable); 
 static void menuTimerEnable(bool enable);
 
+static bool checkI2cState(i2cData_t data);
+static void writeI2cData(uint8_t command, uint16_t data);
+
 static void encLogic();
 static void menuLogic();
 
 
 void initialize() {
-    D_INT_EnableInterrupts(false);
+    sysInterruptEnable(false);
 
     // Initialize system
-    D_SYS_InitPll();
-    D_SYS_InitOscillator();
-    D_SYS_InitPorts();
+    sysInitPll();
+    sysInitOscillator();
+    sysInitPorts();
 
     // Interrupts
-    D_INT_Init();
-    D_INT_EnableInterrupts(true);
+    sysInitInterrupts();
+    sysInterruptEnable(true);
+}
+
+bool checkI2cState(i2cData_t data) {
+    switch(data.status) {
+        default: 
+            return true;
+        case I2C_NOK: 
+        case I2C_OVERFLOW: 
+        case I2C_COLLISION: 
+        case I2C_NO_ADR_ACK: 
+        case I2C_NO_DATA_ACK: 
+        case I2C_UNEXPECTED_DATA: 
+        case I2C_UNEXPECTED_ADR: 
+        case I2C_STILL_BUSY: 
+            LED1 = 1;
+            return false;
+    }
+}
+
+void writeI2cData(uint8_t command, uint16_t data) {
+    split(data, &i2cData.data1, &i2cData.data2);
+    i2cData.command = command;
+    i2cMasterWrite(&i2cData);
+    checkI2cState(i2cData);
 }
 
 /**
@@ -128,6 +152,7 @@ void encLogic() {
     int16_t encValue = encGetValue();
     encButton = encGetButton();
         
+    // Knob turned
     if (encValue != encLast) {
         encLast = encValue;
         turns += encValue;
@@ -136,22 +161,33 @@ void encLogic() {
         }
     }
     
-    if (encButton != Open) {
+    // Knob pressed
+    if (encButton != Open) { // TODO: to menuLogic()
         switch(encButton) {
             default:
             case Open: break;
-            case Closed: ; break;
-            case Pressed: ; break;
-            case Held: ; break;
-            case Released: ; break;
-            case Clicked: menuClicked(); break;
-            case DoubleClicked: ; break;
+            case Closed: break;
+            case Pressed: break;
+            case Held: break;
+            case Released: break;
+            
+            case Clicked: 
+                updateMenu = true;
+                menuClicked(); 
+                break;
+            case DoubleClicked: 
+                updateMenu = true;
+                break;
         }
     }
 }
 
 void menuLogic() {
+    uint16_t v, i;
     if (updateMenu) {
+        menuTurnOnCursor(true);
+        
+        // Execute all turns
         while (turns != 0) {
             if (turns > 0) {
                 menuTurn(-1);
@@ -161,7 +197,51 @@ void menuLogic() {
                 turns++;
             }
         }
+        
+        menuGetVoltage(&v);
+        menuGetCurrent(&i);
+        
+        // Voltage
+        if (v != varVoltage) {
+            varVoltage = v;
+            writeI2cData(COM_SET_V, varVoltage);
+        }
+        
+        // Current
+        if (i != varCurrent) {
+            varCurrent = i;
+            writeI2cData(COM_SET_I, varCurrent);
+        }    
+        
+        menuOnCount = 0;
         updateMenu = false;
+    } else {
+        if (menuOnCount < MENU_MAX_ON) {
+            menuOnCount++;
+        }
+    }
+    
+    // Request data
+    i2cData.command = COM_A1;
+    i2cMasterRead(&i2cData);
+    concatinate(i2cData.data1, i2cData.data2, &v);
+    if (msrVoltage>>4 != v>>4) {
+        msrVoltage = v;
+        menuSetMeasuredVoltage(msrVoltage);
+    }
+    
+    
+    i2cData.command = COM_A0;
+    i2cMasterRead(&i2cData);
+    concatinate(i2cData.data1, i2cData.data2, &i);
+    if (msrCurrent>>4 != i>>4) {
+        msrCurrent = i;
+        menuSetMeasuredCurrent(msrCurrent);
+    }
+    
+    // Menu on count
+    if (menuOnCount >= MENU_MAX_ON) {
+        menuTurnOnCursor(false);
     }
 }
 
@@ -182,19 +262,16 @@ int main(void) {
     encTimerEnable(true);
     menuTimerEnable(true);
     i2cEnable(true);
-   
+    
+    varVoltage = 0;
+    varCurrent = 0;
     i2cData.address = VARIABLE_ADDRESS;
-    i2cData.command = 1;
-    i2cData.data1 = 1;
-    i2cData.data2 = 2;
+    
+    DelayMs(1);
+    writeI2cData(COM_SET_V, varVoltage);
+    writeI2cData(COM_SET_I, varCurrent);
     
     while (1) {
-        
-        i2cData.data1++;
-        i2cData.data2--;
-        i2cMasterWrite(&i2cData);
-       
-        DelayMs(2000);
         
     }
     return 0;
