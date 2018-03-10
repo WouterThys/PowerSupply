@@ -69,6 +69,7 @@ void adcInit(void (*onAdcReadDone)(AdcBuffer_t data)) {
     AD1CSSL = 0x000F;           // AN0, AN1, AN2, AN3
     
     /* Timer 3*/
+    PR3 = 0x3FFF;
     T3CONbits.TON = 0;          // Disable timer
     T3CONbits.TCKPS = 0b10;     // 1:64 pre-scale
     
@@ -92,7 +93,7 @@ void adcEnable(bool enable) {
         ADC3_Dir = 1;
 
         AD1CON1bits.ADON = 1;   // Enable ADC
-        DelayUs(20)             // ADC stabilization delay 
+        DelayUs(20);            // ADC stabilization delay 
         T3CONbits.TON = 1;      // Enable timer        
     } else {
         ANSELA = 0;             // All digital
@@ -118,7 +119,7 @@ void __attribute__ ( (interrupt, no_auto_psv) ) _AD1Interrupt(void) {
         adcBuffer.value2 = ADC1BUF2;
         adcBuffer.value3 = ADC1BUF3;
         _AD1IF = 0;
-        adcEnable(false);
+        adcEnable(false);      
         
         (*readDone)(adcBuffer);
     }

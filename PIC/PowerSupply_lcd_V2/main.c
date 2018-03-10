@@ -14,6 +14,7 @@
 #include "Drivers/SPI_Driver.h"
 #include "Drivers/LCD_Driver.h"
 #include "Drivers/ENC_Driver.h"
+#include "Drivers/UART_Driver.h"
 #include "menu.h"
 #include "utils.h"
 
@@ -23,6 +24,12 @@
  ******************************************************************************/
 #define VOLTAGE_STEP 100
 #define MENU_MAX_ON 1000
+
+#define C_START             'S'
+#define C_LCD_BRIGHTNESS    'a'
+#define C_LCD_CONTRAST      'b'
+
+#define M_START     "SS"
 
 /*******************************************************************************
  *          MACRO FUNCTIONS
@@ -60,6 +67,8 @@ static void menuTimerEnable(bool enable);
 static bool checkI2cState(i2cData_t data);
 static void writeI2cData(uint8_t command, uint16_t data);
 
+static bool checkUartState(UartData_t data);
+
 static void encLogic();
 static void menuLogic();
 
@@ -87,6 +96,8 @@ bool checkI2cState(i2cData_t data) {
         case I2C_NO_ADR_ACK: 
         case I2C_NO_DATA_ACK: 
         case I2C_UNEXPECTED_DATA: 
+            i2cReset();
+            return false;
         case I2C_UNEXPECTED_ADR: 
         case I2C_STILL_BUSY: 
             LED1 = 1;
@@ -245,6 +256,38 @@ void menuLogic() {
     }
 }
 
+static bool checkUartState(UartData_t data) {
+    switch(data.status) {
+        default:
+        case STA_OK             : return true;
+        case STA_NOK            : return false;
+        case STA_INVALID_START  : return false;
+        case STA_INVALID_STOP   : return false;
+        case STA_INVALID_SEP    : return false;
+        case STA_INVALID_LENGTH : return false;
+        case STA_INVALID_COMMAND: return false;
+        case STA_INVALID_MESSAGE: return false;
+    }
+}
+
+void onUartReadDone(UartData_t data) {
+    if (checkUartState(data)) {
+        uint16_t val = 0;
+        concatinate(data.message[0], data.message[1], &val);
+        switch (data.command) {
+            // LCD stuff
+            case C_LCD_CONTRAST:
+                lcdSetDisplayContrast(val); // 1 - 50
+                break;
+            case C_LCD_BRIGHTNESS:
+                lcdSetDisplayBrightness(5); // 1 - 8
+                break;
+            
+            // Voltage & current stuff
+        }
+    }
+}
+
 /*******************************************************************************
  *          MAIN PROGRAM
  ******************************************************************************/
@@ -253,12 +296,13 @@ int main(void) {
 
     initialize();
     
-    DelayMs(1);
+    uartInit(UART1_BAUD, &onUartReadDone);
     menuInit();
     encInit();
     i2cInitMaster();
     
-    DelayMs(1);
+    DelayMs(100);
+    uartEnable(true);
     encTimerEnable(true);
     menuTimerEnable(true);
     i2cEnable(true);
@@ -267,12 +311,18 @@ int main(void) {
     varCurrent = 0;
     i2cData.address = VARIABLE_ADDRESS;
     
-    DelayMs(1);
+    DelayMs(100);
+    
     writeI2cData(COM_SET_V, varVoltage);
     writeI2cData(COM_SET_I, varCurrent);
     
+    DelayMs(1000);
+    uartWrite(C_START, M_START);
+    
     while (1) {
-        
+        LED2 = !LED2;
+
+        DelayMs(500);
     }
     return 0;
 }

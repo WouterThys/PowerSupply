@@ -388,14 +388,12 @@ void __attribute__ ( (interrupt, no_auto_psv) ) _U1RXInterrupt(void) {
         LED3 = !LED3;
         if(U1STAbits.FERR == 1) {
             dummy = U1RXREG;
-            LED2 = 1;
             return;
         } 
         if(U1STAbits.OERR == 1) {
             uartEnable(UART_MODULE_1, false);
             DelayUs(10);
             uartEnable(UART_MODULE_1, true);
-            LED2 = 1;
             return;
         } 
         

@@ -36,14 +36,14 @@
 /**
  * UART
  */      
-#define UART1_BAUD      57600
+#define UART1_BAUD      57600 /* 57600 */
 #define UART1_ID        2   
 
 #define UART1_RX_Dir    TRISBbits.TRISB6    /* RX Pin on RP38-RB6             */
 #define UART1_TX_Dir    TRISBbits.TRISB5    /* TX Pin on RP37-RB5             */
 
-#define UART1_RX_Map    0b0100110           /* I/O RP38                       */
-#define UART1_TX_Map    0b000001
+#define UART1_RX_Map    0b0100110           /* RX on RP38                     */
+#define UART1_TX_Map    RPOR1bits.RP37R     /* TX on RP37                     */
 
 
 /**

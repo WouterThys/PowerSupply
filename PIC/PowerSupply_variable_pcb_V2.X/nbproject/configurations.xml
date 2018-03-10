@@ -6,6 +6,7 @@
                    projectFiles="true">
       <logicalFolder name="Controllers" displayName="Controllers" projectFiles="true">
         <itemPath>Controllers/DAC_Controller.h</itemPath>
+        <itemPath>Controllers/PID_Controller.h</itemPath>
       </logicalFolder>
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/SYSTEM_Driver.h</itemPath>
@@ -26,6 +27,7 @@
                    projectFiles="true">
       <logicalFolder name="Controllers" displayName="Controllers" projectFiles="true">
         <itemPath>Controllers/DAC_Controller.c</itemPath>
+        <itemPath>Controllers/PID_Controller.c</itemPath>
       </logicalFolder>
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/SYSTEM_Driver.c</itemPath>

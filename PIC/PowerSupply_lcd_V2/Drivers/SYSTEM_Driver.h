@@ -16,7 +16,7 @@ extern "C" {
 #include <stdbool.h>
 
 /* Microcontroller MIPs (FCY) */
-#define SYS_FREQ        140000000L
+#define SYS_FREQ        36850000L
 #define FCY             SYS_FREQ/2
 
 #define DelayMs(d) \

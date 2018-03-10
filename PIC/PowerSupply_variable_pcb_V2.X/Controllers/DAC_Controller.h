@@ -37,8 +37,11 @@ void dacInitDacB(bool buf, uint16_t gain);
 void dacShutDownA();
 void dacShutDownB();
 
-void dacSetVoltageA(double voltage);
-void dacSetVoltageB(double voltage);
+void dacSetValueA(float value);
+void dacSetValueB(float value);
+
+void dacSetVoltageA(float voltage);
+void dacSetVoltageB(float voltage);
 
 
 

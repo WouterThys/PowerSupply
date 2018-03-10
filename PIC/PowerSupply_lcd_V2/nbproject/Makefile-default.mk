@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=Drivers/SPI_Driver.c Drivers/SYSTEM_Driver.c Drivers/LCD_Driver.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c configuration.c main.c utils.c menu.c
+SOURCEFILES_QUOTED_IF_SPACED=Drivers/SPI_Driver.c Drivers/SYSTEM_Driver.c Drivers/LCD_Driver.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c configuration.c main.c utils.c menu.c Drivers/UART_Driver.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Drivers/SPI_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/LCD_Driver.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/utils.o ${OBJECTDIR}/menu.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/Drivers/SPI_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/Drivers/LCD_Driver.o.d ${OBJECTDIR}/Drivers/ENC_Driver.o.d ${OBJECTDIR}/Drivers/I2C_Driver.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/utils.o.d ${OBJECTDIR}/menu.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Drivers/SPI_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/LCD_Driver.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/utils.o ${OBJECTDIR}/menu.o ${OBJECTDIR}/Drivers/UART_Driver.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/Drivers/SPI_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/Drivers/LCD_Driver.o.d ${OBJECTDIR}/Drivers/ENC_Driver.o.d ${OBJECTDIR}/Drivers/I2C_Driver.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/utils.o.d ${OBJECTDIR}/menu.o.d ${OBJECTDIR}/Drivers/UART_Driver.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/Drivers/SPI_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/LCD_Driver.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/utils.o ${OBJECTDIR}/menu.o
+OBJECTFILES=${OBJECTDIR}/Drivers/SPI_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/LCD_Driver.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/utils.o ${OBJECTDIR}/menu.o ${OBJECTDIR}/Drivers/UART_Driver.o
 
 # Source Files
-SOURCEFILES=Drivers/SPI_Driver.c Drivers/SYSTEM_Driver.c Drivers/LCD_Driver.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c configuration.c main.c utils.c menu.c
+SOURCEFILES=Drivers/SPI_Driver.c Drivers/SYSTEM_Driver.c Drivers/LCD_Driver.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c configuration.c main.c utils.c menu.c Drivers/UART_Driver.c
 
 
 CFLAGS=
@@ -157,6 +157,13 @@ ${OBJECTDIR}/menu.o: menu.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE)  menu.c  -o ${OBJECTDIR}/menu.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/menu.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/menu.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/Drivers/UART_Driver.o: Drivers/UART_Driver.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Drivers" 
+	@${RM} ${OBJECTDIR}/Drivers/UART_Driver.o.d 
+	@${RM} ${OBJECTDIR}/Drivers/UART_Driver.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/UART_Driver.c  -o ${OBJECTDIR}/Drivers/UART_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/UART_Driver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/Drivers/UART_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 else
 ${OBJECTDIR}/Drivers/SPI_Driver.o: Drivers/SPI_Driver.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Drivers" 
@@ -220,6 +227,13 @@ ${OBJECTDIR}/menu.o: menu.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/menu.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  menu.c  -o ${OBJECTDIR}/menu.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/menu.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/menu.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/Drivers/UART_Driver.o: Drivers/UART_Driver.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Drivers" 
+	@${RM} ${OBJECTDIR}/Drivers/UART_Driver.o.d 
+	@${RM} ${OBJECTDIR}/Drivers/UART_Driver.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/UART_Driver.c  -o ${OBJECTDIR}/Drivers/UART_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/UART_Driver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/Drivers/UART_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
 

@@ -4,6 +4,7 @@
 #include <stdint.h>        /* Includes uint16_t definition                    */
 #include <stdbool.h>       /* Includes true/false definition                  */
 #include <string.h>
+#include <p33EP256GP502.h>
 
 #include "utils.h"
 #include "Settings.h"
@@ -15,12 +16,13 @@
 #include "Drivers/ADC_Driver.h"
 
 #include "Controllers/DAC_Controller.h"
+#include "Controllers/PID_Controller.h"
 
 
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
-
+#define PID_TEST_CNT    128
 /*******************************************************************************
  *          MACRO FUNCTIONS
  ******************************************************************************/
@@ -32,14 +34,16 @@
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-uint16_t adjustedVoltage;
+uint16_t setVoltage; // Voltage send to DAC in mV
 uint16_t varVoltage; // Desired voltage in mV
 uint16_t varCurrent; // Maximum current in mA
 
-uint16_t msrVoltage; // Measured voltage
-uint16_t msrCurrent; // Measured current
+float msrVoltage; // Measured voltage
+float msrCurrent; // Measured current
 
-bool autoAdjust;
+bool adcDone = false;
+uint16_t pidMode = AUTOMATIC;
+float pidOutput;
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
@@ -96,6 +100,8 @@ bool checkI2cState(i2cData_t data) {
         case I2C_NO_ADR_ACK: 
         case I2C_NO_DATA_ACK: 
         case I2C_UNEXPECTED_DATA: 
+            i2cReset();
+            return false;
         case I2C_UNEXPECTED_ADR: 
         case I2C_STILL_BUSY: 
             LED1 = 1;
@@ -109,7 +115,6 @@ bool checkI2cState(i2cData_t data) {
  ******************************************************************************/
 
 int main(void) {
-
     initialize();
     TRISBbits.TRISB5 = 1;
     
@@ -119,34 +124,54 @@ int main(void) {
     i2cInitSlave(VARIABLE_ADDRESS, &onI2cMasterAnswer, &onI2cReadDone);
     adcInit(&onAdcReadDone);
     
-    // Enable
     dacEnable(true);
     uartEnable(UART_MODULE_1, true);
     i2cEnable(true);
-    adcEnable(true);
+    pidSetTunings(60,   0.25, 0.002, 0.008,   0, 4095); 
     
     // Default
-    dacSetVoltageA(0);
-    dacSetVoltageB(0);
-    
     varVoltage = 0;
     varCurrent = 0;
+    setVoltage = 0;
+    dacSetValueA(varVoltage);
+    dacSetValueB(varCurrent);
     
-    autoAdjust = true;
-    
-    DelayMs(2000);
     printf("start\n");
+    
+    // Enable
+    adcEnable(true);
     ledTimerEnable(true);
     
     while(1) {
-        
+        if (adcDone) {
+            adcDone = false;
+            
+            if (setVoltage != varVoltage) {
+                dacSetVoltageA(( ((float)setVoltage) / 5000));
+                varVoltage = setVoltage;
+            }
+            
+            // PID
+//            if (pidMode == MANUAL) {
+//                pidSetMode(MANUAL);
+//                
+//                pidCompute(varVoltage, msrVoltage, &pidOutput);
+//                dacSetVoltageA(( ((float)varVoltage) / 5000));
+//                pidMode = AUTOMATIC;
+//            } else {
+//                pidSetMode(AUTOMATIC);
+//                
+//                pidCompute(varVoltage, msrVoltage, &pidOutput);
+//                dacSetValueA(pidOutput);
+//            }
+        }
     }
 }
 
 // Timer 2 interrupt
 void __attribute__ ( (interrupt, no_auto_psv) ) _T2Interrupt(void) {
     if (_T2IF) {
-        LED2 = !LED2;
+        
         _T2IF = 0; // Clear interrupt
     }
 }
@@ -154,10 +179,10 @@ void __attribute__ ( (interrupt, no_auto_psv) ) _T2Interrupt(void) {
 void onI2cMasterAnswer(i2cData_t * data) {
     switch(data->command) {
         case COM_A0:
-            split(msrCurrent, &data->data1, &data->data2);
+            split((uint16_t)msrCurrent, &data->data1, &data->data2);
             break;
         case COM_A1:
-            split(msrVoltage, &data->data1, &data->data2);
+            split((uint16_t)msrVoltage, &data->data1, &data->data2);
             break;
         default:
             break;
@@ -169,25 +194,26 @@ void onI2cReadDone(i2cData_t data) {
     if (checkI2cState(data)) {
         // Set voltage
         if (data.command == COM_SET_V) {
-            concatinate(data.data1, data.data2, &varVoltage);
-            dacSetVoltageA(( ((double)varVoltage) / 5000));
-            adjustedVoltage = varVoltage;
+            concatinate(data.data1, data.data2, &setVoltage);
+            //pidMode = MANUAL;
         }
 
         // Set current
         if (data.command == COM_SET_I) {
             concatinate(data.data1, data.data2, &varCurrent);
-            dacSetVoltageA(( ((double)varVoltage) / 5000));
+            //dacSetVoltageB(( ((double)varCurrent) / 5000));
         }
     }
 }
 
 void onAdcReadDone(AdcBuffer_t data) {
-    msrCurrent = ((double)adcValueToVolage(data.value0)) * 500; // in mA
-    msrVoltage = ((double)adcValueToVolage(data.value1)) * 4830;// in mV
+    msrCurrent = ((float)adcValueToVolage(data.value0)) * 500; // in mA
+    msrVoltage = ((float)adcValueToVolage(data.value1)) * 4830;// in mV
 
     adcEnable(true); // Restart AD conversion
+    adcDone = true;
 }
+
 
 
 

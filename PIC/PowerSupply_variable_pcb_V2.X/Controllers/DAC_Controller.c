@@ -28,11 +28,11 @@ DAC_Command_t DAC_B;
 /*******************************************************************************
  *          BASIC FUNCTIONS
  ******************************************************************************/
-static uint16_t voltageToDigital(double voltage, double gain);
+static uint16_t voltageToDigital(float voltage, float gain);
 static void writeToDac(DAC_Command_t command);
 
 
-uint16_t voltageToDigital(double voltage, double gain) {
+uint16_t voltageToDigital(float voltage, float gain) {
     return (uint16_t) ((voltage * N) / (VREF * gain));
 }
 
@@ -100,7 +100,29 @@ void dacShutDownB() {
     DAC_B.SHDN = 0;
 }
 
-void dacSetVoltageA(double voltage) {
+void dacSetValueA(float value) {
+    if (value > (N-1)) {
+        value = (N-1);
+    }
+    if (value < 0) {
+        value = 0;
+    }
+    DAC_A.data = (uint16_t)value;
+    writeToDac(DAC_A);
+}
+
+void dacSetValueB(float value) {
+    if (value > (N-1)) {
+        value = (N-1);
+    }
+    if (value < 0) {
+        value = 0;
+    }
+    DAC_B.data = (uint16_t)value;
+    writeToDac(DAC_B);
+}
+
+void dacSetVoltageA(float voltage) {
     if (DAC_A.GA == 0) {
         DAC_A.data = voltageToDigital(voltage, 2);
     } else {
@@ -110,7 +132,7 @@ void dacSetVoltageA(double voltage) {
     writeToDac(DAC_A);
 }
 
-void dacSetVoltageB(double voltage) {
+void dacSetVoltageB(float voltage) {
     if (DAC_B.GA == 0) {
         DAC_B.data = voltageToDigital(voltage, 2);
     } else {
