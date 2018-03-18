@@ -213,6 +213,8 @@ void lcdClearScreen() {
 }
 
 void lcdSetDisplayContrast(uint8_t contrast) {
+    if (contrast > 50) contrast = 50;
+    if (contrast < 1 ) contrast = 1;
     D_SPI_Write(LCD_PREFIX);
     D_SPI_Write(LCD_SET_CONTRAST);
     D_SPI_Write(contrast);
@@ -220,8 +222,11 @@ void lcdSetDisplayContrast(uint8_t contrast) {
 }
 
 void lcdSetDisplayBrightness(uint8_t brightness) {
+    if (brightness > 8) brightness = 8;
+    if (brightness < 1) brightness = 1;
     D_SPI_Write(LCD_PREFIX);
     D_SPI_Write(LCD_SET_BRIGHTNESS);
+    D_SPI_Write(brightness);
     DelayUs(100);
 }
 

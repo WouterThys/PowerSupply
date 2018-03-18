@@ -74,8 +74,8 @@ typedef struct {
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-static Value_t voltage = {0,    {0,2}};
-static Value_t current = {1000, {1,2}};
+static Value_t varVoltage = {0,    {0,2}};
+static Value_t varCurrent = {1000, {1,2}};
 static Value_t msrVoltage = {0, {0,10}};
 static Value_t msrCurrent = {0, {1,10}};
 static CursorPosition_t vcp = {M1_varVPOS};
@@ -162,8 +162,8 @@ void menuInit() {
     // Menus
     varMenu.line1 = M1_LINE1;
     varMenu.line2 = M1_LINE2;
-    varMenu.variable1 = voltage;
-    varMenu.variable2 = current;
+    varMenu.variable1 = varVoltage;
+    varMenu.variable2 = varCurrent;
     varMenu.measure1 = msrVoltage;
     varMenu.measure2 = msrCurrent;
     
@@ -172,11 +172,11 @@ void menuInit() {
     // Cursor
     vcp.next = &icp;
     vcp.prev = &vcp;
-    vcp.value = &voltage;
+    vcp.value = &varVoltage;
     
     icp.next = &vcp;
     icp.prev = &icp;
-    icp.value = &current;
+    icp.value = &varCurrent;
     
     cursor.mode = OFF;
     cursor.position = &vcp;
@@ -240,11 +240,29 @@ void menuTurnOnCursor(bool on) {
 }
 
 void menuGetVoltage(uint16_t * v) {
-    *v = voltage.value;
+    *v = varVoltage.value;
 }
 
 void menuGetCurrent(uint16_t * c) {
-    *c = current.value;
+    *c = varCurrent.value;
+}
+
+void menuSetVariableVoltage(uint16_t voltage) {
+    Position_t p = cursor.position->pos;
+    
+    varVoltage.value = voltage;
+    drawValue(varVoltage);
+    
+    lcdSetCursorPosition(p.line, p.pos);
+}
+    
+void menuSetVariableCurrent(uint16_t current) {
+    Position_t p = cursor.position->pos;
+    
+    varCurrent.value = current;
+    drawValue(varCurrent); 
+    
+    lcdSetCursorPosition(p.line, p.pos);
 }
 
 void menuSetMeasuredVoltage(uint16_t voltage) {

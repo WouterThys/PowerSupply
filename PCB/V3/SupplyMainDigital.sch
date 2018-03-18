@@ -674,17 +674,6 @@ F 3 "" H 7650 1100 50  0000 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR013
-U 1 1 59365D86
-P 7950 900
-F 0 "#PWR013" H 7950 750 50  0001 C CNN
-F 1 "+3.3V" H 7950 1040 50  0000 C CNN
-F 2 "" H 7950 900 50  0000 C CNN
-F 3 "" H 7950 900 50  0000 C CNN
-	1    7950 900 
-	1    0    0    -1  
-$EndComp
-$Comp
 L GND #PWR014
 U 1 1 59365E28
 P 7950 1300
@@ -1907,10 +1896,6 @@ Wire Wire Line
 Wire Wire Line
 	6050 3150 6250 3150
 Wire Wire Line
-	7850 950  7950 950 
-Wire Wire Line
-	7950 950  7950 900 
-Wire Wire Line
 	7850 1250 7950 1250
 Wire Wire Line
 	7950 1250 7950 1300
@@ -2470,4 +2455,5 @@ Connection ~ 14450 5900
 Wire Wire Line
 	14850 5900 14850 5850
 Connection ~ 14650 5900
+NoConn ~ 7850 950 
 $EndSCHEMATC

@@ -18,6 +18,8 @@ extern "C" {
     void menuGetVoltage(uint16_t * voltage);
     void menuGetCurrent(uint16_t * current);
     
+    void menuSetVariableVoltage(uint16_t voltage);
+    void menuSetVariableCurrent(uint16_t current);
     void menuSetMeasuredVoltage(uint16_t voltage);
     void menuSetMeasuredCurrent(uint16_t current);
     

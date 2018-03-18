@@ -27,12 +27,6 @@
  *          VARIABLES
  ******************************************************************************/
 static uint8_t deviceId;
-
-// Reading input
-static uint8_t inputBufferCnt = 0;
-static uint8_t inputBuffer[100];
-
-// Data
 static UartData_t readData;
 
 
@@ -41,6 +35,7 @@ static UartData_t readData;
  ******************************************************************************/
 static void initializeRegisters(uint16_t baud);
 static void convertMessage(uint8_t * data, uint8_t length);
+static void fillDataBuffer(uint8_t data);
 
 /* Event function pointers */
 static void (*readDone)(UartData_t data);
@@ -152,6 +147,7 @@ void convertMessage(uint8_t * data, uint8_t length) {
 #define ACK     STOP  - 1   /* Position of acknowledge character              */
 void convertMessage(uint8_t * data, uint8_t length) {
     uint8_t e = STA_OK; // Error
+    
     if (length != LENGTH) e = STA_INVALID_LENGTH;
     if (data[START] != START_CHAR) e |= STA_INVALID_START;
     if (data[STOP] != STOP_CHAR) e |= STA_INVALID_STOP;
@@ -196,7 +192,7 @@ void convertMessage(uint8_t * data, uint8_t length) {
     if (data[length - 3] != SEP_CHAR) e |= STA_INVALID_SEP;
     
     if (e == STA_OK) {
-        uint8_t l = data[LEN] - 0x30;
+        uint8_t l = data[LEN];
         
         if ((l + LENGTH) == length) {
             readData.command = data[COM];
@@ -233,6 +229,48 @@ void acknowledge(uint8_t ackId) {
     uartWriteByte(STOP_CHAR);
 }
 #endif
+
+#define S0  0 /* State idle */
+#define S1  1 /* State */
+#define S2  2 /* State */
+
+static uint8_t inputBufferCnt = 0;
+static uint8_t inputBuffer[100];
+static uint8_t state;
+void fillDataBuffer(uint8_t data) {
+    // Check
+    if (inputBufferCnt > 100) {
+        inputBufferCnt = 0;
+        return;
+    }
+     
+    // FSM
+    switch (state) {
+        default:
+        case S0:
+            if (data == START_CHAR) {
+                inputBuffer[0] = START_CHAR;
+                inputBufferCnt = 1;
+                state = S1;
+            }
+            break;
+
+        case S1:
+            if (data == STOP_CHAR) {
+                state = S2;
+            } 
+            inputBuffer[inputBufferCnt] = data;
+            inputBufferCnt++;
+            break;
+
+        case S2:
+            if (data == '\0') {
+                convertMessage(inputBuffer, inputBufferCnt);
+            }
+            state = S0;
+            break;
+    }
+}
 
 /*******************************************************************************
  *          DRIVER FUNCTIONS
@@ -309,6 +347,8 @@ void uartWriteInt(char command, int data) {
 }
 
 
+
+
 // UART Received byte
 void __attribute__ ( (interrupt, no_auto_psv) ) _U1RXInterrupt(void) {
     if (_U1RXIF) {
@@ -329,18 +369,7 @@ void __attribute__ ( (interrupt, no_auto_psv) ) _U1RXInterrupt(void) {
             inputBufferCnt = 0;
             return;
         } 
-        if (inputBufferCnt > 100) {
-            // Do something with error
-            inputBufferCnt = 0;
-            return;
-        }
-        
-        if (data == '\0') {
-            convertMessage(inputBuffer, inputBufferCnt);
-            inputBufferCnt = 0;
-        } else {
-            inputBuffer[inputBufferCnt] = data;
-            inputBufferCnt++;
-        }
+       
+        fillDataBuffer(data);
     }
 }
