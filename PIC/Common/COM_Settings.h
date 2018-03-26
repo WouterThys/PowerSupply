@@ -10,24 +10,41 @@
 #ifndef COM_SETTINGS_H
 #define	COM_SETTINGS_H
 
+#include <xc.h>
+#include <stdint.h>
+
+typedef struct {
+    uint16_t command;
+    uint16_t data;
+} Command_t;
+
 // Addresses
-#define MAIN_ADDRESS         0x01
-#define VARIABLE_ADDRESS     0x55
+#define ADDR_MAIN         0x01
+#define ADDR_VAR     0x55
+#define ADDR_5V0         0x66
+#define ADDR_3V3         0x77
 
 
-//// Common commands
-//#define COM_INIT             0x00
-//#define COM_ENABLE           0x01
-//#define COM_READ             0x02
-//#define COM_ASK              0x03
-//#define COM_SET              0x04
-//#define COM_LCD              0x05
-//#define COM_STATUS           0x06
+// Main commands 0x0X
+#define C_START             0x01
+#define C_HANDSHAKE         0x02
 
-#define COM_A0   0x01    
-#define COM_A1   0x02
-#define COM_A2   0x03
-#define COM_A3   0x04
+// Supply commands 0x1X
+#define C_SET_VOLTAGE       0x10
+#define C_SET_CURRENT       0x11
+#define C_GET_VOLTAGE       0x12
+#define C_GET_CURRENT       0x13
+
+// LCD commands 0x1X
+#define C_LCD_BRIGHTNESS    0x70
+#define C_LCD_CONTRAST      0x71
+
+
+// I²C
+#define COM_GET_I   0x01    
+#define COM_GET_V   0x02
+#define COM_GET_T   0x03
+#define COM_A3      0x04
 
 
 #define COM_SET_V   0x08

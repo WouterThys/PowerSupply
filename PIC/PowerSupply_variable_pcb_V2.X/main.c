@@ -178,10 +178,10 @@ void __attribute__ ( (interrupt, no_auto_psv) ) _T2Interrupt(void) {
 
 void onI2cMasterAnswer(i2cData_t * data) {
     switch(data->command) {
-        case COM_A0:
+        case COM_GET_I:
             split((uint16_t)msrCurrent, &data->data1, &data->data2);
             break;
-        case COM_A1:
+        case COM_GET_V:
             split((uint16_t)msrVoltage, &data->data1, &data->data2);
             break;
         default:
