@@ -22,7 +22,10 @@
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
-#define PID_TEST_CNT    128
+#define PID_TEST_CNT       128
+
+#define TEST_VOLTAGE_STEP  200
+#define TEST_BUFFER_CNT    50
 /*******************************************************************************
  *          MACRO FUNCTIONS
  ******************************************************************************/
@@ -30,6 +33,14 @@
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
+typedef struct {
+    uint16_t setVoltage;
+    uint16_t msrVoltage;
+    uint16_t setCurrent;
+    uint16_t msrCurrent;
+    bool clip;
+} Measure_t;
+
 
 /*******************************************************************************
  *          VARIABLES
@@ -45,6 +56,8 @@ bool adcDone = false;
 uint16_t pidMode = AUTOMATIC;
 float pidOutput;
 
+Measure_t testBuffer[TEST_BUFFER_CNT];
+
 /*******************************************************************************
  *          LOCAL FUNCTIONS
  ******************************************************************************/
@@ -56,6 +69,9 @@ static bool checkI2cState(i2cData_t data);
 static void onI2cMasterAnswer(i2cData_t * data);
 static void onI2cReadDone(i2cData_t data);
 static void onAdcReadDone(AdcBuffer_t data);
+static void onUartReadDone(UartData_t data);
+
+static void voltageSweep();
 
 void initialize() {
     sysInterruptEnable(false);
@@ -109,6 +125,11 @@ bool checkI2cState(i2cData_t data) {
     }
 }
 
+void onUartReadDone(UartData_t data) {
+    
+}
+
+
 
 /*******************************************************************************
  *          MAIN PROGRAM
@@ -116,40 +137,48 @@ bool checkI2cState(i2cData_t data) {
 
 int main(void) {
     initialize();
-    TRISBbits.TRISB5 = 1;
-    
-    // Initialize
+    TRISBbits.TRISB5 = 1; // Clip
+//    
+//    // Initialize
     dacInit();
-    uartInit(UART_MODULE_1, UART1_BAUD);
-    i2cInitSlave(VARIABLE_ADDRESS, &onI2cMasterAnswer, &onI2cReadDone);
+    uartDriverInit(UART1_BAUD, &onUartReadDone);
+//    i2cInitSlave(ADDR_VAR, &onI2cMasterAnswer, &onI2cReadDone);
     adcInit(&onAdcReadDone);
-    
+//    
     dacEnable(true);
-    uartEnable(UART_MODULE_1, true);
-    i2cEnable(true);
-    pidSetTunings(60,   0.25, 0.002, 0.008,   0, 4095); 
-    
-    // Default
+    uartDriverEnable(true);
+//    i2cEnable(true);
+//    pidSetTunings(60,   0.25, 0.002, 0.008,   0, 4095); 
+//    
+//    // Default
     varVoltage = 0;
-    varCurrent = 0;
+    varCurrent = 4095;
     setVoltage = 0;
     dacSetValueA(varVoltage);
     dacSetValueB(varCurrent);
     
+    DelayMs(10);
     printf("start\n");
     
     // Enable
     adcEnable(true);
     ledTimerEnable(true);
     
+    DelayMs(10);
+    dacSetVoltageB(0.02);
+    voltageSweep();
+    
     while(1) {
-        if (adcDone) {
-            adcDone = false;
-            
-            if (setVoltage != varVoltage) {
-                dacSetVoltageA(( ((float)setVoltage) / 5000));
-                varVoltage = setVoltage;
-            }
+        
+//        if (adcDone) {
+//            adcDone = false;
+//            
+//            LED1 = !PORTBbits.RB5;
+//            
+//            if (setVoltage != varVoltage) {
+//                dacSetVoltageA(( ((float)setVoltage) / 5000));
+//                varVoltage = setVoltage;
+//            }
             
             // PID
 //            if (pidMode == MANUAL) {
@@ -164,7 +193,7 @@ int main(void) {
 //                pidCompute(varVoltage, msrVoltage, &pidOutput);
 //                dacSetValueA(pidOutput);
 //            }
-        }
+//        }
     }
 }
 
@@ -207,14 +236,55 @@ void onI2cReadDone(i2cData_t data) {
 }
 
 void onAdcReadDone(AdcBuffer_t data) {
-    msrCurrent = ((float)adcValueToVolage(data.value0)) * 500; // in mA
-    msrVoltage = ((float)adcValueToVolage(data.value1)) * 4830;// in mV
+    msrVoltage = data.value0;//((float)adcValueToVolage(data.value0)) * 5000;// in mV
+    msrCurrent = data.value1;//((float)adcValueToVolage(data.value1)) * 500; // in mA
 
-    adcEnable(true); // Restart AD conversion
+    //adcEnable(true); // Restart AD conversion
     adcDone = true;
 }
 
+void voltageSweep() {
+    uint16_t cnt = 0;
+    bool clip = false;
+    uint16_t voltage = 0;
+    
+    while(cnt < TEST_BUFFER_CNT) { 
 
+        dacSetVoltageA(( ((float)voltage) / 5000));
+        DelayMs(500);
+        clip = (PORTBbits.RB5 == 0);
+        adcEnable(true); // Restart AD conversion
+        
+        while(!adcDone);
+        adcDone = false;
+        
+        LED1 = clip;
+        
+        testBuffer[cnt].setVoltage = voltage;
+        testBuffer[cnt].setCurrent = 0;
+        testBuffer[cnt].msrVoltage = msrVoltage;
+        testBuffer[cnt].msrCurrent = msrCurrent;
+        testBuffer[cnt].clip = clip;
+        
+        cnt++;
+        voltage = cnt * TEST_VOLTAGE_STEP;
+    }
+    
+    cnt = 0;
+    while(cnt < TEST_BUFFER_CNT) { 
+        
+        printf("%d,%d,%d,%d,%d\n", 
+                testBuffer[cnt].setVoltage,
+                testBuffer[cnt].setCurrent,
+                testBuffer[cnt].msrVoltage,
+                testBuffer[cnt].msrCurrent,
+                testBuffer[cnt].clip);
+        
+        DelayUs(100);
+        
+        cnt++;
+    }
+}
 
 
 

@@ -1,35 +1,81 @@
-/* 
- * File:   UART functions
- * Author: Wouter
- *
- */
-
 #ifndef UART_DRIVER_H
 #define	UART_DRIVER_H
 
-#ifdef	__cplusplus
-extern "C" {
+/**
+ * Select the message type, only one of these types should be selected!
+ */
+#define TYPE_TEXT
+//#define TYPE_SIMPLE_SHORT
+//#define TYPE_SIMPLE_LONG
+//#define TYPE_VARIABLE
+
+
+#define START_CHAR 0x24 /* $ */
+#define STOP_CHAR  0x26 /* & */
+#define SEP_CHAR   0x3A /* : */
+#define ACK_CHAR   0x40 /* @ */
+#define MES_CHAR   0x4D /* M */
+
+#define STA_OK              0x00  /* Message converted successfull            */
+#define STA_NOK             0x01  /* Message not converted                    */
+#define STA_INVALID_START   0x02  /* Invalid start character                  */
+#define STA_INVALID_STOP    0x04  /* Invalid stop character                   */
+#define STA_INVALID_SEP     0x08  /* Invalid separator character              */
+#define STA_INVALID_LENGTH  0x10  /* Total message length invalid             */
+#define STA_INVALID_COMMAND 0x20  /* Command length invalid                   */
+#define STA_INVALID_MESSAGE 0x40  /* Message length invalid                   */
+
+
+
+/**
+ * Simple text message: any message that ends with '\0' character can be 
+ * received. The maximum length of the message is defined as MESSAGE_LENGTH
+ */
+#ifdef TYPE_TEXT
+#define MESSAGE_LENGTH 100
 #endif
 
-#define UART_MODULE_1   0
-#define UART_MODULE_2   1
-    
-#define MESSAGE_TYPE = 0;
-#define BLOCK_TYPE = 1;
-    
 /**
- * Boolean indicating data can be read.
- */    
-extern bool UART_flag;
+ * Short formatted message: "$C:M&" 
+ *  - 1 command byte - C
+ *  - 1 message byte - M
+ *  - No acknowledge
+ */
+#ifdef TYPE_SIMPLE_SHORT
+#define MESSAGE_LENGTH 1
+#endif
 
 /**
- * Data Struct for reading data.
+ * Long formatted message: "$C:M0M1:A&" 
+ *  - 1 command bytes - C
+ *  - 2 message bytes - M0 and M1
+ *  - With acknowledge
  */
+#ifdef TYPE_SIMPLE_LONG
+#define MESSAGE_LENGTH 2
+#define ACKNOWLEDGE    
+#endif
+
+/**
+ * Variable formatted message: "$C:L:M0M1...ML:A&" 
+ *  - 1 command byte - C
+ *  - L message bytes - M0 -> ML
+ *  - With acknowledge
+ */
+#ifdef TYPE_VARIABLE
+#define MESSAGE_LENGTH 100
+#define ACKNOWLEDGE    
+#endif
+
 typedef struct {
-    uint8_t sender;
-    char command[3];
-    char message[10];
-} READ_Data_t;
+    uint8_t sender; // Sender id
+    uint8_t ack;    // Acknowledge
+    uint8_t messageLength; // Length of the message
+    uint8_t status; // Status - has one of the defined statuses
+    uint8_t command; // Command
+    char message[MESSAGE_LENGTH]; // Message
+} UartData_t;
+
 
 /******************************************************************************/
 /* System Function Prototypes                                                 */
@@ -37,77 +83,35 @@ typedef struct {
 /**
  * Initialize the UART module, select which module to use. The module is enabled
  * when it is initialized.
- * @param which: UART_MODULE_1 or UART_MODULE_2
  * @param baud: Baud rate of the UART 
  */
-void uartInit(uint16_t which, uint16_t baud);
+void uartDriverInit(uint16_t baud, void (*onReadDone)(UartData_t data));
 
 /**
  * Enable the UART module
- * @param which: UART_MODULE_1 or UART_MODULE_2
  * @param enable Enable or disable UART.
  */
-void uartEnable(uint16_t which, bool enable);
+void uartDriverEnable(bool enable);
 
 /**
  * 
  * @param data
  */
-void uartWriteByte(uint8_t data);
-
-/**
- * 
- * @return 
- */
-uint8_t uartReadByte(void);
-
-
-
-
-
-
+void uartDriverWriteByte(uint8_t data);
 
 /**
  * Write data to the TX pin of UART module. 
  * @param command: Command
  * @param data: Data string to write
  */
-void uartWrite(const char* command, const char* data);
+void uartDriverWrite(char command, char* data);
 
 /**
  * Write data to the TX pin of UART module. 
  * @param command: Command
  * @param data: Data integer to write
  */
-void uartWriteInt(const char* command, int data);
-
-/**
- * Read data from the RX pin of UART module.
- * @return data: returns the data struct.
- */
-READ_Data_t uartRead();
-
-/**
- * New data available
- * @param data
- */
-void uartNewData(uint8_t data);
-
-/**
- * 
- * @return 
- */
-READ_Data_t uartReadBlock(uint8_t cnt);
-uint8_t uartBlockLength();
-uint8_t uartMessageType();
-
-void uartAcknowledge(uint16_t val);
-
-/**
- * Get the device name.
- * @return const char* device name
- */
-const char* uartGetDeviceName();
+void uartDriverWriteInt(char command, int data);
 
 
 #endif

@@ -20,6 +20,7 @@ extern "C" {
 #define T3_IP       4    
 #define ADC1_IP     3
 #define U1RX_IP     1
+#define IP_U1RX     5
 
 
 
@@ -65,15 +66,14 @@ extern "C" {
 /**
  * UART
  */    
-    
-#define UART1_BAUD      57600               /* 9600 Baud rate                 */
+#define UART1_BAUD      57600 /* 57600 */
 #define UART1_ID        2   
 
 #define UART1_RX_Dir    TRISBbits.TRISB6    /* RX Pin on RP38-RB6             */
 #define UART1_TX_Dir    TRISBbits.TRISB7    /* TX Pin on RP39-RB7             */
 
-#define UART1_RX_Map    0b0100110           /* I/O RP38                       */
-#define UART1_TX_Map    0b000001
+#define UART1_RX_Map    0b0100110           /* RX on RP38                     */
+#define UART1_TX_Map    RPOR2bits.RP39R     /* TX on RP39                     */
     
 /**
  * SPI 2
