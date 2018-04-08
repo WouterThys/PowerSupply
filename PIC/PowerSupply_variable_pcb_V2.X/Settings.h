@@ -6,11 +6,18 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include "Controllers/DAC_Controller.h"
 
-#ifdef	__cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-
+#define DEBUG       0
+#define DEBUG_I2C   1
+    
+/**
+ * Board constants
+ */    
+#define Rs          0.1     /* Sense resistance                               */
+#define Rt          68100   /* Temperature resitance                          */
+#define Igain       20      /* Current sense amplifier gain                   */
+#define Vgain       5       /* Voltage amplification from DAC to LT3080       */
+#define Vdivider    1/5     /* Voltage divider for sensing output voltage     */
+    
 /**
  * Interrupt priorities
  */
@@ -19,10 +26,8 @@ extern "C" {
 #define SPI2_IP     2
 #define T3_IP       4    
 #define ADC1_IP     3
-#define U1RX_IP     1
 #define IP_U1RX     5
-
-
+#define IP_CN       1
 
     
 /**
@@ -33,13 +38,18 @@ extern "C" {
 #define LED1_Dir        TRISBbits.TRISB15
 #define LED2            PORTBbits.RB14
 #define LED2_Dir        TRISBbits.TRISB14
-#define LED3            PORTBbits.RB13
-#define LED3_Dir        TRISBbits.TRISB13
     
+#define CLIP_PIN        PORTBbits.RB5    
+#define CLIP_PIN_Dir    TRISBbits.TRISB5
+#define CLIP_PIN_Cn     CNENBbits.CNIEB5
+#define CLIP_LED_Dir    TRISBbits.TRISB13
+#define CLIP_LED        PORTBbits.RB13
     
 /**
  *  ADC
  */
+#define VREF            2.048
+#define n               12
     
 #define ADC_CHANNELS    4      
     
@@ -99,18 +109,12 @@ extern "C" {
 /**
  * I²C
  */
-#define I2C_ADDRESS     0x03
-
 #define I2C_SCL_Dir     TRISBbits.TRISB8        /* SCL Direction              */
 #define I2C_SDA_Dir     TRISBbits.TRISB9        /* SDA Direction              */
 
 #define I2C_SCL_Odc     ODCBbits.ODCB8          /* Open drain config for SCL  */
 #define I2C_SDA_Odc     ODCBbits.ODCB9          /* Open drain config for SDA  */
     
-
-#ifdef	__cplusplus
-}
-#endif /* __cplusplus */
 
 #endif	/* XC_HEADER_TEMPLATE_H */
 

@@ -211,7 +211,9 @@ void i2cRead() {
 
                 I2C1STATbits.I2COV = 0;
             }
-            (*onI2cReadDone)(slaveReadData);
+            if (masterWrite) {
+                (*onI2cReadDone)(slaveReadData);
+            }
             break;
     }
 

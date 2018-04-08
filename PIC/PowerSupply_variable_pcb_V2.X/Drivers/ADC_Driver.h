@@ -15,7 +15,7 @@ typedef struct ADC_Buffer AdcBuffer_t;
 
 void adcInit(void (*onAdcReadDone)(AdcBuffer_t data));
 void adcEnable(bool enable);
-double adcValueToVolage(uint16_t value);
+float adcValueToVoltage(uint16_t value);
 
 
 #endif

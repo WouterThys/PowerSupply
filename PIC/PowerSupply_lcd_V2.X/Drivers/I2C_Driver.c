@@ -41,6 +41,8 @@
 #define CHECK_RBF     0x0002 /* Mask for Receive Buffer Full                  */
 #define CHECK_TBF     0x0001 /* Mask for Transmit Buffer Full                 */
 
+#define MAX_TIMEOUT   20
+
 /*******************************************************************************
  *          MACRO FUNCTIONS
  ******************************************************************************/
@@ -66,8 +68,7 @@ static bool masterWrite;
 
 static i2cData_t slaveReadData;
 
-uint16_t i2cInterruptCnt;
-uint16_t i2cTestCnt;
+uint16_t timeoutCnt;
 
 
 /*******************************************************************************
@@ -228,6 +229,7 @@ void i2cDriverInitMaster() {
     masterState = I2C_STATE_IDLE;
     masterReady = true;
     firstTime = true;
+    timeoutCnt = 0;
 
     /* Ports */
     I2C_SCL_Odc = 0;    // Open drain
@@ -238,11 +240,11 @@ void i2cDriverInitMaster() {
     /* I2C1 Registers */
     I2C1CON = 0x0000;
     I2C1STAT = 0x0000;
-    I2C1BRG = 180; // 100kHz clock
+    I2C1BRG = 180;//180; // 100kHz clock
 
     /* Interrupts master */
     _MI2C1IF = 0; // Clear flag
-    _MI2C1IP = 7; // Priority is highest
+    _MI2C1IP = IP_I2C; // Priority is highest
     _MI2C1IE = 1; // Enable
 }
 
@@ -272,7 +274,7 @@ void i2cDriverInitSlave(uint16_t address, void (*answer)(i2cData_t * data), void
 
     /* Interrupts master */
     _SI2C1IF = 0; // Clear flag
-    _SI2C1IP = 7; // Priority is highest
+    _SI2C1IP = IP_I2C; // Priority is highest
     _SI2C1IE = 1; // Enable
 }
 
@@ -298,8 +300,6 @@ void i2cDriverReset() {
     slaveState = I2C_STATE_IDLE;
     slaveReady = true;
     firstTime = true;
-    i2cInterruptCnt = 0;
-    i2cTestCnt = 0;
 
     /* Interrupts */
     _MI2C1IE = 0; // Disable
@@ -320,6 +320,8 @@ void i2cDriverMasterWrite(i2cData_t *data) {
         return;
     }
     masterReady = false;
+    masterInterrupt = false;
+    timeoutCnt = 0;
     data->status = I2C_OK;
     while (!masterReady) {
         switch (masterState) {
@@ -347,6 +349,7 @@ void i2cDriverMasterWrite(i2cData_t *data) {
                 // Send address and R/W bit to slave   
             case I2C_STATE_ADDRESS:
                 if (masterInterrupt) {
+                    timeoutCnt = 0;
                     masterInterrupt = false;
                     // Do checks
                     if (check(CHECK_S) && !check(CHECK_P)) {
@@ -357,11 +360,19 @@ void i2cDriverMasterWrite(i2cData_t *data) {
                         masterState = I2C_STATE_STOP;
                         data->status = I2C_NOK; // ACK not received, something went wrong
                     }
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        I2C1CONbits.PEN = 1; // Initiate stop event
+//                        masterState = I2C_STATE_STOP;
+//                        data->status = I2C_TIMEOUT; // Too long before interrupt came
+//                    }
                 }
                 break;
                 // Check if address went OK
             case I2C_CHECK_ADDRESS:
                 if (masterInterrupt) {
+                    timeoutCnt = 0;
                     masterInterrupt = false;
                     // Do checks
                     if (!check(CHECK_ACKSTAT) && !check(CHECK_IWCOL)) {
@@ -371,6 +382,13 @@ void i2cDriverMasterWrite(i2cData_t *data) {
                         masterState = I2C_STATE_STOP;
                         data->status = I2C_NO_ADR_ACK; // ACK not received, something went wrong
                     }
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        I2C1CONbits.PEN = 1; // Initiate stop event
+//                        masterState = I2C_STATE_STOP;
+//                        data->status = I2C_TIMEOUT; // Too long before interrupt came
+//                    }
                 }
                 break;
                 // Write command
@@ -381,6 +399,7 @@ void i2cDriverMasterWrite(i2cData_t *data) {
                 // Check if command went OK    
             case I2C_CHECK_COMMAND:
                 if (masterInterrupt) {
+                    timeoutCnt = 0;
                     masterInterrupt = false;
                     // Do checks
                     if (!check(CHECK_ACKSTAT) && !check(CHECK_IWCOL)) {
@@ -390,6 +409,13 @@ void i2cDriverMasterWrite(i2cData_t *data) {
                         masterState = I2C_STATE_STOP;
                         data->status = I2C_NO_DATA_ACK; // ACK not received, something went wrong
                     }
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        I2C1CONbits.PEN = 1; // Initiate stop event
+//                        masterState = I2C_STATE_STOP;
+//                        data->status = I2C_TIMEOUT; // Too long before interrupt came
+//                    }
                 }
                 break;
                 // Write first 8 bits 
@@ -400,6 +426,7 @@ void i2cDriverMasterWrite(i2cData_t *data) {
                 // Check first data  
             case I2C_CHECK_FIRST_DATA:
                 if (masterInterrupt) {
+                    timeoutCnt = 0;
                     masterInterrupt = false;
                     // Do checks
                     if (!check(CHECK_ACKSTAT) && !check(CHECK_IWCOL)) {
@@ -409,6 +436,13 @@ void i2cDriverMasterWrite(i2cData_t *data) {
                         masterState = I2C_STATE_STOP;
                         data->status = I2C_NO_DATA_ACK; // ACK not received, something went wrong
                     }
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        I2C1CONbits.PEN = 1; // Initiate stop event
+//                        masterState = I2C_STATE_STOP;
+//                        data->status = I2C_TIMEOUT; // Too long before interrupt came
+//                    }
                 }
                 break;
                 // Receive last 8 bits 
@@ -419,6 +453,7 @@ void i2cDriverMasterWrite(i2cData_t *data) {
                 // Stop Sequence
             case I2C_CHECK_SECOND_DATA:
                 if (masterInterrupt) {
+                    timeoutCnt = 0;
                     masterInterrupt = false;
                     // Do checks
                     if (!check(CHECK_ACKSTAT) && !check(CHECK_IWCOL)) {
@@ -429,6 +464,13 @@ void i2cDriverMasterWrite(i2cData_t *data) {
                         masterState = I2C_STATE_STOP;
                         data->status = I2C_NO_DATA_ACK; // ACK not received, something went wrong
                     }
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        I2C1CONbits.PEN = 1; // Initiate stop event
+//                        masterState = I2C_STATE_STOP;
+//                        data->status = I2C_TIMEOUT; // Too long before interrupt came
+//                    }
                 }
                 break;
                 // End    
@@ -437,6 +479,13 @@ void i2cDriverMasterWrite(i2cData_t *data) {
                     masterInterrupt = false;
                     masterState = I2C_STATE_IDLE;
                     masterReady = true;
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        masterInterrupt = false;
+//                        masterState = I2C_STATE_IDLE;
+//                        masterReady = true;
+//                    }
                 }
                 break;
             default:
@@ -454,8 +503,11 @@ void i2cDriverMasterRead(i2cData_t *data) {
         return;
     }
     masterReady = false;
+    masterInterrupt = false;
+    timeoutCnt = 0;
     data->status = I2C_OK;
     while (!masterReady) {
+
         switch (masterState) {
                 // Check the P status bit to ensure that the bus is in an Idle state.
             case I2C_STATE_IDLE:
@@ -481,6 +533,7 @@ void i2cDriverMasterRead(i2cData_t *data) {
                 // Send address and R/W bit to slave   
             case I2C_STATE_ADDRESS:
                 if (masterInterrupt) {
+                    timeoutCnt = 0;
                     masterInterrupt = false;
                     // Do checks
                     if (check(CHECK_S) && !check(CHECK_P)) {
@@ -491,11 +544,19 @@ void i2cDriverMasterRead(i2cData_t *data) {
                         masterState = I2C_STATE_STOP;
                         data->status = I2C_NO_ADR_ACK; // ACK not received, something went wrong
                     }
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        I2C1CONbits.PEN = 1; // Initiate stop event
+//                        masterState = I2C_STATE_STOP;
+//                        data->status = I2C_TIMEOUT; // Too long before interrupt came
+//                    }
                 }
                 break;
                 // Check if address went OK
             case I2C_CHECK_ADDRESS:
                 if (masterInterrupt) {
+                    timeoutCnt = 0;
                     masterInterrupt = false;
                     // Do checks
                     if (!check(CHECK_ACKSTAT) && !check(CHECK_IWCOL)) {
@@ -503,8 +564,15 @@ void i2cDriverMasterRead(i2cData_t *data) {
                     } else {
                         I2C1CONbits.PEN = 1; // Initiate stop event
                         masterState = I2C_STATE_STOP;
-                        data->status = I2C_NO_DATA_ACK; // ACK not received, something went wrong
+                        data->status = I2C_NO_ADR_ACK; // ACK not received, something went wrong
                     }
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        I2C1CONbits.PEN = 1; // Initiate stop event
+//                        masterState = I2C_STATE_STOP;
+//                        data->status = I2C_TIMEOUT; // Too long before interrupt came
+//                    }
                 }
                 break;
                 // Write command
@@ -515,6 +583,7 @@ void i2cDriverMasterRead(i2cData_t *data) {
                 // Check if command went OK    
             case I2C_CHECK_COMMAND:
                 if (masterInterrupt) {
+                    timeoutCnt = 0;
                     masterInterrupt = false;
                     // Do checks
                     if (!check(CHECK_ACKSTAT) && !check(CHECK_IWCOL)) {
@@ -524,6 +593,13 @@ void i2cDriverMasterRead(i2cData_t *data) {
                         masterState = I2C_STATE_STOP;
                         data->status = I2C_NO_DATA_ACK; // ACK not received, something went wrong
                     }
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        I2C1CONbits.PEN = 1; // Initiate stop event
+//                        masterState = I2C_STATE_STOP;
+//                        data->status = I2C_TIMEOUT; // Too long before interrupt came
+//                    }
                 }
                 break;
                 // Repeated start
@@ -534,22 +610,39 @@ void i2cDriverMasterRead(i2cData_t *data) {
                 // Check repeated start
             case I2C_CHECK_REP_START:
                 if (masterInterrupt) {
+                    timeoutCnt = 0;
                     masterInterrupt = false;
                     i2cAddressRead(data->address);
                     masterState = I2C_STATE_ENABLE_RECEIVE;
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        I2C1CONbits.PEN = 1; // Initiate stop event
+//                        masterState = I2C_STATE_STOP;
+//                        data->status = I2C_TIMEOUT; // Too long before interrupt came
+//                    }
                 }
                 break;
                 // Enable receiving of data    
             case I2C_STATE_ENABLE_RECEIVE:
                 if (masterInterrupt) {
+                    timeoutCnt = 0;
                     masterInterrupt = false;
                     I2C1CONbits.RCEN = 1;
                     masterState = I2C_STATE_FIRST_DATA;
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        I2C1CONbits.PEN = 1; // Initiate stop event
+//                        masterState = I2C_STATE_STOP;
+//                        data->status = I2C_TIMEOUT; // Too long before interrupt came
+//                    }
                 }
                 break;
                 // Receive first 8 bits 
             case I2C_STATE_FIRST_DATA:
                 if (masterInterrupt) {
+                    timeoutCnt = 0;
                     masterInterrupt = false;
 
                     data->data1 = i2cDataRead();
@@ -558,19 +651,35 @@ void i2cDriverMasterRead(i2cData_t *data) {
                     I2C1CONbits.ACKEN = 1;
 
                     masterState = I2C_CHECK_FIRST_DATA;
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        I2C1CONbits.PEN = 1; // Initiate stop event
+//                        masterState = I2C_STATE_STOP;
+//                        data->status = I2C_TIMEOUT; // Too long before interrupt came
+//                    }
                 }
                 break;
                 // Receive enable    
             case I2C_CHECK_FIRST_DATA:
                 if (masterInterrupt) {
+                    timeoutCnt = 0;
                     masterInterrupt = false;
                     I2C1CONbits.RCEN = 1;
                     masterState = I2C_STATE_SECOND_DATA;
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        I2C1CONbits.PEN = 1; // Initiate stop event
+//                        masterState = I2C_STATE_STOP;
+//                        data->status = I2C_TIMEOUT; // Too long before interrupt came
+//                    }
                 }
                 break;
                 // Receive last 8 bits 
             case I2C_STATE_SECOND_DATA:
                 if (masterInterrupt) {
+                    timeoutCnt = 0;
                     masterInterrupt = false;
 
                     data->data2 = i2cDataRead();
@@ -579,14 +688,29 @@ void i2cDriverMasterRead(i2cData_t *data) {
                     I2C1CONbits.ACKEN = 1;
 
                     masterState = I2C_CHECK_SECOND_DATA;
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        I2C1CONbits.PEN = 1; // Initiate stop event
+//                        masterState = I2C_STATE_STOP;
+//                        data->status = I2C_TIMEOUT; // Too long before interrupt came
+//                    }
                 }
                 break;
                 // Stop Sequence
             case I2C_CHECK_SECOND_DATA:
                 if (masterInterrupt) {
+                    timeoutCnt = 0;
                     masterInterrupt = false;
                     I2C1CONbits.PEN = 1; // Initiate stop event
                     masterState = I2C_STATE_STOP;
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        I2C1CONbits.PEN = 1; // Initiate stop event
+//                        masterState = I2C_STATE_STOP;
+//                        data->status = I2C_TIMEOUT; // Too long before interrupt came
+//                    }
                 }
                 break;
                 // End    
@@ -595,6 +719,13 @@ void i2cDriverMasterRead(i2cData_t *data) {
                     masterInterrupt = false;
                     masterState = I2C_STATE_IDLE;
                     masterReady = true;
+                } else {
+//                    timeoutCnt++;
+//                    if (timeoutCnt > MAX_TIMEOUT) {
+//                        masterInterrupt = false;
+//                        masterState = I2C_STATE_IDLE;
+//                        masterReady = true;
+//                    }
                 }
                 break;
             default:

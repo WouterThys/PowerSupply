@@ -13,15 +13,17 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 
 
-#define DEBUG       1
+#define DEBUG       0   /* General debug enable                               */
+#define DEBUG_I2C   1   /* I²C debug enable                                   */
 
 /**
- * Interrupt priorities (Highest (1) - Lowest(7))
+ * Interrupt priorities (Highest (7) - Lowest(1))
  */
 
-#define IP_U1RX      3
-#define IP_MENU_TMR  4
-#define IP_MAIN_TMR  7
+#define IP_U1RX      7
+#define IP_I2C       6
+#define IP_MENU_TMR  2
+#define IP_MAIN_TMR  1
     
 /**
  *  PIC

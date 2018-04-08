@@ -59,6 +59,8 @@ static bool putCommand(Command_t command);
 static bool getCommand(Command_t * command);
 static bool executeCommand(Command_t command);
 
+static void clearChange(SupplyData_t * supplyData);
+
 void initialize() {
     sysInterruptEnable(false);
 
@@ -80,7 +82,11 @@ void timerEnable(bool enable) {
     
     // Registers
     TMR4 = 0x0000;
-    PR4 = 1000;
+    if (DEBUG) {
+        PR4 = 10000;
+    } else {
+        PR4 = 2500;
+    }
     
     // Interrupts
     _T4IP = IP_MAIN_TMR; 
@@ -95,11 +101,8 @@ void timerEnable(bool enable) {
 bool putCommand(Command_t command) {
     
     if (commandCnt >= COMMAND_BUFFER-1) {
-        LED1 = 1;
         return false;
     }
-    
-    LED1 = 0;
     
     // Check if command already in buffer, overwrite data
     int16_t i;
@@ -137,23 +140,35 @@ bool executeCommand(Command_t command) {
     switch (command.command) {
         // Supply stuff
         case C_SET_VOLTAGE:
-            supVarData.changed = true;
-            supVarData.setVoltage = command.data;
+            supVarData.setVoltage.value = command.data;
+            supVarData.setVoltage.changed = true;
+            if (DEBUG) printf("Execute command: C_SET_VOLTAGE\n");
             break;
         case C_SET_CURRENT:
-            supVarData.changed = true;
-            supVarData.setCurrent = command.data;
+            supVarData.setCurrent.value = command.data;
+            supVarData.setCurrent.changed = true;
+            if (DEBUG) printf("Execute command: C_SET_CURRENT\n");
             break;
 
         // LCD stuff
         case C_LCD_CONTRAST:
             lcdSetDisplayContrast(command.data); // 1 - 50
+            if (DEBUG) printf("Execute command: C_LCD_CONTRAST\n");
             break;
         case C_LCD_BRIGHTNESS:
             lcdSetDisplayBrightness(command.data); // 1 - 8
+            if (DEBUG) printf("Execute command: C_LCD_BRIGHTNESS\n");
             break;
     }
     return true;
+}
+
+void clearChange(SupplyData_t * supplyData)  {
+    supplyData->setVoltage.changed = false;
+    supplyData->setCurrent.changed = false;
+    supplyData->msrVoltage.changed = false;
+    supplyData->msrCurrent.changed = false;
+    supplyData->msrTemperature.changed = false;
 }
 
 /*******************************************************************************
@@ -172,11 +187,22 @@ int main(void) {
     lcdSettings.on = 1;
     lcdSettings.contrast = 40;
     lcdSettings.brightness = 6;
+    
+    supVarData.setVoltage.value = 1000;
+    supVarData.setVoltage.changed = true;
+    
+    supVarData.setCurrent.value = 1000;
+    supVarData.setCurrent.changed = true;
+    
+    DelayMs(100);
     timerEnable(true);
+    
+    if (DEBUG) printf("start\n");
     
     while (1) {
         
         if (tmrFlag) {
+            LED1 = !LED1;
             
             // Determine next state
             switch(fsmCurrentState) {
@@ -198,32 +224,50 @@ int main(void) {
             // Handle current state
             switch(fsmCurrentState) {
                 default:
-                case S0: 
+                case S0: LED2 = 1;
                     // Get commands from UART or MENU
                     while (getCommand(&command)) {
                         executeCommand(command);
                     }
+                LED2 = 0;
                     break;
-                case S1: 
-                    // Get and set data from variable
-                    if (supVarData.changed) {
-                        setVoltage(supVarData.setVoltage);
-                    }
+                case S1: LED2 = 1;
+                    // Get input from other devices
                     getVarData(&supVarData);
+                    if (DEBUG) printf("V: %d\n", supVarData.msrVoltage.value);
+                    if (DEBUG) printf("I: %d\n", supVarData.msrCurrent.value);
+                    if (DEBUG) printf("T: %d\n\n", supVarData.msrTemperature.value);
+                    // get5_0V data
+                    // ..
+                LED2 = 0;
                     break;
-                case S2: 
-                    // Get data from 5V
+                case S2: LED2 = 1;
+                    // Set voltage (only on variable?)
+                    if (supVarData.setVoltage.changed) {
+                        setVoltage(supVarData.setVoltage.value);
+                    }
+                LED2 = 0;
                     break;
-                case S3: 
-                    // Get data from 3.3V
+                case S3: LED2 = 1;
+                    // Set current
+                    if (supVarData.setCurrent.changed) {
+                        setCurrent(supVarData.setCurrent.value);
+                    }
+                    // also for 5 and 3.3 volt
+                LED2 = 0;
                     break;
-                case S4: 
+                case S4: LED2 = 1;
                     // Update menu
                     menuUpdate(
                             lcdSettings,
                             supVarData,
                             sup5V0Data,
                             sup3V3Data);
+                    
+                    clearChange(&supVarData);
+                    clearChange(&sup5V0Data);
+                    clearChange(&sup3V3Data);
+                    LED2 = 0;
                     break;
             }
             

@@ -11,7 +11,7 @@
  ******************************************************************************/
 
 #define M1_LINE1 "V:     V |     V"
-#define M1_LINE2 "I:     A |     A"
+#define M1_LINE2 "I:     mA|     m"
 #define M1_varVPOS {0,0}
 #define M1_varIPOS {1,0}
 #define M1_msrVPOS {0,10}
@@ -69,7 +69,8 @@ typedef struct {
  ******************************************************************************/
 static void drawMenu(Menu_t menu);
 static void drawCursor(Cursor_t cursor);
-static void drawValue(Value_t value);
+static void drawPrettyValue(Value_t value);
+static void drawRealValue(Value_t value);
 
 static void menuTurn(int16_t turns);
 static void menuClicked();
@@ -168,10 +169,10 @@ void drawMenu(Menu_t menu) {
     writeString(0,0, menu.line1);
     writeString(1,0, menu.line2);
     
-    drawValue(menu.variable1);
-    drawValue(menu.variable2);
-    drawValue(menu.measure1);
-    drawValue(menu.measure2);
+    drawPrettyValue(menu.variable1);
+    drawRealValue(menu.variable2);
+    drawPrettyValue(menu.measure1);
+    drawRealValue(menu.measure2);
 }
 
 void drawCursor(Cursor_t cursor) {
@@ -196,7 +197,7 @@ void drawCursor(Cursor_t cursor) {
 }
 
 // d0 d1 , d2 d3
-void drawValue(Value_t value) {
+void drawPrettyValue(Value_t value) {
     uint16_t p = value.position.pos;
     uint16_t l = value.position.line;
     uint16_t v = value.value / 10;
@@ -218,6 +219,46 @@ void drawValue(Value_t value) {
     p++;  writeChar(l, p, ',');
     p++; writeDigit(l, p, d2);
     p++; writeDigit(l, p, d3);
+    
+    Position_t cp = cursor.position->pos;
+    lcdSetCursorPosition(cp.line, cp.pos);
+}
+
+void drawRealValue(Value_t value) {
+    uint16_t p = value.position.pos;
+    uint16_t l = value.position.line;
+    uint16_t v = value.value;
+    
+    uint16_t d4 = v % 10;
+    v /= 10;
+    uint16_t d3 = v % 10;
+    v /= 10;
+    uint16_t d2 = v % 10;
+    v /= 10;
+    uint16_t d1 = v % 10;
+    v /= 10;
+    uint16_t d0 = v % 10;
+    
+    if (d0 > 0) { writeDigit(l, p, d0); }
+    else { writeChar(l, p, ' '); }
+    
+    p++; 
+    if (d0 > 0 || d1 > 0) { writeDigit(l, p, d1); }
+    else { writeChar(l, p, ' '); }
+    
+    p++; 
+    if (d0 > 0 || d1 > 0 || d2 > 0) { writeDigit(l, p, d2); }
+    else { writeChar(l, p, ' '); }
+    
+    p++; 
+    if (d0 > 0 || d1 > 0 || d2 > 0 || d3 > 0) { writeDigit(l, p, d3); }
+    else { writeChar(l, p, ' '); }
+    
+    p++; 
+    writeDigit(l, p, d4);
+    
+    Position_t cp = cursor.position->pos;
+    lcdSetCursorPosition(cp.line, cp.pos);
 }
 
 void menuTurn(int16_t turns) {
@@ -232,8 +273,10 @@ void menuTurn(int16_t turns) {
             uint16_t * val = &cursor.position->value->value;
             if (turns > 0) {
                 if (*val > 100) *val -= 100;
+                else if (*val > 10) *val -= 10;
             } else {
-                *val += 100;
+                if (*val > 100) *val += 100;
+                else *val += 10;
             }
         }
     }
@@ -338,32 +381,29 @@ void menuUpdate(
         SupplyData_t data3V3) 
 {
     
-    if (settings.changed) {
-        lcdSetDisplayBrightness(settings.brightness);
-        lcdSetDisplayContrast(settings.contrast);
-        settings.changed = 0;
+//    if (settings.changed) {
+//        lcdSetDisplayBrightness(settings.brightness);
+//        lcdSetDisplayContrast(settings.contrast);
+//        settings.changed = 0;
+//    }
+    
+    if (dataVar.msrVoltage.changed) {
+        msrVoltage.value = dataVar.msrVoltage.value;
+        drawPrettyValue(msrVoltage);
+    }
+    if (dataVar.msrCurrent.changed) {
+        msrCurrent.value = dataVar.msrCurrent.value;
+        drawRealValue(msrCurrent);
+    }
+    if (dataVar.setVoltage.changed /* && current menu has variable*/) {
+        varVoltage.value = dataVar.setVoltage.value;
+        drawPrettyValue(varVoltage);
+    }
+    if (dataVar.setCurrent.changed /* && current menu has variable*/) {
+        varCurrent.value = dataVar.setCurrent.value;
+        drawRealValue(varCurrent);
     }
     
-    if (dataVar.changed) {
-        if (msrVoltage.value != dataVar.msrVoltage) {
-            msrVoltage.value = dataVar.msrVoltage;
-            drawValue(msrVoltage);
-        }
-        if (msrCurrent.value != dataVar.msrCurrent) {
-            msrCurrent.value = dataVar.msrCurrent;
-            drawValue(msrCurrent);
-        }
-        if (varVoltage.value != dataVar.setVoltage /* && current menu has variable*/) {
-            varVoltage.value = dataVar.setVoltage;
-            drawValue(varVoltage);
-        }
-        if (varCurrent.value != dataVar.setCurrent /* && current menu has variable*/) {
-            varCurrent.value = dataVar.setCurrent;
-            drawValue(varCurrent);
-        }
-        dataVar.changed = 0;
-        updateMenu = true;
-    }
     
     // if (data5V0 ...)
     // if (data3V3 ...)
@@ -371,7 +411,6 @@ void menuUpdate(
     if (updateMenu) {
         menuTurnOnCursor(true);
         
-        //drawValue(*cursor.position->value);
         drawCursor(cursor);
         
         menuOnCount = 0;
@@ -396,7 +435,7 @@ void menuSetVariableVoltage(uint16_t voltage) {
         Position_t p = cursor.position->pos;
 
         varVoltage.value = voltage;
-        drawValue(varVoltage);
+        drawPrettyValue(varVoltage);
 
         lcdSetCursorPosition(p.line, p.pos);
     }
@@ -407,7 +446,7 @@ void menuSetVariableCurrent(uint16_t current) {
         Position_t p = cursor.position->pos;
 
         varCurrent.value = current;
-        drawValue(varCurrent); 
+        drawPrettyValue(varCurrent); 
 
         lcdSetCursorPosition(p.line, p.pos);
     }
@@ -418,7 +457,7 @@ void menuSetMeasuredVoltage(uint16_t voltage) {
         Position_t p = cursor.position->pos;
 
         msrVoltage.value = voltage;
-        drawValue(msrVoltage);
+        drawPrettyValue(msrVoltage);
 
         lcdSetCursorPosition(p.line, p.pos);
     }
@@ -429,7 +468,7 @@ void menuSetMeasuredCurrent(uint16_t current) {
         Position_t p = cursor.position->pos;
 
         msrCurrent.value = current;
-        drawValue(msrCurrent); 
+        drawPrettyValue(msrCurrent); 
 
         lcdSetCursorPosition(p.line, p.pos);
     }

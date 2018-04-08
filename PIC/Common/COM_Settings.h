@@ -21,8 +21,8 @@ typedef struct {
 // Addresses
 #define ADDR_MAIN        0x01
 #define ADDR_VAR         0x55
-#define ADDR_5V0         0x66
-#define ADDR_3V3         0x77
+#define ADDR_5V0         0x56
+#define ADDR_3V3         0x57
 
 
 // Main commands 0x0X

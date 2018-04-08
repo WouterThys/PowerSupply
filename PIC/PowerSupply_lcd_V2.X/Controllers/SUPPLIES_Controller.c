@@ -31,6 +31,8 @@ static i2cData_t i2cVar;
 static i2cData_t i2c5V0;
 static i2cData_t i2c3V3;
 
+static int8_t i2cError = I2C_OK;
+
 /*******************************************************************************
  *          LOCAL FUNCTIONS
  ******************************************************************************/
@@ -52,20 +54,33 @@ void setCurrent(uint16_t current) {
  *          I²C
  ******************************************************************************/
 bool i2cCheckState(i2cData_t data) {
-    switch(data.status) {
-        default: 
-            return true;
-        case I2C_NOK: 
-        case I2C_OVERFLOW: 
-        case I2C_COLLISION: 
-        case I2C_NO_ADR_ACK: 
-        case I2C_NO_DATA_ACK: 
-        case I2C_UNEXPECTED_DATA: 
-            i2cDriverReset();
-            return false;
-        case I2C_UNEXPECTED_ADR: 
-        case I2C_STILL_BUSY: 
-            return false;
+    //if (data.status != i2cError) {
+        i2cError = data.status;
+        if (DEBUG & DEBUG_I2C) {
+            switch(i2cError) {
+                default: 
+                    printf("I2C_OK\n"); break;
+                    break;
+                case I2C_NOK: printf("I2C_NOK\n"); break;
+                case I2C_OVERFLOW: printf("I2C_OVERFLOW\n"); break;
+                case I2C_COLLISION: printf("I2C_COLLISION\n"); break;
+                case I2C_NO_ADR_ACK: printf("I2C_NO_ADR_ACK\n"); break;
+                case I2C_NO_DATA_ACK: printf("I2C_NO_DATA_ACK\n"); break;
+                case I2C_UNEXPECTED_DATA: printf("I2C_UNEXPECTED_DATA\n"); break;
+                case I2C_UNEXPECTED_ADR: printf("I2C_UNEXPECTED_ADR\n"); break;
+                case I2C_STILL_BUSY: printf("I2C_STILL_BUSY\n"); break;
+                case I2C_TIMEOUT: printf("I2C_TIMEOUT\n"); break;
+            }
+        }
+    //}
+    
+    if (i2cError < I2C_OK) {
+        //LED1 = 1;
+        i2cDriverReset();
+        return false;
+    } else {
+        //LED1 = 0;
+        return true; 
     }
 }
 
@@ -84,63 +99,79 @@ void suppliesInit() {
 
 
 void getVarData(SupplyData_t * data) {
+    uint16_t value = 0;
+    
     i2cVar.command = COM_GET_V;
     i2cDriverMasterRead(&i2cVar);
     if (i2cCheckState(i2cVar)) {
-        concatinate(i2cVar.data1, i2cVar.data2, &data->msrVoltage);   
+        concatinate(i2cVar.data1, i2cVar.data2, &value);   
+        if (value != data->msrVoltage.value) {
+            data->msrVoltage.value = value;
+            data->msrVoltage.changed = true;
+        }
     }
+    DelayUs(10);
     
     i2cVar.command = COM_GET_I;
     i2cDriverMasterRead(&i2cVar);
     if (i2cCheckState(i2cVar)) {
-        concatinate(i2cVar.data1, i2cVar.data2, &data->msrCurrent);   
+        concatinate(i2cVar.data1, i2cVar.data2, &value);
+        if (value != data->msrCurrent.value) {
+            data->msrCurrent.value = value;
+            data->msrCurrent.changed = true;
+        }
     }
+    DelayUs(10);
     
     i2cVar.command = COM_GET_T;
     i2cDriverMasterRead(&i2cVar);
     if (i2cCheckState(i2cVar)) {
-        concatinate(i2cVar.data1, i2cVar.data2, &data->msrTemperature);   
+        concatinate(i2cVar.data1, i2cVar.data2, &value);
+        if (value != data->msrTemperature.value) {
+            data->msrTemperature.value = value;
+            data->msrTemperature.changed = true;
+        }
     }
 }
 
 
 void get5V0Data(SupplyData_t * data) {
-    i2c5V0.command = COM_GET_V;
-    i2cDriverMasterRead(&i2c5V0);
-    if (i2cCheckState(i2c5V0)) {
-        concatinate(i2c5V0.data1, i2c5V0.data2, &data->msrVoltage);   
-    }
-    
-    i2c5V0.command = COM_GET_I;
-    i2cDriverMasterRead(&i2c5V0);
-    if (i2cCheckState(i2c5V0)) {
-        concatinate(i2c5V0.data1, i2c5V0.data2, &data->msrCurrent);   
-    }
-    
-    i2c5V0.command = COM_GET_T;
-    i2cDriverMasterRead(&i2c5V0);
-    if (i2cCheckState(i2c5V0)) {
-        concatinate(i2c5V0.data1, i2c5V0.data2, &data->msrTemperature);   
-    }
+//    i2c5V0.command = COM_GET_V;
+//    i2cDriverMasterRead(&i2c5V0);
+//    if (i2cCheckState(i2c5V0)) {
+//        concatinate(i2c5V0.data1, i2c5V0.data2, &data->msrVoltage);   
+//    }
+//    
+//    i2c5V0.command = COM_GET_I;
+//    i2cDriverMasterRead(&i2c5V0);
+//    if (i2cCheckState(i2c5V0)) {
+//        concatinate(i2c5V0.data1, i2c5V0.data2, &data->msrCurrent);   
+//    }
+//    
+//    i2c5V0.command = COM_GET_T;
+//    i2cDriverMasterRead(&i2c5V0);
+//    if (i2cCheckState(i2c5V0)) {
+//        concatinate(i2c5V0.data1, i2c5V0.data2, &data->msrTemperature);   
+//    }
 }
 
 
 void get3V3Data(SupplyData_t * data) {
-    i2c3V3.command = COM_GET_V;
-    i2cDriverMasterRead(&i2c3V3);
-    if (i2cCheckState(i2c3V3)) {
-        concatinate(i2c3V3.data1, i2c3V3.data2, &data->msrVoltage);   
-    }
-    
-    i2c3V3.command = COM_GET_I;
-    i2cDriverMasterRead(&i2c3V3);
-    if (i2cCheckState(i2c3V3)) {
-        concatinate(i2c3V3.data1, i2c3V3.data2, &data->msrCurrent);   
-    }
-    
-    i2c3V3.command = COM_GET_T;
-    i2cDriverMasterRead(&i2c3V3);
-    if (i2cCheckState(i2c3V3)) {
-        concatinate(i2c3V3.data1, i2c3V3.data2, &data->msrTemperature);   
-    }
+//    i2c3V3.command = COM_GET_V;
+//    i2cDriverMasterRead(&i2c3V3);
+//    if (i2cCheckState(i2c3V3)) {
+//        concatinate(i2c3V3.data1, i2c3V3.data2, &data->msrVoltage);   
+//    }
+//    
+//    i2c3V3.command = COM_GET_I;
+//    i2cDriverMasterRead(&i2c3V3);
+//    if (i2cCheckState(i2c3V3)) {
+//        concatinate(i2c3V3.data1, i2c3V3.data2, &data->msrCurrent);   
+//    }
+//    
+//    i2c3V3.command = COM_GET_T;
+//    i2cDriverMasterRead(&i2c3V3);
+//    if (i2cCheckState(i2c3V3)) {
+//        concatinate(i2c3V3.data1, i2c3V3.data2, &data->msrTemperature);   
+//    }
 }

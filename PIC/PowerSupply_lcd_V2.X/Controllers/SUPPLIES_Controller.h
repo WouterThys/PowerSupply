@@ -5,12 +5,16 @@
 #include "../Drivers/I2C_Driver.h"
 
 typedef struct {
-    bool changed;
-    uint16_t setVoltage; // Variable voltage 
-    uint16_t setCurrent; // Maximum current
-    uint16_t msrVoltage; // Measured output voltage
-    uint16_t msrCurrent; // Measured output current
-    uint16_t msrTemperature; // Measured temperature of the LT3081
+    uint16_t value   : 15; // Value
+    uint16_t changed : 1; // Value has changed
+} SupplyValue_t;
+
+typedef struct {
+    SupplyValue_t setVoltage;  // Variable voltage 
+    SupplyValue_t setCurrent;  // Maximum current
+    SupplyValue_t msrVoltage; // Measured output voltage
+    SupplyValue_t msrCurrent; // Measured output current
+    SupplyValue_t msrTemperature; // Measured temperature of the LT3081
 } SupplyData_t;
 
 

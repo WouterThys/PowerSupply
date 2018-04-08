@@ -19,10 +19,11 @@
 #define I2C_OVERFLOW        -2
 #define I2C_COLLISION       -3
 #define I2C_NO_ADR_ACK      -4
-#define I2C_NO_DATA_ACK     -5
+#define I2C_NO_DATA_ACK     -5  /* Happens when other device is not there     */
 #define I2C_UNEXPECTED_DATA -6
 #define I2C_UNEXPECTED_ADR  -7
-#define I2C_STILL_BUSY      -8
+#define I2C_STILL_BUSY      -8  /* Writing or reading still in progress       */
+#define I2C_TIMEOUT         -9
 
 struct I2C_Data {
     uint8_t address;    /* Address (7-bit) of the slave                       */

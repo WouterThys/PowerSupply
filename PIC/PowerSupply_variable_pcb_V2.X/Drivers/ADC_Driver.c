@@ -11,8 +11,6 @@
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
-#define VREF    2.048
-#define n       12
 #define N       pow(2, n)
 
 /*******************************************************************************
@@ -103,7 +101,7 @@ void adcEnable(bool enable) {
     }
 }
 
-double adcValueToVolage(uint16_t value) {
+float adcValueToVoltage(uint16_t value) {
     return value * VREF / N;
 }
 
