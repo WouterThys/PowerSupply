@@ -184,11 +184,9 @@ bool checkI2cState(i2cData_t data) {
     //}
     
     if (i2cError < I2C_OK) {
-        //LED1 = 1;
         //i2cDriverReset();
         return false;
     } else {
-        //LED1 = 0;
         return true; 
     }
 }
@@ -230,10 +228,14 @@ int main(void) {
     
     // Enable
     adcEnable(true);
-    ledTimerEnable(true);
+//    ledTimerEnable(true);
     clipEnable(true);
     
     DelayMs(10);
+    
+    // TEST
+    dacSetVoltageA(1);
+    // TEST
     
     while(1) {
        
@@ -248,7 +250,6 @@ int main(void) {
                 varCurrent = setCurrent;
             }
             i2cDone = false;
-            LED2 = !LED2;
             
             if (DEBUG) {
                 printf("\n");
@@ -263,7 +264,6 @@ int main(void) {
         if (adcDone) {
             adcDone = false;
             
-            LED1 = !LED1;
             // PID
 //            if (pidMode == MANUAL) {
 //                pidSetMode(MANUAL);
@@ -278,14 +278,6 @@ int main(void) {
 //                dacSetValueA(pidOutput);
 //            }
         }
-    }
-}
-
-// Timer 2 interrupt
-void __attribute__ ( (interrupt, no_auto_psv) ) _T2Interrupt(void) {
-    if (_T2IF) {
-        
-        _T2IF = 0; // Clear interrupt
     }
 }
 
@@ -337,12 +329,40 @@ void onI2cReadDone(i2cData_t data) {
 }
 
 void onAdcReadDone(AdcBuffer_t data) {
-    msrVoltage = data.value0;
-    msrCurrent = data.value1;
-    msrTemperature = data.value2;
-
-    adcEnable(true); // Restart AD conversion
-    adcDone = true;
+//    msrVoltage = data.value0;
+//    msrCurrent = data.value1;
+//    msrTemperature = data.value2;
+//
+//    adcEnable(true); // Restart AD conversion
+//    adcDone = true;
+    
+    if (DEBUG) {
+        adcEnable(false);
+        
+        int b = 0;
+        printf("\n");
+        printf("\nBuffer1:\n");
+        for (b = 0; b < ADC_BUFFER_SIZE; b++) {
+            printf("%d\n", data.adcCh0[b]);
+        }
+        
+        printf("\nBuffer2:\n");
+        for (b = 0; b < ADC_BUFFER_SIZE; b++) {
+            printf("%d\n", data.adcCh1[b]);
+        }
+        
+        printf("\nBuffer3:\n");
+        for (b = 0; b < ADC_BUFFER_SIZE; b++) {
+            printf("%d\n", data.adcCh2[b]);
+        }
+        
+        printf("\nBuffer4:\n");
+        for (b = 0; b < ADC_BUFFER_SIZE; b++) {
+            printf("%d\n", data.adcCh3[b]);
+        }
+    }
+    
+    LED1 = !LED1;
 }
 
 void voltageSweep() {
@@ -421,7 +441,6 @@ void voltageSweep() {
 
 
 //        if (UART_flag) {
-//            LED1 = 1;
 //            UART_flag = false;
 //            READ_Data read = C_UART_Read();
 //            if (strcmp(read.command, "S") == 0) {

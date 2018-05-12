@@ -6,7 +6,7 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include "Controllers/DAC_Controller.h"
 
-#define DEBUG       0
+#define DEBUG       1
 #define DEBUG_I2C   1
     
 /**
@@ -23,10 +23,11 @@
  */
 
 #define MI2C_IP     7
+#define T3_IP       6    
+#define DMA1_IP     5
+
+#define IP_U1RX     3
 #define SPI2_IP     2
-#define T3_IP       4    
-#define ADC1_IP     3
-#define IP_U1RX     5
 #define IP_CN       1
 
     
@@ -49,25 +50,30 @@
  *  ADC
  */
 #define VREF            2.048
-#define n               12
+#define n               10
     
+#define ADC_BUFFER_SIZE 8
 #define ADC_CHANNELS    4      
     
 #define ADC_CURRENT     0
 #define ADC_TEMPERATURE 1    
-    
+  
+#define ADC0_Asl        ANSELAbits.ANSA0        
 #define ADC0_Pin        PORTAbits.RA0
 #define ADC0_Dir        TRISAbits.TRISA0
 #define ADC0_PNr        1 /* AN0 */
   
+#define ADC1_Asl        ANSELAbits.ANSA1           
 #define ADC1_Pin        PORTAbits.RA1
 #define ADC1_Dir        TRISAbits.TRISA1
 #define ADC1_PNr        2 /* AN1 */
 
+#define ADC2_Asl        ANSELBbits.ANSB0      
 #define ADC2_Pin        PORTBbits.RB0
 #define ADC2_Dir        TRISBbits.TRISB0
 #define ADC2_PNr        3 /* AN2 */
 
+#define ADC3_Asl        ANSELBbits.ANSB1       
 #define ADC3_Pin        PORTBbits.RB1
 #define ADC3_Dir        TRISBbits.TRISB1
 #define ADC3_PNr        4 /* AN3 */    

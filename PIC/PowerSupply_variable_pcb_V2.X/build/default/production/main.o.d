@@ -8,4 +8,5 @@ Settings.h  \
 Drivers/UART_Driver.h  \
 Drivers/I2C_Driver.h  \
  Drivers/ADC_Driver.h  \
+Drivers/../Settings.h  \
 Controllers/PID_Controller.h 
