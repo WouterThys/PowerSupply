@@ -109,7 +109,7 @@ static bool checkI2cState(i2cData_t data);
 
 static void onI2cMasterAnswer(i2cData_t * data);
 static void onI2cReadDone(i2cData_t data);
-static void onAdcReadDone(AdcBuffer_t data);
+static void onAdcReadDone(uint16_t buffer, uint16_t * data);
 static void onUartReadDone(UartData_t data);
 
 static void voltageSweep();
@@ -228,16 +228,22 @@ int main(void) {
     
     // Enable
     adcEnable(true);
-//    ledTimerEnable(true);
+    //ledTimerEnable(true);
     clipEnable(true);
     
     DelayMs(10);
     
     // TEST
-    dacSetVoltageA(1);
+    //dacSetVoltageA(1);
     // TEST
+    LED1 = 1;
     
     while(1) {
+        
+        LED2 = !LED2;
+        DelayMs(500);
+        LED1 = !LED1;
+        DelayMs(500);
        
         if (i2cDone) {
             if (setVoltage != varVoltage) {
@@ -328,7 +334,7 @@ void onI2cReadDone(i2cData_t data) {
     }
 }
 
-void onAdcReadDone(AdcBuffer_t data) {
+void onAdcReadDone(uint16_t buffer, uint16_t * data) {
 //    msrVoltage = data.value0;
 //    msrCurrent = data.value1;
 //    msrTemperature = data.value2;
@@ -336,33 +342,17 @@ void onAdcReadDone(AdcBuffer_t data) {
 //    adcEnable(true); // Restart AD conversion
 //    adcDone = true;
     
-    if (DEBUG) {
-        adcEnable(false);
+    if (DEBUG && buffer == 1) {
+        LED1 = 1;
         
-        int b = 0;
-        printf("\n");
-        printf("\nBuffer1:\n");
-        for (b = 0; b < ADC_BUFFER_SIZE; b++) {
-            printf("%d\n", data.adcCh0[b]);
+        int i = 0;
+        for (i=0; i<8; i++) {
+            printf("%d\n", *(data + 1));
         }
         
-        printf("\nBuffer2:\n");
-        for (b = 0; b < ADC_BUFFER_SIZE; b++) {
-            printf("%d\n", data.adcCh1[b]);
-        }
+        LED1 = 0;
         
-        printf("\nBuffer3:\n");
-        for (b = 0; b < ADC_BUFFER_SIZE; b++) {
-            printf("%d\n", data.adcCh2[b]);
-        }
-        
-        printf("\nBuffer4:\n");
-        for (b = 0; b < ADC_BUFFER_SIZE; b++) {
-            printf("%d\n", data.adcCh3[b]);
-        }
     }
-    
-    LED1 = !LED1;
 }
 
 void voltageSweep() {

@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name SupplyMainDigital-rescue)(type Legacy)(uri ${KIPRJMOD}/SupplyMainDigital-rescue.lib)(options "")(descr ""))
+  (lib (name MyLib)(type Legacy)(uri /home/wouter/Documents/Geeken/aLibs/KiCad/MyLib.lib)(options "")(descr ""))
+)
