@@ -1,4 +1,4 @@
-update=Sun 03 Jun 2018 04:22:20 PM CEST
+update=12/06/2018 16:05:33
 version=1
 last_client=kicad
 [pcbnew]
@@ -23,8 +23,6 @@ ModuleOutlineThickness=0.150000000000
 [cvpcb]
 version=1
 NetIExt=net
-[general]
-version=1
 [eeschema]
 version=1
 LibDir=
@@ -61,4 +59,6 @@ LibName29=opto
 LibName30=atmel
 LibName31=contrib
 LibName32=valves
-LibName33=/home/wouter/Documents/Geeken/aLibs/KiCad/MyLib
+LibName33=C:/Users/gebruiker/Documents/WALDO/Libraries/KiCad/MyLib
+[general]
+version=1
