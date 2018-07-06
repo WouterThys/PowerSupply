@@ -823,7 +823,7 @@ __FUID3
  .debug_abbrev    0x000b95        0x1d1 build/default/production/main.o
  .debug_abbrev    0x000d66         0x8a build/default/production/utils.o
 
-.debug_line       0x000000       0x1131
+.debug_line       0x000000       0x1132
  *(.debug_line)
  .debug_line      0x000000        0x128 build/default/production/Controllers/UART_Controller.o
  .debug_line      0x000128        0x288 build/default/production/Controllers/MENU_Controller.o
@@ -835,8 +835,8 @@ __FUID3
  .debug_line      0x0009bc        0x324 build/default/production/Drivers/I2C_Driver.o
  .debug_line      0x000ce0        0x1ae build/default/production/Drivers/UART_Driver.o
  .debug_line      0x000e8e         0x1a build/default/production/configuration.o
- .debug_line      0x000ea8        0x1d9 build/default/production/main.o
- .debug_line      0x001081         0xb0 build/default/production/utils.o
+ .debug_line      0x000ea8        0x1da build/default/production/main.o
+ .debug_line      0x001082         0xb0 build/default/production/utils.o
 
 .debug_frame      0x000000        0xc84
  *(.debug_frame)
