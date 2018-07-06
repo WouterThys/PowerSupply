@@ -3,6 +3,7 @@ main.c  \
 utils.h  \
 Settings.h  \
  Drivers/SYSTEM_Driver.h  \
+Drivers/ENC_Driver.h  \
 ../Common/COM_Settings.h  \
  Controllers/MENU_Controller.h  \
 Controllers/../../Common/COM_Settings.h  \
