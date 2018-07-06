@@ -29,7 +29,7 @@ extern "C" {
     /**
      * 
      */
-    void menuUpdate(LCD_Settings_t settings, SupplyData_t dataVar, SupplyData_t data5V0, SupplyData_t data3V3);
+    void menuUpdate(LCD_Settings_t settings, SupplyData_t dataVar);
     
     /**
      * 

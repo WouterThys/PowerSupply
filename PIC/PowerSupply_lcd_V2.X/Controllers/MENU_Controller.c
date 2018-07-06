@@ -376,9 +376,7 @@ void menuInit(bool (*onPutCommand)(Command_t data)) {
 
 void menuUpdate(
         LCD_Settings_t settings, 
-        SupplyData_t dataVar, 
-        SupplyData_t data5V0, 
-        SupplyData_t data3V3) 
+        SupplyData_t dataVar) 
 {
     
 //    if (settings.changed) {

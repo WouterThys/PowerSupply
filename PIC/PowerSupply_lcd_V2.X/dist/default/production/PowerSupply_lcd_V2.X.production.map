@@ -175,12 +175,12 @@ section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200              0x142a          0x1e3f  (7743)
 .const                      0x162a                0x28            0x3c  (60)
-.text                       0x1652              0x1996          0x2661  (9825)
-.dinit                      0x2fe8               0x122           0x1b3  (435)
-.text                       0x310a               0x33a           0x4d7  (1239)
-.init.delay32               0x3444                0x1c            0x2a  (42)
+.text                       0x1652              0x1960          0x2610  (9744)
+.dinit                      0x2fb2               0x122           0x1b3  (435)
+.text                       0x30d4               0x33a           0x4d7  (1239)
+.init.delay32               0x340e                0x1c            0x2a  (42)
 
-                 Total program memory used (bytes):         0x4b90  (19344) 58%
+                 Total program memory used (bytes):         0x4b3f  (19263) 58%
 
 
 Ivt Memory  [Origin = 0x4, Length = 0x1fc]
@@ -199,18 +199,18 @@ Data Memory  [Origin = 0x1000, Length = 0x1000]
 
 section                    address      alignment gaps    total length  (dec)
 -------                    -------      --------------    -------------------
-.nbss                       0x1000                   0           0x13e  (318)
-.ndata                      0x113e                   0            0x22  (34)
-.nbss                       0x1160                   0            0x3e  (62)
-.ndata                      0x119e                   0             0x2  (2)
-.nbss                       0x11a0                   0             0x2  (2)
-.ndata                      0x11a2                   0             0x4  (4)
-.data                       0x11a6                   0            0xc4  (196)
-.bss                        0x126a                   0             0x6  (6)
-.data                       0x1270                   0             0x4  (4)
-.bss                        0x1274                   0             0x2  (2)
+.nbss                       0x1000                   0           0x12a  (298)
+.ndata                      0x112a                   0            0x22  (34)
+.nbss                       0x114c                   0            0x3e  (62)
+.ndata                      0x118a                   0             0x2  (2)
+.nbss                       0x118c                   0             0x2  (2)
+.ndata                      0x118e                   0             0x4  (4)
+.data                       0x1192                   0            0xc4  (196)
+.bss                        0x1256                   0             0x6  (6)
+.data                       0x125c                   0             0x4  (4)
+.bss                        0x1260                   0             0x2  (2)
 
-                 Total data memory used (bytes):          0x276  (630) 15%
+                 Total data memory used (bytes):          0x262  (610) 14%
 
 
 Dynamic Memory Usage
@@ -218,34 +218,34 @@ Dynamic Memory Usage
 region                     address                      maximum length  (dec)
 ------                     -------                      ---------------------
 heap                             0                                   0  (0)
-stack                       0x1276                               0xd8a  (3466)
+stack                       0x1262                               0xd9e  (3486)
 
-                 Maximum dynamic memory (bytes):          0xd8a  (3466)
+                 Maximum dynamic memory (bytes):          0xd9e  (3486)
 
 
 External Symbols in Data Memory (by address):
 
-                    0x1170                  _timeoutCnt
-                    0x11a6                  __Stdin
-                    0x11ce                  __Stdout
-                    0x11f6                  __Stderr
-                    0x121e                  __Files
-                    0x126a                  __Aldata
-                    0x1270                  __Size_block
-                    0x1272                  ___C30_UART
-                    0x1274                  ___curbrk
+                    0x115c                  _timeoutCnt
+                    0x1192                  __Stdin
+                    0x11ba                  __Stdout
+                    0x11e2                  __Stderr
+                    0x120a                  __Files
+                    0x1256                  __Aldata
+                    0x125c                  __Size_block
+                    0x125e                  ___C30_UART
+                    0x1260                  ___curbrk
 
 External Symbols in Data Memory (by name):
 
-                    0x126a                  __Aldata
-                    0x121e                  __Files
-                    0x1270                  __Size_block
-                    0x11f6                  __Stderr
-                    0x11a6                  __Stdin
-                    0x11ce                  __Stdout
-                    0x1272                  ___C30_UART
-                    0x1274                  ___curbrk
-                    0x1170                  _timeoutCnt
+                    0x1256                  __Aldata
+                    0x120a                  __Files
+                    0x125c                  __Size_block
+                    0x11e2                  __Stderr
+                    0x1192                  __Stdin
+                    0x11ba                  __Stdout
+                    0x125e                  ___C30_UART
+                    0x1260                  ___curbrk
+                    0x115c                  _timeoutCnt
 
 External Symbols in Program Memory (by address):
 
@@ -348,48 +348,48 @@ External Symbols in Program Memory (by address):
                   0x0026ba                  _lcdDisplayFirmwareVersion
                   0x0026ce                  _lcdDisplayBaudRate
                   0x0026e2                  _lcdDisplayI2CAddress
-                  0x00273e                  build/default/production/main.o:_putCommand
-                  0x00287e                  _main
-                  0x002be8                  _uartDriverInit
-                  0x002bfa                  _uartDriverEnable
-                  0x002c14                  _uartDriverWriteByte
-                  0x002c2c                  _uartReadByte
-                  0x002c36                  _putch
-                  0x002c42                  _uartDriverWrite
-                  0x002c5c                  _uartDriverWriteInt
-                  0x002cac                  _encDriverInit
-                  0x002cd2                  _encDriverService
-                  0x002de4                  _encDriverGetValue
-                  0x002e52                  _encDriverGetButton
-                  0x002e66                  _setVoltage
-                  0x002e86                  _setCurrent
-                  0x002ec4                  _suppliesInit
-                  0x002edc                  _getVarData
-                  0x002fd8                  _get5V0Data
-                  0x002fe0                  _get3V3Data
-                  0x003158                  build/default/production/Controllers/UART_Controller.o:_onReadDone
-                  0x0031f8                  _uartInit
-                  0x00320e                  _stringEquals
-                  0x003228                  _stringToInt
-                  0x00326e                  _minimumValue
-                  0x0032ca                  _concatinate
-                  0x0032e6                  _split
-                  0x003304                  _sysInitOscillator
-                  0x003336                  _sysInitPll
-                  0x00336c                  _sysInitPorts
-                  0x00337e                  _sysInitInterrupts
-                  0x00338c                  _sysInterruptEnable
-                  0x0033b2                  _D_SPI_Init
-                  0x00340c                  _D_SPI_Enable
-                  0x00342a                  _D_SPI_Write
-                  0x003444                  ___delay32
+                  0x0028f8                  _uartDriverInit
+                  0x00290a                  _uartDriverEnable
+                  0x002924                  _uartDriverWriteByte
+                  0x00293c                  _uartReadByte
+                  0x002946                  _putch
+                  0x002952                  _uartDriverWrite
+                  0x00296c                  _uartDriverWriteInt
+                  0x002a04                  build/default/production/main.o:_putCommand
+                  0x002b44                  _main
+                  0x002c76                  _encDriverInit
+                  0x002c9c                  _encDriverService
+                  0x002dae                  _encDriverGetValue
+                  0x002e1c                  _encDriverGetButton
+                  0x002e30                  _setVoltage
+                  0x002e50                  _setCurrent
+                  0x002e8e                  _suppliesInit
+                  0x002ea6                  _getVarData
+                  0x002fa2                  _get5V0Data
+                  0x002faa                  _get3V3Data
+                  0x003122                  build/default/production/Controllers/UART_Controller.o:_onReadDone
+                  0x0031c2                  _uartInit
+                  0x0031d8                  _stringEquals
+                  0x0031f2                  _stringToInt
+                  0x003238                  _minimumValue
+                  0x003294                  _concatinate
+                  0x0032b0                  _split
+                  0x0032ce                  _sysInitOscillator
+                  0x003300                  _sysInitPll
+                  0x003336                  _sysInitPorts
+                  0x003348                  _sysInitInterrupts
+                  0x003356                  _sysInterruptEnable
+                  0x00337c                  _D_SPI_Init
+                  0x0033d6                  _D_SPI_Enable
+                  0x0033f4                  _D_SPI_Write
+                  0x00340e                  ___delay32
                   0x0057fa                  __FGS.sec
 
 External Symbols in Program Memory (by name):
 
-                  0x00340c                  _D_SPI_Enable
-                  0x0033b2                  _D_SPI_Init
-                  0x00342a                  _D_SPI_Write
+                  0x0033d6                  _D_SPI_Enable
+                  0x00337c                  _D_SPI_Init
+                  0x0033f4                  _D_SPI_Write
                   0x0012b8                  __Atexit
                   0x00117e                  __Closreg
                   0x001242                  __DNKfflush
@@ -409,7 +409,7 @@ External Symbols in Program Memory (by name):
                   0x00086c                  ___Printf_cdnopuxX
                   0x0009d0                  ___Putfld_cdnopuxX
                   0x0004fa                  ___addsf3
-                  0x003444                  ___delay32
+                  0x00340e                  ___delay32
                   0x00156e                  ___divdi3
                   0x0005b4                  ___divsi3
                   0x0005d2                  ___eqsf2
@@ -442,17 +442,17 @@ External Symbols in Program Memory (by name):
                   0x00085c                  __printf_cdnopuxX
                   0x00023c                  __psv_init
                   0x000200                  __resetPRI
-                  0x0032ca                  _concatinate
-                  0x002e52                  _encDriverGetButton
-                  0x002de4                  _encDriverGetValue
-                  0x002cac                  _encDriverInit
-                  0x002cd2                  _encDriverService
+                  0x003294                  _concatinate
+                  0x002e1c                  _encDriverGetButton
+                  0x002dae                  _encDriverGetValue
+                  0x002c76                  _encDriverInit
+                  0x002c9c                  _encDriverService
                   0x001190                  _fclose
                   0x0012d2                  _free
                   0x000c14                  _fwrite
-                  0x002fe0                  _get3V3Data
-                  0x002fd8                  _get5V0Data
-                  0x002edc                  _getVarData
+                  0x002faa                  _get3V3Data
+                  0x002fa2                  _get5V0Data
+                  0x002ea6                  _getVarData
                   0x0018ac                  _i2cDriverEnable
                   0x001834                  _i2cDriverInitMaster
                   0x00186a                  _i2cDriverInitSlave
@@ -484,7 +484,7 @@ External Symbols in Program Memory (by name):
                   0x002432                  _lcdWriteDouble
                   0x0023b8                  _lcdWriteInt
                   0x002398                  _lcdWriteString
-                  0x00287e                  _main
+                  0x002b44                  _main
                   0x00139c                  _malloc
                   0x000cbc                  _memchr
                   0x000cd0                  _memcpy
@@ -495,31 +495,31 @@ External Symbols in Program Memory (by name):
                   0x0022ae                  _menuSetVariableVoltage
                   0x002118                  _menuTurnOnCursor
                   0x002204                  _menuUpdate
-                  0x00326e                  _minimumValue
-                  0x002c36                  _putch
-                  0x002e86                  _setCurrent
-                  0x002e66                  _setVoltage
-                  0x0032e6                  _split
+                  0x003238                  _minimumValue
+                  0x002946                  _putch
+                  0x002e50                  _setCurrent
+                  0x002e30                  _setVoltage
+                  0x0032b0                  _split
                   0x000cde                  _strchr
                   0x000814                  _strcmp
-                  0x00320e                  _stringEquals
-                  0x003228                  _stringToInt
+                  0x0031d8                  _stringEquals
+                  0x0031f2                  _stringToInt
                   0x000834                  _strlen
-                  0x002ec4                  _suppliesInit
-                  0x00337e                  _sysInitInterrupts
-                  0x003304                  _sysInitOscillator
-                  0x003336                  _sysInitPll
-                  0x00336c                  _sysInitPorts
-                  0x00338c                  _sysInterruptEnable
-                  0x002bfa                  _uartDriverEnable
-                  0x002be8                  _uartDriverInit
-                  0x002c42                  _uartDriverWrite
-                  0x002c14                  _uartDriverWriteByte
-                  0x002c5c                  _uartDriverWriteInt
-                  0x0031f8                  _uartInit
-                  0x002c2c                  _uartReadByte
-                  0x003158                  build/default/production/Controllers/UART_Controller.o:_onReadDone
-                  0x00273e                  build/default/production/main.o:_putCommand
+                  0x002e8e                  _suppliesInit
+                  0x003348                  _sysInitInterrupts
+                  0x0032ce                  _sysInitOscillator
+                  0x003300                  _sysInitPll
+                  0x003336                  _sysInitPorts
+                  0x003356                  _sysInterruptEnable
+                  0x00290a                  _uartDriverEnable
+                  0x0028f8                  _uartDriverInit
+                  0x002952                  _uartDriverWrite
+                  0x002924                  _uartDriverWriteByte
+                  0x00296c                  _uartDriverWriteInt
+                  0x0031c2                  _uartInit
+                  0x00293c                  _uartReadByte
+                  0x003122                  build/default/production/Controllers/UART_Controller.o:_onReadDone
+                  0x002a04                  build/default/production/main.o:_putCommand
                   0x001220                  fclose.EP_elo:_closeall
                   0x000840                  printf_cdnopuxX.EPeo:_prout
 
@@ -792,20 +792,20 @@ __FUID3
  *(.comment)
  .comment         0x000000         0x5e c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-c-elf.a(xfiles.EP_eo)
 
-.debug_info       0x000000       0x7c82
+.debug_info       0x000000       0x7c2c
  *(.debug_info)
  .debug_info      0x000000        0x339 build/default/production/Controllers/UART_Controller.o
- .debug_info      0x000339       0x114a build/default/production/Controllers/MENU_Controller.o
- .debug_info      0x001483        0x476 build/default/production/Controllers/SUPPLIES_Controller.o
- .debug_info      0x0018f9        0xf7d build/default/production/Drivers/SPI_Driver.o
- .debug_info      0x002876       0x1027 build/default/production/Drivers/SYSTEM_Driver.o
- .debug_info      0x00389d        0x6bd build/default/production/Drivers/LCD_Driver.o
- .debug_info      0x003f5a        0x836 build/default/production/Drivers/ENC_Driver.o
- .debug_info      0x004790       0x108e build/default/production/Drivers/I2C_Driver.o
- .debug_info      0x00581e       0x1306 build/default/production/Drivers/UART_Driver.o
- .debug_info      0x006b24        0x141 build/default/production/configuration.o
- .debug_info      0x006c65        0xcdb build/default/production/main.o
- .debug_info      0x007940        0x342 build/default/production/utils.o
+ .debug_info      0x000339       0x1124 build/default/production/Controllers/MENU_Controller.o
+ .debug_info      0x00145d        0x476 build/default/production/Controllers/SUPPLIES_Controller.o
+ .debug_info      0x0018d3        0xf7d build/default/production/Drivers/SPI_Driver.o
+ .debug_info      0x002850       0x1027 build/default/production/Drivers/SYSTEM_Driver.o
+ .debug_info      0x003877        0x6bd build/default/production/Drivers/LCD_Driver.o
+ .debug_info      0x003f34        0x836 build/default/production/Drivers/ENC_Driver.o
+ .debug_info      0x00476a       0x108e build/default/production/Drivers/I2C_Driver.o
+ .debug_info      0x0057f8       0x1306 build/default/production/Drivers/UART_Driver.o
+ .debug_info      0x006afe        0x141 build/default/production/configuration.o
+ .debug_info      0x006c3f        0xcab build/default/production/main.o
+ .debug_info      0x0078ea        0x342 build/default/production/utils.o
  *(.gnu.linkonce.wi.*)
 
 .debug_abbrev     0x000000        0xdf0
@@ -823,7 +823,7 @@ __FUID3
  .debug_abbrev    0x000b95        0x1d1 build/default/production/main.o
  .debug_abbrev    0x000d66         0x8a build/default/production/utils.o
 
-.debug_line       0x000000       0x1135
+.debug_line       0x000000       0x1131
  *(.debug_line)
  .debug_line      0x000000        0x128 build/default/production/Controllers/UART_Controller.o
  .debug_line      0x000128        0x288 build/default/production/Controllers/MENU_Controller.o
@@ -835,10 +835,10 @@ __FUID3
  .debug_line      0x0009bc        0x324 build/default/production/Drivers/I2C_Driver.o
  .debug_line      0x000ce0        0x1ae build/default/production/Drivers/UART_Driver.o
  .debug_line      0x000e8e         0x1a build/default/production/configuration.o
- .debug_line      0x000ea8        0x1dd build/default/production/main.o
- .debug_line      0x001085         0xb0 build/default/production/utils.o
+ .debug_line      0x000ea8        0x1d9 build/default/production/main.o
+ .debug_line      0x001081         0xb0 build/default/production/utils.o
 
-.debug_frame      0x000000        0xc92
+.debug_frame      0x000000        0xc84
  *(.debug_frame)
  .debug_frame     0x000000         0x76 build/default/production/Controllers/UART_Controller.o
  .debug_frame     0x000076        0x206 build/default/production/Controllers/MENU_Controller.o
@@ -849,8 +849,8 @@ __FUID3
  .debug_frame     0x000756         0x84 build/default/production/Drivers/ENC_Driver.o
  .debug_frame     0x0007da        0x158 build/default/production/Drivers/I2C_Driver.o
  .debug_frame     0x000932        0x1b0 build/default/production/Drivers/UART_Driver.o
- .debug_frame     0x000ae2        0x10a build/default/production/main.o
- .debug_frame     0x000bec         0xa6 build/default/production/utils.o
+ .debug_frame     0x000ae2         0xfc build/default/production/main.o
+ .debug_frame     0x000bde         0xa6 build/default/production/utils.o
 
 .debug_str        0x000000        0x244
  *(.debug_str)
@@ -2168,54 +2168,54 @@ __c30_signature
  __c30_signature
                   0x000bd6          0x6 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\libm-elf.a(divmoddi3.epeo)
 
-.nbss               0x1000        0x13e
+.nbss               0x1000        0x12a
  .nbss              0x1000         0xd4 build/default/production/Drivers/UART_Driver.o
- .nbss              0x10d4         0x3a build/default/production/main.o
- .nbss              0x110e         0x30 build/default/production/Controllers/MENU_Controller.o
+ .nbss              0x10d4         0x30 build/default/production/Controllers/MENU_Controller.o
+ .nbss              0x1104         0x26 build/default/production/main.o
 
-.ndata              0x113e         0x22
- .ndata             0x113e         0x22 build/default/production/Controllers/MENU_Controller.o
+.ndata              0x112a         0x22
+ .ndata             0x112a         0x22 build/default/production/Controllers/MENU_Controller.o
 
-.nbss               0x1160         0x3e
- .nbss              0x1160         0x16 build/default/production/Drivers/I2C_Driver.o
-                    0x1170                  _timeoutCnt
- .nbss              0x1176         0x14 build/default/production/Drivers/ENC_Driver.o
- .nbss              0x118a         0x12 build/default/production/Controllers/SUPPLIES_Controller.o
- .nbss              0x119c          0x2 build/default/production/Controllers/UART_Controller.o
+.nbss               0x114c         0x3e
+ .nbss              0x114c         0x16 build/default/production/Drivers/I2C_Driver.o
+                    0x115c                  _timeoutCnt
+ .nbss              0x1162         0x14 build/default/production/Drivers/ENC_Driver.o
+ .nbss              0x1176         0x12 build/default/production/Controllers/SUPPLIES_Controller.o
+ .nbss              0x1188          0x2 build/default/production/Controllers/UART_Controller.o
 
-.ndata              0x119e          0x2
- .ndata             0x119e          0x2 build/default/production/Controllers/SUPPLIES_Controller.o
+.ndata              0x118a          0x2
+ .ndata             0x118a          0x2 build/default/production/Controllers/SUPPLIES_Controller.o
 
-.nbss               0x11a0          0x2
- .nbss              0x11a0          0x2 build/default/production/Drivers/SPI_Driver.o
+.nbss               0x118c          0x2
+ .nbss              0x118c          0x2 build/default/production/Drivers/SPI_Driver.o
 
-.ndata              0x11a2          0x4
- .ndata             0x11a2          0x2 build/default/production/Drivers/ENC_Driver.o
- .ndata             0x11a4          0x2 build/default/production/main.o
+.ndata              0x118e          0x4
+ .ndata             0x118e          0x2 build/default/production/Drivers/ENC_Driver.o
+ .ndata             0x1190          0x2 build/default/production/main.o
 
-.data               0x11a6         0xc4
- .data              0x11a6         0x88 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-c-elf.a(xfiles.EP_eo)
-                    0x11a6                  __Stdin
-                    0x11ce                  __Stdout
-                    0x11f6                  __Stderr
-                    0x121e                  __Files
- .data              0x122e         0x22 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-c-elf.a(xlitob.EP_eo)
- .data              0x1250         0x1a c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-c-elf.a(xprintf_cdnopuxX.EPeo)
+.data               0x1192         0xc4
+ .data              0x1192         0x88 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-c-elf.a(xfiles.EP_eo)
+                    0x1192                  __Stdin
+                    0x11ba                  __Stdout
+                    0x11e2                  __Stderr
+                    0x120a                  __Files
+ .data              0x121a         0x22 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-c-elf.a(xlitob.EP_eo)
+ .data              0x123c         0x1a c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-c-elf.a(xprintf_cdnopuxX.EPeo)
 
-.bss                0x126a          0x6
- .bss               0x126a          0x4 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-c-elf.a(malloc.EP_eo)
-                    0x126a                  __Aldata
- .bss               0x126e          0x2 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-c-elf.a(fclose.EP_elo)
+.bss                0x1256          0x6
+ .bss               0x1256          0x4 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-c-elf.a(malloc.EP_eo)
+                    0x1256                  __Aldata
+ .bss               0x125a          0x2 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-c-elf.a(fclose.EP_elo)
 
-.data               0x1270          0x4
- .data              0x1270          0x2 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-c-elf.a(malloc.EP_eo)
-                    0x1270                  __Size_block
- .data              0x1272          0x2 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-pic30-elf.a(c30_uartep.Leo)
-                    0x1272                  ___C30_UART
+.data               0x125c          0x4
+ .data              0x125c          0x2 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-c-elf.a(malloc.EP_eo)
+                    0x125c                  __Size_block
+ .data              0x125e          0x2 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-pic30-elf.a(c30_uartep.Leo)
+                    0x125e                  ___C30_UART
 
-.bss                0x1274          0x2
- .bss               0x1274          0x2 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-pic30-elf.a(brkep.Lelo)
-                    0x1274                  ___curbrk
+.bss                0x1260          0x2
+ .bss               0x1260          0x2 c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-pic30-elf.a(brkep.Lelo)
+                    0x1260                  ___curbrk
 
 .ivt._T2Interrupt
                   0x000022          0x2
@@ -2270,7 +2270,7 @@ __c30_signature
  .const             0x964c          0x4 build/default/production/Drivers/UART_Driver.o
  .const             0x9650          0x2 build/default/production/Drivers/LCD_Driver.o
 
-.text             0x001652       0x1996
+.text             0x001652       0x1960
  .text            0x001652        0x6b4 build/default/production/Drivers/I2C_Driver.o
                   0x001834                  _i2cDriverInitMaster
                   0x00186a                  _i2cDriverInitSlave
@@ -2312,54 +2312,54 @@ __c30_signature
                   0x0026ba                  _lcdDisplayFirmwareVersion
                   0x0026ce                  _lcdDisplayBaudRate
                   0x0026e2                  _lcdDisplayI2CAddress
- .text            0x0026f6        0x2f0 build/default/production/main.o
-                  0x00273e                  build/default/production/main.o:_putCommand
-                  0x00287e                  _main
- .text            0x0029e6        0x2c6 build/default/production/Drivers/UART_Driver.o
-                  0x002be8                  _uartDriverInit
-                  0x002bfa                  _uartDriverEnable
-                  0x002c14                  _uartDriverWriteByte
-                  0x002c2c                  _uartReadByte
-                  0x002c36                  _putch
-                  0x002c42                  _uartDriverWrite
-                  0x002c5c                  _uartDriverWriteInt
- .text            0x002cac        0x1ba build/default/production/Drivers/ENC_Driver.o
-                  0x002cac                  _encDriverInit
-                  0x002cd2                  _encDriverService
-                  0x002de4                  _encDriverGetValue
-                  0x002e52                  _encDriverGetButton
- .text            0x002e66        0x182 build/default/production/Controllers/SUPPLIES_Controller.o
-                  0x002e66                  _setVoltage
-                  0x002e86                  _setCurrent
-                  0x002ec4                  _suppliesInit
-                  0x002edc                  _getVarData
-                  0x002fd8                  _get5V0Data
-                  0x002fe0                  _get3V3Data
+ .text            0x0026f6        0x2c6 build/default/production/Drivers/UART_Driver.o
+                  0x0028f8                  _uartDriverInit
+                  0x00290a                  _uartDriverEnable
+                  0x002924                  _uartDriverWriteByte
+                  0x00293c                  _uartReadByte
+                  0x002946                  _putch
+                  0x002952                  _uartDriverWrite
+                  0x00296c                  _uartDriverWriteInt
+ .text            0x0029bc        0x2ba build/default/production/main.o
+                  0x002a04                  build/default/production/main.o:_putCommand
+                  0x002b44                  _main
+ .text            0x002c76        0x1ba build/default/production/Drivers/ENC_Driver.o
+                  0x002c76                  _encDriverInit
+                  0x002c9c                  _encDriverService
+                  0x002dae                  _encDriverGetValue
+                  0x002e1c                  _encDriverGetButton
+ .text            0x002e30        0x182 build/default/production/Controllers/SUPPLIES_Controller.o
+                  0x002e30                  _setVoltage
+                  0x002e50                  _setCurrent
+                  0x002e8e                  _suppliesInit
+                  0x002ea6                  _getVarData
+                  0x002fa2                  _get5V0Data
+                  0x002faa                  _get3V3Data
 
-.dinit            0x002fe8        0x122
- .dinit           0x002fe8        0x122 data_init
+.dinit            0x002fb2        0x122
+ .dinit           0x002fb2        0x122 data_init
 
-.text             0x00310a        0x33a
- .text            0x00310a        0x104 build/default/production/Controllers/UART_Controller.o
-                  0x003158                  build/default/production/Controllers/UART_Controller.o:_onReadDone
-                  0x0031f8                  _uartInit
- .text            0x00320e         0xf6 build/default/production/utils.o
-                  0x00320e                  _stringEquals
-                  0x003228                  _stringToInt
-                  0x00326e                  _minimumValue
-                  0x0032ca                  _concatinate
-                  0x0032e6                  _split
- .text            0x003304         0xae build/default/production/Drivers/SYSTEM_Driver.o
-                  0x003304                  _sysInitOscillator
-                  0x003336                  _sysInitPll
-                  0x00336c                  _sysInitPorts
-                  0x00337e                  _sysInitInterrupts
-                  0x00338c                  _sysInterruptEnable
- .text            0x0033b2         0x92 build/default/production/Drivers/SPI_Driver.o
-                  0x0033b2                  _D_SPI_Init
-                  0x00340c                  _D_SPI_Enable
-                  0x00342a                  _D_SPI_Write
+.text             0x0030d4        0x33a
+ .text            0x0030d4        0x104 build/default/production/Controllers/UART_Controller.o
+                  0x003122                  build/default/production/Controllers/UART_Controller.o:_onReadDone
+                  0x0031c2                  _uartInit
+ .text            0x0031d8         0xf6 build/default/production/utils.o
+                  0x0031d8                  _stringEquals
+                  0x0031f2                  _stringToInt
+                  0x003238                  _minimumValue
+                  0x003294                  _concatinate
+                  0x0032b0                  _split
+ .text            0x0032ce         0xae build/default/production/Drivers/SYSTEM_Driver.o
+                  0x0032ce                  _sysInitOscillator
+                  0x003300                  _sysInitPll
+                  0x003336                  _sysInitPorts
+                  0x003348                  _sysInitInterrupts
+                  0x003356                  _sysInterruptEnable
+ .text            0x00337c         0x92 build/default/production/Drivers/SPI_Driver.o
+                  0x00337c                  _D_SPI_Init
+                  0x0033d6                  _D_SPI_Enable
+                  0x0033f4                  _D_SPI_Write
 
-.init.delay32     0x003444         0x1c
- .init.delay32    0x003444         0x1c c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-pic30-elf.a(delay32ep.Leo)
-                  0x003444                  ___delay32
+.init.delay32     0x00340e         0x1c
+ .init.delay32    0x00340e         0x1c c:/program files (x86)/microchip/xc16/v1.33/bin/bin/../../lib\liblega-pic30-elf.a(delay32ep.Leo)
+                  0x00340e                  ___delay32

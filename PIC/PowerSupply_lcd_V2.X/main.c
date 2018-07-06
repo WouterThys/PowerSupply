@@ -16,6 +16,24 @@
 #include "Controllers/SUPPLIES_Controller.h"
 
 /*******************************************************************************
+ *          TODO
+ *******************************************************************************
+ * - Timer which will update the measured data every 1/10(?) sec with one
+ *   I²C call, that will get:
+ *      - measured voltage
+ *      - measured current
+ *      - measured temperature
+ *   and set the local measured values.
+ * 
+ * - Timer (T2) which will get the user input. Create FSM to handle user input
+ *   and set the:
+ *      - set voltage
+ *      - set current
+ * 
+ * 
+ * */
+
+/*******************************************************************************
  *          DEFINES
  ******************************************************************************/
 #define VOLTAGE_STEP        100
@@ -41,8 +59,6 @@ static FSMState_e fsmCurrentState = S0;
 static FSMState_e fsmNextState = S0;
 
 static SupplyData_t supVarData;
-static SupplyData_t sup5V0Data;
-static SupplyData_t sup3V3Data;
 
 static LCD_Settings_t lcdSettings;
 
@@ -260,13 +276,9 @@ int main(void) {
                     // Update menu
                     menuUpdate(
                             lcdSettings,
-                            supVarData,
-                            sup5V0Data,
-                            sup3V3Data);
+                            supVarData);
                     
                     clearChange(&supVarData);
-                    clearChange(&sup5V0Data);
-                    clearChange(&sup3V3Data);
                     LED2 = 0;
                     break;
             }
