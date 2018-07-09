@@ -61,7 +61,45 @@ extern "C" {
      * @param on
      */
     void menuTurnOnCursor(bool on);
-
+    
+    
+    
+    
+    /**
+     * NEW NEW NEW
+     */
+    
+    /**
+     * 
+     * @param msrVoltage
+     * @param msrCurrent
+     * @param msrTemperature
+     */
+    void menuUpdateMeasuredData(uint16_t msrVoltage, uint16_t msrCurrent, uint16_t msrTemperature);
+    
+    /**
+     * 
+     * @param selVoltage
+     */
+    void menuSelectVoltage(uint16_t selVoltage);
+    
+    /**
+     * 
+     * @param selCurrent
+     */
+    void menuSelectCurrent(uint16_t selCurrent);
+    
+    /**
+     * 
+     * @param selVoltage
+     */
+    void menuChangeVoltage(uint16_t selVoltage);
+    
+    /**
+     * 
+     * @param selCurrent
+     */
+    void menuChangeCurrent(uint16_t selCurrent);
 
 #ifdef	__cplusplus
 }

@@ -39,10 +39,10 @@
  ******************************************************************************/
 #define VOLTAGE_STEP        100     /* Step size of voltage in [mV]           */
 #define VOLTAGE_MAX         10000   /* Maximum voltage in [mV]                */
-#define VOLTAGE_MIN         10      /* Minimum voltage in [mV]                */
-#define CURRENT_STEP        10      /* Step size of current in [mA]           */
+#define VOLTAGE_MIN         100     /* Minimum voltage in [mV]                */
+#define CURRENT_STEP        100     /* Step size of current in [mA]           */
 #define CURRENT_MAX         2000    /* Maximum current in [mA]                */
-#define CURRENT_MIN         10      /* Minimum current in [mA]                */
+#define CURRENT_MIN         100     /* Minimum current in [mA]                */
 
 #define FSM_PRE_SCALE       200     /* Timer with 1ms -> 200ms                */
 #define FSM_MAX_WAIT_CNT    25      /* FSM at 200ms -> wait of 5s             */ 
