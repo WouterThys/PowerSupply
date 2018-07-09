@@ -12,13 +12,10 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/gebruiker/Documents/WALDO/PowerSupply/PowerSupply/PIC/PowerSupply_lcd_V2.X/Controllers/SUPPLIES_Controller.c</file>
-            <file>file:/C:/Users/gebruiker/Documents/WALDO/PowerSupply/PowerSupply/PIC/PowerSupply_lcd_V2.X/Drivers/ENC_Driver.h</file>
             <file>file:/C:/Users/gebruiker/Documents/WALDO/PowerSupply/PowerSupply/PIC/PowerSupply_lcd_V2.X/Controllers/MENU_Controller.h</file>
-            <file>file:/C:/Users/gebruiker/Documents/WALDO/PowerSupply/PowerSupply/PIC/PowerSupply_lcd_V2.X/Controllers/SUPPLIES_Controller.h</file>
             <file>file:/C:/Users/gebruiker/Documents/WALDO/PowerSupply/PowerSupply/PIC/PowerSupply_lcd_V2.X/Controllers/MENU_Controller.c</file>
             <file>file:/C:/Users/gebruiker/Documents/WALDO/PowerSupply/PowerSupply/PIC/PowerSupply_lcd_V2.X/main.c</file>
-            <file>file:/C:/Users/gebruiker/Documents/WALDO/PowerSupply/PowerSupply/PIC/PowerSupply_lcd_V2.X/Drivers/ENC_Driver.c</file>
+            <file>file:/C:/Users/gebruiker/Documents/WALDO/PowerSupply/PowerSupply/PIC/PowerSupply_lcd_V2.X/Drivers/LCD_Driver.c</file>
         </group>
     </open-files>
 </project-private>

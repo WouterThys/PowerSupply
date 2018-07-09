@@ -19,6 +19,16 @@
 
 #define MENU_MAX_ON 200
 
+/** NEW NEW NEW */
+typedef enum {
+    MEASURE_VALUES,
+    SELECT_VOLTAGE,
+    SELECT_CURRENT,
+    CHANGE_VOLTAGE,
+    CHANGE_CURRENT
+} Menu_e;
+/** NEW NEW NEW */
+
 typedef enum {
     OFF,
     SELECTING,
@@ -71,6 +81,7 @@ static void drawMenu(Menu_t menu);
 static void drawCursor(Cursor_t cursor);
 static void drawPrettyValue(Value_t value);
 static void drawRealValue(Value_t value);
+static void drawValue(uint8_t line, uint8_t startPos, uint16_t value);
 
 static void menuTurn(int16_t turns);
 static void menuClicked();
@@ -97,6 +108,10 @@ static Cursor_t cursor;
 static uint16_t menuOnCount = 0;
 
 static bool updateMenu = false;
+
+/** NEW NEW NEW */
+static Menu_e currentMenu;
+/** NEW NEW NEW */
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
@@ -472,3 +487,89 @@ void menuSetMeasuredCurrent(uint16_t current) {
     }
 }
 
+
+
+
+void menuUpdateMeasuredData(uint16_t msrVoltage, uint16_t msrCurrent, uint16_t msrTemperature) {
+    if (currentMenu != MEASURE_VALUES) {
+        lcdCursorUnderlineOn(false);
+        lcdTurnOnBlinkingCursor(false);
+        writeString(0,0, "M|V[mV] I[mA] T ");
+        writeString(1,0, " |xx,xx xx,xx xx");
+        currentMenu = MEASURE_VALUES;
+    }
+    
+    drawValue(1, 2, msrVoltage);
+    drawValue(1, 8, msrCurrent);
+    //drawValue(1, 14, msrVoltage);
+}
+
+void menuSelectVoltage(uint16_t selVoltage) {
+    if (currentMenu != SELECT_VOLTAGE) {
+        lcdCursorUnderlineOn(true);
+        lcdTurnOnBlinkingCursor(false);
+        lcdSetCursorPosition(0,15); // Underline 'V'
+        writeString(0,0, "S|Set voltage  V");
+        writeString(1,0, " |              ");
+        currentMenu = SELECT_VOLTAGE;
+    }
+    drawValue(1, 2, selVoltage);
+}
+
+void menuSelectCurrent(uint16_t selCurrent) {
+    if (currentMenu != SELECT_CURRENT) {
+        lcdCursorUnderlineOn(true);
+        lcdTurnOnBlinkingCursor(false);
+        lcdSetCursorPosition(1,15); // Underline 'I'
+        writeString(0,0, "S|Set current  I");
+        writeString(1,0, " |              ");
+        currentMenu = SELECT_CURRENT;
+    }
+    drawValue(1, 2, selCurrent);
+}
+    
+void menuChangeVoltage(uint16_t selVoltage) {
+    if (currentMenu != CHANGE_VOLTAGE) {
+        lcdCursorUnderlineOn(true);
+        lcdTurnOnBlinkingCursor(true);
+        lcdSetCursorPosition(1,7);
+        writeString(0,0, "C|Set voltage  V");
+        writeString(1,0, " | xx,xx       V");
+        currentMenu = CHANGE_VOLTAGE;
+    }
+    drawValue(1, 2, selVoltage);
+}
+    
+void menuChangeCurrent(uint16_t selCurrent) {
+    if (currentMenu != CHANGE_CURRENT) {
+        lcdCursorUnderlineOn(true);
+        lcdTurnOnBlinkingCursor(true);
+        lcdSetCursorPosition(1,7);
+        writeString(0,0, "C|Set current  I");
+        writeString(1,0, " | xx,xx       A");
+        currentMenu = CHANGE_CURRENT;
+    }
+    drawValue(1, 2, selCurrent);
+}
+
+// TODO put on top
+// TODO more edit
+void drawValue(uint8_t line, uint8_t startPos, uint16_t value) {
+    uint16_t v = value / 10;
+    uint8_t p = startPos;
+    
+    uint16_t d3 = v % 10;
+    v /= 10;
+    uint16_t d2 = v % 10;
+    v /= 10;
+    uint16_t d1 = v % 10;
+    v /= 10;
+    uint16_t d0 = v % 10;
+    
+    writeDigit(line, p++, d0);
+    writeDigit(line, p++, d1);
+    writeChar(line, p++, ',');
+    writeDigit(line, p++, d2);
+    writeDigit(line, p, d3);
+    
+}
