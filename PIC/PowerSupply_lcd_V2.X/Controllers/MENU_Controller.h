@@ -28,46 +28,10 @@ extern "C" {
     
     /**
      * 
+     * @param brightness
+     * @param contrast
      */
-    void menuUpdate(LCD_Settings_t settings, SupplyData_t dataVar);
-    
-    /**
-     * 
-     * @param voltage
-     */
-    void menuSetVariableVoltage(uint16_t voltage);
-    
-    /**
-     * 
-     * @param current
-     */
-    void menuSetVariableCurrent(uint16_t current);
-    
-    /**
-     * 
-     * @param voltage
-     */
-    void menuSetMeasuredVoltage(uint16_t voltage);
-    
-    /**
-     * 
-     * @param current
-     */
-    void menuSetMeasuredCurrent(uint16_t current);
-    
-    
-    /**
-     * 
-     * @param on
-     */
-    void menuTurnOnCursor(bool on);
-    
-    
-    
-    
-    /**
-     * NEW NEW NEW
-     */
+    void menuConfigure(uint8_t brightness, uint8_t contrast);
     
     /**
      * 

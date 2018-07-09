@@ -118,9 +118,9 @@ void timerEnable(bool enable) {
     // Registers
     TMR4 = 0x0000;
     if (DEBUG) {
-        PR4 = 144;
+        PR4 = 70;
     } else {
-        PR4 = 144; // 6.95µs * 144 = 1ms
+        PR4 = 70; // 6.95µs * 144 = 1ms
     }
     
     // Interrupts
@@ -217,12 +217,12 @@ int main(void) {
     suppliesInit();
     uartInit(&putCommand);
     encDriverInit();
-    //menuInit(&putCommand);
+    menuInit(&putCommand);
     DelayMs(100);
     
     lcdSettings.on = 1;
-    lcdSettings.contrast = 40;
-    lcdSettings.brightness = 6;
+    lcdSettings.contrast = 30;
+    lcdSettings.brightness = 7;
     
     supVarData.setVoltage.value = 1000;
     supVarData.setVoltage.changed = true;
@@ -234,19 +234,22 @@ int main(void) {
     timerEnable(true);
     
     if (DEBUG) printf("start\n");
+    fsmHandeState(S_INIT, 0);
     
     while (1) {
         
         if (tmrFlag) {
             tmrFlag = false;
             fsmCalculateNextState(fsmCurrentState, &fsmNextState, encTurns, encButtonState);
+            
+            if (fsmCurrentState != fsmNextState) {
+                if (DEBUG) printf("FSM S%d>S%d\n", fsmCurrentState, fsmNextState);
+                fsmCurrentState = fsmNextState;
+            }
+            
+            fsmHandeState(fsmCurrentState, encTurns);
         }
         
-        if (fsmCurrentState != fsmNextState) {
-            if (DEBUG) printf("FSM S%d>S%d\n", fsmCurrentState, fsmNextState);
-            fsmCurrentState = fsmNextState;
-        }
-        fsmHandeState(fsmCurrentState, encTurns);
     }
     return 0;
 }
@@ -338,12 +341,21 @@ void fsmHandeState(FSMState_e currentState, int16_t turns) {
             if (supVarData.msrVoltage.changed ||
                     supVarData.msrCurrent.changed ||
                     supVarData.msrTemperature.changed) {
-                // lcdUpdateMeasuredData(...);
+                
+                menuUpdateMeasuredData(
+                        supVarData.msrVoltage.value,
+                        supVarData.msrCurrent.value,
+                        supVarData.msrTemperature.value
+                        );
+                
+                supVarData.msrVoltage.changed = false;
+                supVarData.msrCurrent.changed = false;
+                supVarData.msrTemperature.changed = false;
             }
             break;
             
         case S_SEL_VOLTAGE: 
-            // lcdSelVoltage(...);
+            menuSelectVoltage(supVarData.setVoltage.value);
             break;
             
         case S_CHA_VOLTAGE: 
@@ -366,15 +378,15 @@ void fsmHandeState(FSMState_e currentState, int16_t turns) {
                 supVarData.setVoltage.changed = true;
             }
             if (supVarData.setVoltage.changed) {
-                // update lcd
                 // update supplies   
                 if (DEBUG) printf("Vs=%dmV\n", supVarData.setVoltage.value);
+                menuChangeVoltage(supVarData.setVoltage.value);
                 supVarData.setVoltage.changed = false;
             }
             break;
             
         case S_SEL_CURRENT: 
-            // lcdChaCurrent(...);
+            menuSelectCurrent(supVarData.setCurrent.value);
             break;
             
         case S_CHA_CURRENT: 
@@ -397,9 +409,9 @@ void fsmHandeState(FSMState_e currentState, int16_t turns) {
                 supVarData.setCurrent.changed = true;
             }
             if (supVarData.setCurrent.changed) {
-                // update lcd
                 // update supplies   
                 if (DEBUG) printf("Is=%dmA\n", supVarData.setVoltage.value);
+                menuChangeCurrent(supVarData.setCurrent.value);
                 supVarData.setCurrent.changed = false;
             }
             break;

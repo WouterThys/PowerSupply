@@ -12,7 +12,7 @@
 
 #include <xc.h> // include processor files - each processor file is guarded.  
 
-#define DEBUG       1   /* General debug enable                               */
+#define DEBUG       0   /* General debug enable                               */
 #define DEBUG_I2C   1   /* I²C debug enable                                   */
 
 /**
