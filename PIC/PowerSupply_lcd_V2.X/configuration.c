@@ -35,8 +35,8 @@
 #pragma config JTAGEN = OFF             // JTAG Enable bit (JTAG is disabled)
 
 // FPOR
-#pragma config ALTI2C1 = ON             // Alternate I2C1 pins (I2C1 mapped to SDA1/SCL1 pins)
-#pragma config ALTI2C2 = OFF            // Alternate I2C2 pins (I2C2 mapped to SDA2/SCL2 pins)
+#pragma config ALTI2C1 = OFF             // Alternate I2C1 pins (I2C1 mapped to SDA1/SCL1 pins)
+#pragma config ALTI2C2 = ON            // Alternate I2C2 pins (I2C2 mapped to SDA2/SCL2 pins)
 #pragma config WDTWIN = WIN25           // Watchdog Window Select bits (WDT Window is 25% of WDT period)
 
 // FWDT

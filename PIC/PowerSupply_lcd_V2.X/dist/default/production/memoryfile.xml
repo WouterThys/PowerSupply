@@ -4,15 +4,15 @@
   <executable name="dist/default/production/PowerSupply_lcd_V2.X.production.elf">
     <memory name="data">
       <units>bytes</units>
-      <length>4096</length>
-      <used>622</used>
-      <free>3474</free>
+      <length>32768</length>
+      <used>708</used>
+      <free>32060</free>
     </memory>
     <memory name="program">
       <units>bytes</units>
-      <length>32994</length>
-      <used>20073</used>
-      <free>12921</free>
+      <length>263394</length>
+      <used>21654</used>
+      <free>241740</free>
     </memory>
   </executable>
 </project>

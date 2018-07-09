@@ -6,6 +6,7 @@
 
 #include "../Settings.h"
 #include "SYSTEM_Driver.h"
+#include "../Controllers/MCP_Controller.h"
 #include "ENC_Driver.h"
 
 // ----------------------------------------------------------------------------
@@ -21,6 +22,8 @@
 #define ENC_ACCEL_TOP      3072   // max. acceleration: *12 (val >> 8)
 #define ENC_ACCEL_INC        25
 #define ENC_ACCEL_DEC         2
+
+// ----------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------
 
@@ -52,14 +55,14 @@ static unsigned long now = 0;
 // ----------------------------------------------------------------------------
      
 void encDriverInit() {
-    ENC_A_Dir = 1;
-    ENC_B_Dir = 1;
-    ENC_BTN_Dir = 1;
     
-    if (ENC_A_Pin == 1) last = 3;
-    if (ENC_B_Pin == 1) last ^= 1;
+    mcpInit();
     
-    // Interrupts..
+    uint8_t read = mcpGetPORTB();
+    
+    if ((read & 0x80) == 1) last = 3;
+    if ((read & 0x40) == 1) last ^= 1;
+    
 }     
 
 // ----------------------------------------------------------------------------
@@ -93,12 +96,14 @@ void encDriverService(){
   }
 #elif ENC_DECODER == ENC_NORMAL
   int8_t curr = 0;
+  
+  uint8_t read = mcpGetPORTB();
 
-  if (ENC_A_Pin == 1) {
+  if ((read & 0x80) > 0) {
     curr = 3;
   }
 
-  if (ENC_B_Pin == 1) {
+  if ((read & 0x40) > 0) {
     curr ^= 1;
   }
   
@@ -129,14 +134,14 @@ void encDriverService(){
   if ((now - lastButtonCheck) >= ENC_BUTTONINTERVAL) { 
     lastButtonCheck = now;
     
-    if (ENC_BTN_Pin == 0) { // key is down
+    if ((read & 0x20) == 0) { // key is down
       keyDownTicks++;
       if (keyDownTicks > (ENC_HOLDTIME / ENC_BUTTONINTERVAL)) {
         button = Held;
       }
     }
 
-    if (ENC_BTN_Pin == 1) { // key is now up
+    if ((read & 0x20) > 0) { // key is now up
       if (keyDownTicks /*> ENC_BUTTONINTERVAL*/) {
         if (button == Held) {
           button = Released;

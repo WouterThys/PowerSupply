@@ -39,13 +39,13 @@
  ******************************************************************************/
 #define VOLTAGE_STEP        100     /* Step size of voltage in [mV]           */
 #define VOLTAGE_MAX         10000   /* Maximum voltage in [mV]                */
-#define VOLTAGE_MIN          0       /* Minimum voltage in [mV]                */
+#define VOLTAGE_MIN         10      /* Minimum voltage in [mV]                */
 #define CURRENT_STEP        10      /* Step size of current in [mA]           */
 #define CURRENT_MAX         2000    /* Maximum current in [mA]                */
 #define CURRENT_MIN         10      /* Minimum current in [mA]                */
 
-#define FSM_PRE_SCALE       25      /* Timer with 20ms -> 500ms               */
-#define FSM_MAX_WAIT_CNT    10      /* FSM at 500ms -> wait of 5s             */ 
+#define FSM_PRE_SCALE       200     /* Timer with 1ms -> 200ms                */
+#define FSM_MAX_WAIT_CNT    25      /* FSM at 200ms -> wait of 5s             */ 
 
 #define COMMAND_BUFFER      5
 
@@ -113,14 +113,14 @@ void timerEnable(bool enable) {
     T4CONbits.TON = 0; // Disable
     T4CONbits.TCS = 0; // Internal clock (Fp)
     T4CONbits.T32 = 0; // 16-bit timer
-    T4CONbits.TCKPS = 0b11; // 1:256 -> 273.437,5 Hz (3.66 탎)
+    T4CONbits.TCKPS = 0b11; // 1:256 -> 143.948,3 Hz (6.95 탎)
     
     // Registers
     TMR4 = 0x0000;
     if (DEBUG) {
-        PR4 = 54680;
+        PR4 = 144;
     } else {
-        PR4 = 5468; // 3.66탎 * 5468 = 20ms
+        PR4 = 144; // 6.95탎 * 144 = 1ms
     }
     
     // Interrupts
@@ -216,6 +216,7 @@ int main(void) {
     
     suppliesInit();
     uartInit(&putCommand);
+    encDriverInit();
     //menuInit(&putCommand);
     DelayMs(100);
     
@@ -244,9 +245,8 @@ int main(void) {
         if (fsmCurrentState != fsmNextState) {
             if (DEBUG) printf("FSM S%d>S%d\n", fsmCurrentState, fsmNextState);
             fsmCurrentState = fsmNextState;
-            
-            fsmHandeState(fsmCurrentState, encTurns);
         }
+        fsmHandeState(fsmCurrentState, encTurns);
     }
     return 0;
 }
@@ -271,9 +271,12 @@ void fsmCalculateNextState(FSMState_e currentState, FSMState_e * nextState, int1
         case S_SEL_VOLTAGE: 
             // Check if turn or click
             if (turns != 0) {
+                turns = 0;
                 *nextState = S_SEL_CURRENT;
+                fsmWaitCnt = 0;
             } else if (buttonState == Clicked) {
                 *nextState = S_CHA_VOLTAGE;
+                fsmWaitCnt = 0;
             } else {
                 fsmWaitCnt++;
                 if (fsmWaitCnt >= FSM_MAX_WAIT_CNT) {
@@ -293,9 +296,12 @@ void fsmCalculateNextState(FSMState_e currentState, FSMState_e * nextState, int1
         case S_SEL_CURRENT: 
             // Check if turn or click
             if (turns != 0) {
+                turns = 0;
                 *nextState = S_SEL_VOLTAGE;
+                fsmWaitCnt = 0;
             } else if (buttonState == Clicked) {
                 *nextState = S_CHA_CURRENT;
+                fsmWaitCnt = 0;
             } else {
                 fsmWaitCnt++;
                 if (fsmWaitCnt >= FSM_MAX_WAIT_CNT) {
@@ -362,6 +368,7 @@ void fsmHandeState(FSMState_e currentState, int16_t turns) {
             if (supVarData.setVoltage.changed) {
                 // update lcd
                 // update supplies   
+                if (DEBUG) printf("Vs=%dmV\n", supVarData.setVoltage.value);
                 supVarData.setVoltage.changed = false;
             }
             break;
@@ -392,6 +399,7 @@ void fsmHandeState(FSMState_e currentState, int16_t turns) {
             if (supVarData.setCurrent.changed) {
                 // update lcd
                 // update supplies   
+                if (DEBUG) printf("Is=%dmA\n", supVarData.setVoltage.value);
                 supVarData.setCurrent.changed = false;
             }
             break;
@@ -406,6 +414,9 @@ static volatile Button_e prevBtnState = Open;
 static volatile int16_t turns = 0;
 void __attribute__ ( (interrupt, no_auto_psv) ) _T4Interrupt(void) {
     if (_T4IF) {
+        
+        LED1 = !LED1;
+        
         encDriverService(); // Update data
         
         // Turns -> increment
@@ -413,12 +424,8 @@ void __attribute__ ( (interrupt, no_auto_psv) ) _T4Interrupt(void) {
         
         // Button state -> update if needed
         Button_e newBtnState = encDriverGetButton();
-        if (prevBtnState == Open) {
+        if (newBtnState > prevBtnState) {
             encButtonState = newBtnState;
-        } else {
-            if (newBtnState != Open) {
-                encButtonState = newBtnState;
-            }
         }
         
         prevBtnState = newBtnState;

@@ -1,4 +1,4 @@
-update=28/06/2018 10:19:20
+update=Sat 07 Jul 2018 04:37:46 PM CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -62,3 +62,13 @@ LibName32=valves
 LibName33=C:/Users/gebruiker/Documents/WALDO/Libraries/KiCad/MyLib
 [general]
 version=1
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60

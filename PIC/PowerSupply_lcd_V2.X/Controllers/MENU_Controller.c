@@ -75,8 +75,8 @@ static void drawRealValue(Value_t value);
 static void menuTurn(int16_t turns);
 static void menuClicked();
 
-static void timerEnable(bool enable);
-static void doEncLogic();
+//static void timerEnable(bool enable);
+//static void doEncLogic();
 
 /* Event function pointers */
 static bool (*putCommand)(Command_t data);
@@ -102,68 +102,68 @@ static bool updateMenu = false;
  *          LOCAL FUNCTIONS
  ******************************************************************************/
 
-void __attribute__ ( (interrupt, no_auto_psv) ) _T2Interrupt(void) {
-    if (_T2IF) {
-        doEncLogic();
-        _T2IF = 0; // Clear interrupt
-    }
-}
+//void __attribute__ ( (interrupt, no_auto_psv) ) _T2Interrupt(void) {
+//    if (_T2IF) {
+//        doEncLogic();
+//        _T2IF = 0; // Clear interrupt
+//    }
+//}
 
-void doEncLogic() {
-    encDriverService(); // Update data
-    int16_t turns = encDriverGetValue();
-    Button_e buttonState = encDriverGetButton();
-    
-    uint16_t vVar = varVoltage.value;
-    uint16_t iVar = varCurrent.value;
-    // 5V, 3.3V ...
-    
-    // Knob turned
-    while (turns != 0) {
-        if (turns > 0) {
-            menuTurn(-1);
-            turns--;
-        } else {
-            menuTurn(1);
-            turns++;
-        }
-        updateMenu = true;
-    }
-    
-    // Knob pressed
-    switch(buttonState) {
-        default:
-        case Open: break;
-        case Closed: break;
-        case Pressed: break;
-        case Held: break;
-        case Released: break;
-        case Clicked: 
-            menuClicked();
-            updateMenu = true;
-            break;
-        case DoubleClicked:
-            updateMenu = true;
-            break;
-    }
-    
-    // Send commands to main
-    if (updateMenu) {
-         Command_t command;
-         
-         if (vVar != varVoltage.value) {
-             command.command = C_SET_VOLTAGE;
-             command.data = varVoltage.value;
-             (*putCommand)(command);
-         }
-         
-         if (iVar != varCurrent.value) {
-             command.command = C_SET_CURRENT;
-             command.data = varCurrent.value;
-             (*putCommand)(command);
-         }
-    }
-}
+//void doEncLogic() {
+//    encDriverService(); // Update data
+//    int16_t turns = encDriverGetValue();
+//    Button_e buttonState = encDriverGetButton();
+//    
+//    uint16_t vVar = varVoltage.value;
+//    uint16_t iVar = varCurrent.value;
+//    // 5V, 3.3V ...
+//    
+//    // Knob turned
+//    while (turns != 0) {
+//        if (turns > 0) {
+//            menuTurn(-1);
+//            turns--;
+//        } else {
+//            menuTurn(1);
+//            turns++;
+//        }
+//        updateMenu = true;
+//    }
+//    
+//    // Knob pressed
+//    switch(buttonState) {
+//        default:
+//        case Open: break;
+//        case Closed: break;
+//        case Pressed: break;
+//        case Held: break;
+//        case Released: break;
+//        case Clicked: 
+//            menuClicked();
+//            updateMenu = true;
+//            break;
+//        case DoubleClicked:
+//            updateMenu = true;
+//            break;
+//    }
+//    
+//    // Send commands to main
+//    if (updateMenu) {
+//         Command_t command;
+//         
+//         if (vVar != varVoltage.value) {
+//             command.command = C_SET_VOLTAGE;
+//             command.data = varVoltage.value;
+//             (*putCommand)(command);
+//         }
+//         
+//         if (iVar != varCurrent.value) {
+//             command.command = C_SET_CURRENT;
+//             command.data = varCurrent.value;
+//             (*putCommand)(command);
+//         }
+//    }
+//}
 
 void drawMenu(Menu_t menu) {
     writeString(0,0, menu.line1);
@@ -317,25 +317,25 @@ void menuTurnOnCursor(bool on) {
     }
 }
 
-void timerEnable(bool enable) {
-    T2CONbits.TON = 0; // Disable
-    T2CONbits.TCS = 0; // Internal clock (Fp)
-    T2CONbits.T32 = 0; // 16-bit timer
-    T2CONbits.TCKPS = 0b11; // 1:256
-    
-    // Registers
-    TMR2 = 0x0000;
-    PR2 = 70;
-    
-    // Interrupts
-    _T2IP = IP_MAIN_TMR; 
-    _T2IF = 0; // Clear
-    _T2IE = 1; // Enable
-    
-    if (enable) {
-        T2CONbits.TON = 1; // Enable
-    } 
-}
+//void timerEnable(bool enable) {
+//    T2CONbits.TON = 0; // Disable
+//    T2CONbits.TCS = 0; // Internal clock (Fp)
+//    T2CONbits.T32 = 0; // 16-bit timer
+//    T2CONbits.TCKPS = 0b11; // 1:256
+//    
+//    // Registers
+//    TMR2 = 0x0000;
+//    PR2 = 70;
+//    
+//    // Interrupts
+//    _T2IP = IP_MAIN_TMR; 
+//    _T2IF = 0; // Clear
+//    _T2IE = 1; // Enable
+//    
+//    if (enable) {
+//        T2CONbits.TON = 1; // Enable
+//    } 
+//}
 
 /*******************************************************************************
  *          DRIVER FUNCTIONS
@@ -370,8 +370,8 @@ void menuInit(bool (*onPutCommand)(Command_t data)) {
     cursor.position = &vcp;
     drawCursor(cursor);
     
-    encDriverInit();
-    timerEnable(true);
+    //encDriverInit();
+    //timerEnable(true);
 }
 
 void menuUpdate(
