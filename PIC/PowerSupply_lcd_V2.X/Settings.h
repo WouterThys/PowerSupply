@@ -12,8 +12,9 @@
 
 #include <xc.h> // include processor files - each processor file is guarded.  
 
-#define DEBUG       0   /* General debug enable                               */
-#define DEBUG_I2C   1   /* I²C debug enable                                   */
+#define DEBUG       0           /* General debug enable                       */
+#define DEBUG_I2C  (1 & DEBUG)  /* I²C debug enable                           */
+#define DEBUG_FSM  (1 & DEBUG)  /* FSM debug enable                           */
 
 /**
  * Interrupt priorities (Highest (7) - Lowest(1))
