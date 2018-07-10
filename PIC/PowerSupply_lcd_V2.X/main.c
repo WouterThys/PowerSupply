@@ -58,6 +58,14 @@ typedef enum {
     S_CHA_CURRENT   // Change the current
 } FSMState_e;
 
+typedef struct {
+    bool execute;            // Flag to indicate the FSM should execute
+    FSMState_e currentState; // Current state of the FSM
+    FSMState_e nextState;    // Next calculated state
+    uint16_t waitCnt;        // Delay count
+    uint16_t prescale;       // Pre-scale counter
+} FSM_t;
+
 /*******************************************************************************
  *          MACRO FUNCTIONS
  ******************************************************************************/
@@ -65,14 +73,12 @@ typedef enum {
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-static volatile bool tmrFlag = false;
-static FSMState_e fsmCurrentState = S_INIT;
-static FSMState_e fsmNextState = S_INIT;
-static uint16_t fsmWaitCnt = 0;
-static uint16_t fsmPreScale = 0;
+static volatile FSM_t mainFsm;
+static volatile Button_e prevBtnState = Open;
+static volatile int16_t prevTurns = 0;
+static volatile bool updateMsrData = false;
 
 static SupplyData_t supVarData;
-
 static LCD_Settings_t lcdSettings;
 
 static volatile int16_t commandCnt = -1;
@@ -93,8 +99,10 @@ static bool executeCommand(Command_t command);
 
 static void clearChange(SupplyData_t * supplyData);
 
-static void fsmCalculateNextState(FSMState_e currentState, FSMState_e * nextState, int16_t turns, Button_e buttonState);
-static void fsmHandeState(FSMState_e currentState, int16_t turns);
+static void heartBeat();
+static void fsmCheckInputs();
+static void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonState);
+static void fsmHandeState(volatile FSM_t * fsm, int16_t turns);
 
 void initialize() {
     sysInterruptEnable(false);
@@ -206,68 +214,66 @@ void clearChange(SupplyData_t * supplyData)  {
     supplyData->msrTemperature.changed = false;
 }
 
-/*******************************************************************************
- *          MAIN PROGRAM
- ******************************************************************************/
-int main(void) {
 
-    initialize();
-    DelayMs(100);
+
+void heartBeat() {
+    // Check user inputs
+    fsmCheckInputs();
     
-    suppliesInit();
-    uartInit(&putCommand);
-    encDriverInit();
-    menuInit(&putCommand);
-    DelayMs(100);
+    // Check work
+    mainFsm.prescale++;
     
-    lcdSettings.on = 1;
-    lcdSettings.contrast = 30;
-    lcdSettings.brightness = 7;
-    
-    supVarData.setVoltage.value = 1000;
-    supVarData.setVoltage.changed = true;
-    
-    supVarData.setCurrent.value = 1000;
-    supVarData.setCurrent.changed = true;
-    
-    DelayMs(100);
-    timerEnable(true);
-    
-    if (DEBUG) printf("start\n");
-    fsmHandeState(S_INIT, 0);
-    
-    while (1) {
-        
-        if (tmrFlag) {
-            tmrFlag = false;
-            fsmCalculateNextState(fsmCurrentState, &fsmNextState, encTurns, encButtonState);
-            
-            if (fsmCurrentState != fsmNextState) {
-                if (DEBUG) printf("FSM S%d>S%d\n", fsmCurrentState, fsmNextState);
-                fsmCurrentState = fsmNextState;
-            }
-            
-            fsmHandeState(fsmCurrentState, encTurns);
-        }
-        
+    // Update measured data
+    if (mainFsm.prescale == 0) {
+        updateMsrData = true;
     }
-    return 0;
+    
+    // FSM
+    if (mainFsm.prescale > FSM_PRE_SCALE) {
+        mainFsm.prescale = 0;
+
+        // Update turns
+        encTurns = prevTurns;
+        prevTurns = 0;
+
+        // Update button
+        prevBtnState = Open;
+
+        // Flag
+        mainFsm.execute = true;
+    }
 }
 
-void fsmCalculateNextState(FSMState_e currentState, FSMState_e * nextState, int16_t turns, Button_e buttonState) {
+void fsmCheckInputs() {
+    // Update data
+    encDriverService();
     
-    *nextState = currentState;
+    // Turns -> increment
+    prevTurns += encDriverGetValue();
+
+    // Button state -> update if needed
+    Button_e newBtnState = encDriverGetButton();
+    if (newBtnState > prevBtnState) {
+        encButtonState = newBtnState;
+    }
+
+    prevBtnState = newBtnState;
+}
+
+void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonState) {
+    
+    fsm->nextState = fsm->currentState;
     
     // Find next state
-    switch (currentState) {
+    switch (fsm->currentState) {
         case S_INIT: 
-            *nextState = S_SHOW_MEASURE;
+            fsm->nextState = S_SHOW_MEASURE;
             break;
             
         case S_SHOW_MEASURE: 
             // Stay in this state until user input change
             if ((turns != 0) || (buttonState != Open)) {
-                *nextState = S_SEL_VOLTAGE;
+                fsm->nextState = S_SEL_VOLTAGE;
             }
             break;
             
@@ -275,16 +281,16 @@ void fsmCalculateNextState(FSMState_e currentState, FSMState_e * nextState, int1
             // Check if turn or click
             if (turns != 0) {
                 turns = 0;
-                *nextState = S_SEL_CURRENT;
-                fsmWaitCnt = 0;
+                fsm->nextState = S_SEL_CURRENT;
+                fsm->waitCnt = 0;
             } else if (buttonState == Clicked) {
-                *nextState = S_CHA_VOLTAGE;
-                fsmWaitCnt = 0;
+                fsm->nextState = S_CHA_VOLTAGE;
+                fsm->waitCnt = 0;
             } else {
-                fsmWaitCnt++;
-                if (fsmWaitCnt >= FSM_MAX_WAIT_CNT) {
-                    fsmWaitCnt = 0;
-                    *nextState = S_SHOW_MEASURE;
+                fsm->waitCnt++;
+                if (fsm->waitCnt >= FSM_MAX_WAIT_CNT) {
+                    fsm->waitCnt = 0;
+                    fsm->nextState = S_SHOW_MEASURE;
                 }
             }
             break;
@@ -292,7 +298,7 @@ void fsmCalculateNextState(FSMState_e currentState, FSMState_e * nextState, int1
         case S_CHA_VOLTAGE: 
             // Go back when clicked
             if (buttonState == Clicked) {
-                *nextState = S_SEL_VOLTAGE;
+                fsm->nextState = S_SEL_VOLTAGE;
             }
             break;
             
@@ -300,16 +306,16 @@ void fsmCalculateNextState(FSMState_e currentState, FSMState_e * nextState, int1
             // Check if turn or click
             if (turns != 0) {
                 turns = 0;
-                *nextState = S_SEL_VOLTAGE;
-                fsmWaitCnt = 0;
+                fsm->nextState = S_SEL_VOLTAGE;
+                fsm->waitCnt = 0;
             } else if (buttonState == Clicked) {
-                *nextState = S_CHA_CURRENT;
-                fsmWaitCnt = 0;
+                fsm->nextState = S_CHA_CURRENT;
+                fsm->waitCnt = 0;
             } else {
-                fsmWaitCnt++;
-                if (fsmWaitCnt >= FSM_MAX_WAIT_CNT) {
-                    fsmWaitCnt = 0;
-                    *nextState = S_SHOW_MEASURE;
+                fsm->waitCnt++;
+                if (fsm->waitCnt >= FSM_MAX_WAIT_CNT) {
+                    fsm->waitCnt = 0;
+                    fsm->nextState = S_SHOW_MEASURE;
                 }
             }
             break;
@@ -317,7 +323,7 @@ void fsmCalculateNextState(FSMState_e currentState, FSMState_e * nextState, int1
         case S_CHA_CURRENT: 
              // Go back when clicked
             if (buttonState == Clicked) {
-                *nextState = S_SEL_VOLTAGE;
+                fsm->nextState = S_SEL_VOLTAGE;
             }
             break;
             
@@ -326,15 +332,21 @@ void fsmCalculateNextState(FSMState_e currentState, FSMState_e * nextState, int1
     }
 }
 
-void fsmHandeState(FSMState_e currentState, int16_t turns) {
+void fsmHandeState(volatile FSM_t * fsm, int16_t turns) {
     
-    switch (currentState) {
+    switch (fsm->currentState) {
         case S_INIT: 
             // Initialize LCD 
             lcdInit();
             lcdTurnDisplayOn(lcdSettings.on);
             lcdSetDisplayBrightness(lcdSettings.brightness);
             lcdSetDisplayContrast(lcdSettings.contrast);
+            
+            menuUpdateMeasuredData(
+                        supVarData.msrVoltage.value,
+                        supVarData.msrCurrent.value,
+                        supVarData.msrTemperature.value
+                        );
             break;
             
         case S_SHOW_MEASURE: 
@@ -377,10 +389,13 @@ void fsmHandeState(FSMState_e currentState, int16_t turns) {
                 }
                 supVarData.setVoltage.changed = true;
             }
-            if (supVarData.setVoltage.changed) {
-                // update supplies   
-                if (DEBUG) printf("Vs=%dmV\n", supVarData.setVoltage.value);
+            if (supVarData.setVoltage.changed) { 
+                if (DEBUG_FSM) printf("Vs=%dmV\n", supVarData.setVoltage.value);
+                
+                // Update LCD and Supplies (I²C)
                 menuChangeVoltage(supVarData.setVoltage.value);
+                setVoltage(supVarData.setVoltage.value);
+                
                 supVarData.setVoltage.changed = false;
             }
             break;
@@ -409,9 +424,12 @@ void fsmHandeState(FSMState_e currentState, int16_t turns) {
                 supVarData.setCurrent.changed = true;
             }
             if (supVarData.setCurrent.changed) {
-                // update supplies   
-                if (DEBUG) printf("Is=%dmA\n", supVarData.setVoltage.value);
+                if (DEBUG_FSM) printf("Is=%dmA\n", supVarData.setVoltage.value);
+                
+                // Update LCD and Supplies (I²C)
                 menuChangeCurrent(supVarData.setCurrent.value);
+                setCurrent(supVarData.setCurrent.value);
+                
                 supVarData.setCurrent.changed = false;
             }
             break;
@@ -422,40 +440,75 @@ void fsmHandeState(FSMState_e currentState, int16_t turns) {
     
 }
 
-static volatile Button_e prevBtnState = Open;
-static volatile int16_t turns = 0;
+/*******************************************************************************
+ *          MAIN PROGRAM
+ ******************************************************************************/
+int main(void) {
+
+    initialize();
+    DelayMs(100);
+    
+    suppliesInit();
+    uartInit(&putCommand);
+    encDriverInit();
+    menuInit(&putCommand);
+    DelayMs(100);
+    
+    // Initial values
+    lcdSettings.on = 1;
+    lcdSettings.contrast = 30;
+    lcdSettings.brightness = 7;
+    
+    supVarData.setVoltage.value = 1000;
+    supVarData.setVoltage.changed = true;
+    supVarData.setCurrent.value = 1000;
+    supVarData.setCurrent.changed = true;
+    
+    mainFsm.execute = false;
+    mainFsm.currentState = S_INIT;
+    mainFsm.nextState = S_INIT;
+    mainFsm.prescale = 0;
+    mainFsm.waitCnt = 0;
+    
+    DelayMs(100);
+    timerEnable(true);
+    
+    if (DEBUG) printf("start\n");
+    fsmHandeState(S_INIT, 0);
+    
+    while (1) {
+        
+        // Fetch measured data
+        if (updateMsrData) {
+            updateMsrData = false;
+            getVarData(&supVarData);
+        }
+        
+        // Execute FSM
+        if (mainFsm.execute) {
+            mainFsm.execute = false;
+            fsmCalculateNextState(&mainFsm, encTurns, encButtonState);
+            
+            if (mainFsm.currentState != mainFsm.nextState) {
+                if (DEBUG_FSM) printf("FSM S%d>S%d\n", mainFsm.currentState, mainFsm.nextState);
+            }
+            
+            mainFsm.currentState = mainFsm.nextState;
+            fsmHandeState(&mainFsm, encTurns);
+        }
+        
+    }
+    return 0;
+}
+
+
+/*******************************************************************************
+ *          INTERRUPTS
+ ******************************************************************************/
 void __attribute__ ( (interrupt, no_auto_psv) ) _T4Interrupt(void) {
     if (_T4IF) {
-        
         LED1 = !LED1;
-        
-        encDriverService(); // Update data
-        
-        // Turns -> increment
-        turns += encDriverGetValue();
-        
-        // Button state -> update if needed
-        Button_e newBtnState = encDriverGetButton();
-        if (newBtnState > prevBtnState) {
-            encButtonState = newBtnState;
-        }
-        
-        prevBtnState = newBtnState;
-        
-        fsmPreScale++;
-        if (fsmPreScale > FSM_PRE_SCALE) {
-            fsmPreScale = 0;
-            
-            // Update turns
-            encTurns = turns;
-            turns = 0;
-            
-            // Update button
-            prevBtnState = Open;
-            
-            // Flag
-            tmrFlag = true;
-        }
+        heartBeat();
         _T4IF = 0; // Clear interrupt
     }
 }

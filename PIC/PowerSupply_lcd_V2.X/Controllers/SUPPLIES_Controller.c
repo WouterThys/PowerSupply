@@ -56,7 +56,7 @@ void setCurrent(uint16_t current) {
 bool i2cCheckState(i2cData_t data) {
     //if (data.status != i2cError) {
         i2cError = data.status;
-        if (DEBUG & DEBUG_I2C) {
+        if (DEBUG_I2C) {
             switch(i2cError) {
                 default: 
                     printf("I2C_OK\n"); break;
@@ -101,6 +101,8 @@ void suppliesInit() {
 void getVarData(SupplyData_t * data) {
     uint16_t value = 0;
     
+    // TODO: in one message?
+    
     i2cVar.command = COM_GET_V;
     i2cDriverMasterRead(&i2cVar);
     if (i2cCheckState(i2cVar)) {
@@ -110,7 +112,6 @@ void getVarData(SupplyData_t * data) {
             data->msrVoltage.changed = true;
         }
     }
-    DelayUs(10);
     
     i2cVar.command = COM_GET_I;
     i2cDriverMasterRead(&i2cVar);
@@ -121,7 +122,6 @@ void getVarData(SupplyData_t * data) {
             data->msrCurrent.changed = true;
         }
     }
-    DelayUs(10);
     
     i2cVar.command = COM_GET_T;
     i2cDriverMasterRead(&i2cVar);
