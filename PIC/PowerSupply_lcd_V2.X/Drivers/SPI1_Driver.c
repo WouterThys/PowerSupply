@@ -17,7 +17,7 @@
  *          VARIABLES
  ******************************************************************************/
 static uint8_t readData;
-static bool readDone;
+//static bool readDone;
 
 /*******************************************************************************
  *          BASIC FUNCTIONS
@@ -45,9 +45,9 @@ void spi1Init() {
     SPI1CON2bits.SPIBEN = 0;        // Enhanced Buffer is disabled
 
     /* Interrupts */
-    _SPI1IF = 0; // Clear flag
-    _SPI1IP = SPI1_IP; // Priority
-    _SPI1IE = 1; // Enable interrupt
+//    _SPI1IF = 0; // Clear flag
+//    _SPI1IP = SPI1_IP; // Priority
+//    _SPI1IE = 1; // Enable interrupt
 }
 
 void spi1Enable(bool enable) {
@@ -65,9 +65,11 @@ void spi1Enable(bool enable) {
 }
 
 uint8_t spi1Write(uint8_t data) {
-    readDone = false;
+//    readDone = false;
     SPI1BUF = data;
-    while(!readDone);
+    //while(!readDone);
+    while(!SPI1STATbits.SPIRBF) {} 
+    readData = SPI1BUF; // Read back
     return readData;
 }
 
@@ -76,12 +78,12 @@ uint8_t spi1Write(uint8_t data) {
  *          INTERRUPTS
  ******************************************************************************/
 
-// SPI TX done
-void __attribute__ ( (interrupt, no_auto_psv) ) _SPI1Interrupt(void) {
-    if (_SPI1IF) {
-        readData = SPI1BUF;
-        readDone = true;
-        _SPI1IF = 0;
-    }
-}
+//// SPI TX done
+//void __attribute__ ( (interrupt, no_auto_psv) ) _SPI1Interrupt(void) {
+//    if (_SPI1IF) {
+//        readData = SPI1BUF;
+//        readDone = true;
+//        _SPI1IF = 0;
+//    }
+//}
 

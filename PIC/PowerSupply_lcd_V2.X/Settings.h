@@ -20,7 +20,6 @@
  * Interrupt priorities (Highest (7) - Lowest(1))
  */
 
-#define SPI1_IP      7
 #define IP_U1RX      6
 #define IP_I2C       5
 #define IP_MENU_TMR  2
@@ -66,6 +65,12 @@
 #define MCP_INTB_Pu     CNPUBbits.CNPUB15
 
 /**
+ * LCD
+ */
+#define LCD_SS_Dir      TRISBbits.TRISB13       /* SS on pin RB10             */
+#define LCD_SS_Pin      PORTBbits.RB13          /* SS pin                     */
+
+/**
  *  SPI1
  */
     
@@ -80,9 +85,6 @@
 #define SPI2_SCK_Dir    TRISBbits.TRISB10       /* SCK pin on RB7             */
 #define SPI2_SDO_Dir    TRISBbits.TRISB11       /* SDO pin on RB8             */
 #define SPI2_SDI_Dir    TRISBbits.TRISB12       /* SDI pin on RB9             */
-
-#define SPI2_SS_Dir     TRISBbits.TRISB13       /* SS on pin RB10             */
-#define SPI2_SS_Pin     PORTBbits.RB13          /* SS pin                     */
 
 #define SPI2_SCK_Map    RPOR4bits.RP42R         /* RP42 Pin Assignment  SCK   */
 #define SPI2_SDO_Map    RPOR4bits.RP43R         /* RP43 Pin Assignment  SDO   */
