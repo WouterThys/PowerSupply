@@ -44,11 +44,14 @@ typedef struct {
 #define COM_GET_I   0x01    
 #define COM_GET_V   0x02
 #define COM_GET_T   0x03
-#define COM_A3      0x04
+#define COM_GET_A   0x04    /* Get all data */
 
 
 #define COM_SET_V   0x08
 #define COM_SET_I   0x09
+
+#define LEN_SET_V   1
+#define LEN_SET_I   1
 
 
 

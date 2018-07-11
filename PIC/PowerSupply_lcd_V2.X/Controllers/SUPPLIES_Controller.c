@@ -21,15 +21,15 @@
 /*******************************************************************************
  *          LOCAL FUNCTION DEFINES
  ******************************************************************************/
-static bool i2cCheckState(i2cData_t data);
+static bool i2cCheckState(i2cPackage_t data);
 
 
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-static i2cData_t i2cVar;
-static i2cData_t i2c5V0;
-static i2cData_t i2c3V3;
+static i2cPackage_t i2cVar;
+static i2cPackage_t i2c5V0;
+static i2cPackage_t i2c3V3;
 
 static int8_t i2cError = I2C_OK;
 
@@ -37,15 +37,21 @@ static int8_t i2cError = I2C_OK;
  *          LOCAL FUNCTIONS
  ******************************************************************************/
 void setVoltage(uint16_t voltage) {
-    split(voltage, &i2cVar.data1, &i2cVar.data2);
+    i2cData_t d;
+    split(voltage, &d.data1, &d.data2);
+    i2cVar.length = LEN_SET_V;
     i2cVar.command = COM_SET_V;
+    i2cVar.data[0] = d;
     i2cDriverMasterWrite(&i2cVar);
     i2cCheckState(i2cVar);
 }
 
 void setCurrent(uint16_t current) {
-    split(current, &i2cVar.data1, &i2cVar.data2);
+    i2cData_t d;
+    split(current, &d.data1, &d.data2);
+    i2cVar.length = LEN_SET_I;
     i2cVar.command = COM_SET_I;
+    i2cVar.data[0] = d;
     i2cDriverMasterWrite(&i2cVar);
     i2cCheckState(i2cVar);
 }
@@ -53,7 +59,7 @@ void setCurrent(uint16_t current) {
 /*******************************************************************************
  *          I²C
  ******************************************************************************/
-bool i2cCheckState(i2cData_t data) {
+bool i2cCheckState(i2cPackage_t data) {
     //if (data.status != i2cError) {
         i2cError = data.status;
         if (DEBUG_I2C) {
@@ -99,39 +105,60 @@ void suppliesInit() {
 
 
 void getVarData(SupplyData_t * data) {
-    uint16_t value = 0;
     
-    // TODO: in one message?
-    
-    i2cVar.command = COM_GET_V;
+    i2cVar.command = COM_GET_A;
+    i2cVar.length = 3;
     i2cDriverMasterRead(&i2cVar);
+    
+    uint16_t v, i, t = 0;
     if (i2cCheckState(i2cVar)) {
-        concatinate(i2cVar.data1, i2cVar.data2, &value);   
-        if (value != data->msrVoltage.value) {
-            data->msrVoltage.value = value;
+        concatinate(i2cVar.data[0].data1, i2cVar.data[0].data2, &v);
+        concatinate(i2cVar.data[1].data1, i2cVar.data[1].data2, &i);
+        concatinate(i2cVar.data[2].data1, i2cVar.data[2].data2, &t);
+        
+        if (v != data->msrVoltage.value) {
+            data->msrVoltage.value = v;
             data->msrVoltage.changed = true;
         }
-    }
-    
-    i2cVar.command = COM_GET_I;
-    i2cDriverMasterRead(&i2cVar);
-    if (i2cCheckState(i2cVar)) {
-        concatinate(i2cVar.data1, i2cVar.data2, &value);
-        if (value != data->msrCurrent.value) {
-            data->msrCurrent.value = value;
+        if (i != data->msrCurrent.value) {
+            data->msrCurrent.value = i;
             data->msrCurrent.changed = true;
         }
-    }
-    
-    i2cVar.command = COM_GET_T;
-    i2cDriverMasterRead(&i2cVar);
-    if (i2cCheckState(i2cVar)) {
-        concatinate(i2cVar.data1, i2cVar.data2, &value);
-        if (value != data->msrTemperature.value) {
-            data->msrTemperature.value = value;
+        if (t != data->msrTemperature.value) {
+            data->msrTemperature.value = t;
             data->msrTemperature.changed = true;
         }
     }
+    
+    
+//    i2cDriverMasterRead(&i2cVar);
+//    if (i2cCheckState(i2cVar)) {
+//        concatinate(i2cVar.data1, i2cVar.data2, &value);   
+//        if (value != data->msrVoltage.value) {
+//            data->msrVoltage.value = value;
+//            data->msrVoltage.changed = true;
+//        }
+//    }
+//    
+//    i2cVar.command = COM_GET_I;
+//    i2cDriverMasterRead(&i2cVar);
+//    if (i2cCheckState(i2cVar)) {
+//        concatinate(i2cVar.data1, i2cVar.data2, &value);
+//        if (value != data->msrCurrent.value) {
+//            data->msrCurrent.value = value;
+//            data->msrCurrent.changed = true;
+//        }
+//    }
+//    
+//    i2cVar.command = COM_GET_T;
+//    i2cDriverMasterRead(&i2cVar);
+//    if (i2cCheckState(i2cVar)) {
+//        concatinate(i2cVar.data1, i2cVar.data2, &value);
+//        if (value != data->msrTemperature.value) {
+//            data->msrTemperature.value = value;
+//            data->msrTemperature.changed = true;
+//        }
+//    }
 }
 
 
