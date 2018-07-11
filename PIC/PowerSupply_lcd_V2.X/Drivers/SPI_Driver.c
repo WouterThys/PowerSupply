@@ -18,7 +18,7 @@
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-static uint16_t read;
+static uint16_t readData;
 
 /*******************************************************************************
  *          BASIC FUNCTIONS
@@ -52,20 +52,18 @@ void D_SPI_Init() {
     SPI2_SDO_Map = 0b001000;          // Assign SDO output pin
     RPINR22bits.SDI2R = SPI2_SDI_Map; // Assign SDI input pin
     
-    /* Interrupts */
-    _SPI2IF = 0; // Clear flag
-    _SPI2IP = 7; // Priority
-    _SPI2IE = 1; // Enable
+//    /* Interrupts */
+//    _SPI2IF = 0; // Clear flag
+//    _SPI2IP = 7; // Priority
+//    _SPI2IE = 1; // Enable
 }
 
 void D_SPI_Enable(bool enable) {
     if (enable) {
-        SPI2_SS_Dir = 0;            // SS output    (RB13)
         SPI2_SDI_Dir = 1;           // SDI input    (RB12)
         SPI2_SDO_Dir = 0;           // SDO output   (RB11)
         SPI2_SCK_Dir = 0;           // SCK output   (RB10)
         
-        SPI2_SS_Pin = 1;            // SS pin is active low
         SPI2STATbits.SPIEN = 1;     // Enable SPI2
     } else {
         SPI2STATbits.SPIEN = 0;     // Disable SPI2
@@ -73,17 +71,20 @@ void D_SPI_Enable(bool enable) {
 }
 
 void D_SPI_Write(uint8_t data) {
-    while(SPI2_SS_Pin == 0);
-    SPI2_SS_Pin = 0;
+//    readDone = false;
     SPI2BUF = data;
+    //while(!readDone);
+    while(!SPI2STATbits.SPIRBF) {} 
+    readData = SPI2BUF; // Read back
+    //return readData;
 }
 
-// SPI TX done
-void __attribute__ ( (interrupt, no_auto_psv) ) _SPI2Interrupt(void) {
-    if (_SPI2IF) {
-        SPI2_SS_Pin = 1;
-        read = SPI2BUF;
-        _SPI2IF = 0;
-    }
-}
+//// SPI TX done
+//void __attribute__ ( (interrupt, no_auto_psv) ) _SPI2Interrupt(void) {
+//    if (_SPI2IF) {
+//        SPI2_SS_Pin = 1;
+//        read = SPI2BUF;
+//        _SPI2IF = 0;
+//    }
+//}
 

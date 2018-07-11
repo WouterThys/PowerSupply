@@ -4,6 +4,7 @@
 #include <stdbool.h>       /* Includes true/false definition                  */
 #include <string.h>        /* Includes string functions                       */
 
+#include "../Settings.h"
 #include "SYSTEM_Driver.h"
 #include "SPI_Driver.h"
 #include "LCD_Driver.h"
@@ -39,6 +40,8 @@
 /*******************************************************************************
  *          MACRO FUNCTIONS
  ******************************************************************************/
+#define lcdWrite(w)      LCD_SS_Pin = 0; D_SPI_Write(w); LCD_SS_Pin = 1
+
 
 /*******************************************************************************
  *          VARIABLES
@@ -61,12 +64,12 @@ void lcdInit() {
 }
 
 void lcdWriteChar(char c) {
-    D_SPI_Write(c);
+    lcdWrite(c);
     DelayUs(100);
 }
 
 void lcdWriteDigit(uint16_t d) {
-    D_SPI_Write(d + 0x30);
+    lcdWrite(d + 0x30);
     DelayUs(100);
 }
 
@@ -124,25 +127,25 @@ void lcdWriteDouble(double value, uint16_t precision) {
 }
 
 void lcdChangeI2CAddress(uint8_t address) {
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_CHANGE_I2C_ADDRESS);
-    D_SPI_Write(address);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_CHANGE_I2C_ADDRESS);
+    lcdWrite(address);
     DelayUs(3000);
 }
 
 void lcdChangeBaudRate(uint8_t baud) {
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_CHANGE_RS232_BAUD);
-    D_SPI_Write(baud);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_CHANGE_RS232_BAUD);
+    lcdWrite(baud);
     DelayUs(3000);
 }
 
 void lcdTurnDisplayOn(bool on) {
-    D_SPI_Write(LCD_PREFIX);
+    lcdWrite(LCD_PREFIX);
     if (on) {
-        D_SPI_Write(LCD_DISPLAY_ON);
+        lcdWrite(LCD_DISPLAY_ON);
     } else {
-        D_SPI_Write(LCD_DISPLAY_OFF);
+        lcdWrite(LCD_DISPLAY_OFF);
     }
     DelayUs(100);
 }
@@ -156,118 +159,118 @@ void lcdSetCursorPosition(uint8_t line, uint8_t x) {
         pos += 0x40;
     }
     
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_SET_CURSOR);
-    D_SPI_Write(pos);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_SET_CURSOR);
+    lcdWrite(pos);
     DelayUs(100);
 }
 
 void lcdSetCursorHome() {
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_CURSOR_HOME);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_CURSOR_HOME);
     DelayUs(1500);
 }
 
 void lcdCursorUnderlineOn(bool on) {
-    D_SPI_Write(LCD_PREFIX);
+    lcdWrite(LCD_PREFIX);
     if (on) {
-        D_SPI_Write(LCD_UNDERLINE_CURSOR_ON);
+        lcdWrite(LCD_UNDERLINE_CURSOR_ON);
     } else {
-        D_SPI_Write(LCD_UNDERLINE_CURSOR_OFF);
+        lcdWrite(LCD_UNDERLINE_CURSOR_OFF);
     }
     DelayUs(1500);
 }
 
 void lcdMoveCursorLeft() {
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_MOVE_CURSOR_LEFT);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_MOVE_CURSOR_LEFT);
     DelayUs(100);
 }
 
 void lcdMoveCursorRight() {
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_MOVE_CURSOR_RIGHT);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_MOVE_CURSOR_RIGHT);
     DelayUs(100);
 }
 
 void lcdTurnOnBlinkingCursor(bool on) {
-    D_SPI_Write(LCD_PREFIX);
+    lcdWrite(LCD_PREFIX);
     if (on) {
-        D_SPI_Write(LCD_BLINKING_CURSOR_ON);
+        lcdWrite(LCD_BLINKING_CURSOR_ON);
     } else {
-        D_SPI_Write(LCD_BLINKING_CURSOR_OFF);
+        lcdWrite(LCD_BLINKING_CURSOR_OFF);
     }
     DelayUs(100);
 }
 
 void lcdBackspace() {
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_BACKSPACE);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_BACKSPACE);
     DelayUs(100);
 }
 
 void lcdClearScreen() {
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_CLEAR_SCREEN);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_CLEAR_SCREEN);
     DelayUs(1500);
 }
 
 void lcdSetDisplayContrast(uint8_t contrast) {
     if (contrast > 50) contrast = 50;
     if (contrast < 1 ) contrast = 1;
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_SET_CONTRAST);
-    D_SPI_Write(contrast);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_SET_CONTRAST);
+    lcdWrite(contrast);
     DelayUs(500);
 }
 
 void lcdSetDisplayBrightness(uint8_t brightness) {
     if (brightness > 8) brightness = 8;
     if (brightness < 1) brightness = 1;
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_SET_BRIGHTNESS);
-    D_SPI_Write(brightness);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_SET_BRIGHTNESS);
+    lcdWrite(brightness);
     DelayUs(100);
 }
 
 void lcdLoadCustomChar(uint8_t address, const char * character) {
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_LOAD_CUSTOM_CHAR);
-    D_SPI_Write(address);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_LOAD_CUSTOM_CHAR);
+    lcdWrite(address);
     uint8_t c;
     for (c = 0; c < 8; c++) {
-        D_SPI_Write(*(character + c));
+        lcdWrite(*(character + c));
     }
     DelayUs(200);
 }
 
 void lcdShiftDisplayLeft() {
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_MOVE_DISPLAY_LEFT);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_MOVE_DISPLAY_LEFT);
     DelayUs(100);
 }
 
 void lcdShiftDisplayRight() {
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_MOVE_DISPLAY_RIGHT);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_MOVE_DISPLAY_RIGHT);
     DelayUs(100);
 }
 
 void lcdDisplayFirmwareVersion() {
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_DISPLAY_FIRMWARE);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_DISPLAY_FIRMWARE);
     DelayUs(4000);
 }
 
 void lcdDisplayBaudRate() {
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_DISPLAY_RS232_BAUD);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_DISPLAY_RS232_BAUD);
     DelayUs(10000);
 }
 
 void lcdDisplayI2CAddress() {
-    D_SPI_Write(LCD_PREFIX);
-    D_SPI_Write(LCD_DISPLAY_I2C_ADDRESS);
+    lcdWrite(LCD_PREFIX);
+    lcdWrite(LCD_DISPLAY_I2C_ADDRESS);
     DelayUs(4000);
 }
 
