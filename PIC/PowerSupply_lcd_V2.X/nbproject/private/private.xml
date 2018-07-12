@@ -11,11 +11,6 @@
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/home/wouter/Documents/Geeken/PowerSupply/PIC/PowerSupply_lcd_V2.X/Settings.h</file>
-            <file>file:/home/wouter/Documents/Geeken/PowerSupply/PIC/PowerSupply_lcd_V2.X/Controllers/MENU_Controller.c</file>
-            <file>file:/home/wouter/Documents/Geeken/PowerSupply/PIC/PowerSupply_lcd_V2.X/main.c</file>
-            <file>file:/home/wouter/Documents/Geeken/PowerSupply/PIC/PowerSupply_lcd_V2.X/Controllers/UART_Controller.c</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

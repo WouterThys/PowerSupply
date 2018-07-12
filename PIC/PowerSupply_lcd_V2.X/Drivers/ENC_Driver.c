@@ -30,12 +30,12 @@
 #if ENC_DECODER != ENC_NORMAL
 #  ifdef ENC_HALFSTEP
      // decoding table for hardware with flaky notch (half resolution)
-     const int8_t ClickEncoder::table[16] __attribute__((__progmem__)) = { 
+     const int8_t encoderTable[16] = { 
        0, 0, -1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, -1, 0, 0 
      };    
 #  else
      // decoding table for normal hardware
-     const int8_t ClickEncoder::table[16] __attribute__((__progmem__)) = { 
+     const int8_t encoderTable[16] = { 
        0, 1, -1, 0, -1, 0, 0, 1, 1, 0, 0, -1, 0, -1, 1, 0 
      };    
 #  endif
@@ -77,27 +77,26 @@ void encDriverService(){
       acceleration = 0;
     }
   
+    uint8_t read = mcpGetPORTB();
 
 #if ENC_DECODER == ENC_FLAKY
   last = (last << 2) & 0x0F;
 
-  if (digitalRead(pinA) == pinsActive) {
+  if ((read & 0x80) > 0) {
     last |= 2;
   }
 
-  if (digitalRead(pinB) == pinsActive) {
+  if ((read & 0x40) > 0) {
     last |= 1;
   }
 
-  uint8_t tbl = pgm_read_byte(&table[last]); 
+  uint8_t tbl = encoderTable[last]; 
   if (tbl) {
     delta += tbl;
     moved = true;
   }
 #elif ENC_DECODER == ENC_NORMAL
   int8_t curr = 0;
-  
-  uint8_t read = mcpGetPORTB();
 
   if ((read & 0x80) > 0) {
     curr = 3;
