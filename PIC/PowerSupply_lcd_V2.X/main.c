@@ -44,8 +44,8 @@
 #define CURRENT_MAX         2000    /* Maximum current in [mA]                */
 #define CURRENT_MIN         100     /* Minimum current in [mA]                */
 
-#define FSM_PRE_SCALE       200     /* Timer with 1ms -> 200ms                */
-#define FSM_MAX_WAIT_CNT    25      /* FSM at 200ms -> wait of 5s             */ 
+#define FSM_PRE_SCALE       100     /* Timer with 1ms -> 200ms                */
+#define FSM_MAX_WAIT_CNT    100     /* FSM at 200ms -> wait of 5s             */ 
 
 #define COMMAND_BUFFER      5
 
@@ -75,8 +75,10 @@ typedef struct {
  ******************************************************************************/
 static volatile FSM_t mainFsm;
 static volatile Button_e prevBtnState = Open;
+static volatile Button_e tmpBtnState = Open;
 static volatile int16_t prevTurns = 0;
 static volatile bool updateMsrData = false;
+static volatile bool updateMenu = true;
 
 static SupplyData_t supVarData;
 static LCD_Settings_t lcdSettings;
@@ -237,11 +239,17 @@ void heartBeat() {
         prevTurns = 0;
 
         // Update button
+        encButtonState = tmpBtnState;
+        tmpBtnState = Open;
         prevBtnState = Open;
 
         // Flag
         mainFsm.execute = true;
+        
+        LED3 = LED2;
+        LED2 = !LED3;
     }
+    LED1 = !LED1;
 }
 
 void fsmCheckInputs() {
@@ -254,7 +262,7 @@ void fsmCheckInputs() {
     // Button state -> update if needed
     Button_e newBtnState = encDriverGetButton();
     if (newBtnState > prevBtnState) {
-        encButtonState = newBtnState;
+        tmpBtnState = newBtnState;
     }
 
     prevBtnState = newBtnState;
@@ -266,18 +274,18 @@ void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonS
     
     // Find next state
     switch (fsm->currentState) {
-        case S_INIT: 
+        case S_INIT: // 0
             fsm->nextState = S_SHOW_MEASURE;
             break;
             
-        case S_SHOW_MEASURE: 
+        case S_SHOW_MEASURE: // 1 
             // Stay in this state until user input change
             if ((turns != 0) || (buttonState != Open)) {
                 fsm->nextState = S_SEL_VOLTAGE;
             }
             break;
             
-        case S_SEL_VOLTAGE: 
+        case S_SEL_VOLTAGE: // 2
             // Check if turn or click
             if (turns != 0) {
                 turns = 0;
@@ -291,11 +299,12 @@ void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonS
                 if (fsm->waitCnt >= FSM_MAX_WAIT_CNT) {
                     fsm->waitCnt = 0;
                     fsm->nextState = S_SHOW_MEASURE;
+                    updateMenu = true;
                 }
             }
             break;
             
-        case S_CHA_VOLTAGE: 
+        case S_CHA_VOLTAGE: // 3
             // Go back when clicked
             if (buttonState == Clicked) {
                 fsm->nextState = S_SEL_VOLTAGE;
@@ -316,6 +325,7 @@ void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonS
                 if (fsm->waitCnt >= FSM_MAX_WAIT_CNT) {
                     fsm->waitCnt = 0;
                     fsm->nextState = S_SHOW_MEASURE;
+                    updateMenu = true;
                 }
             }
             break;
@@ -350,10 +360,12 @@ void fsmHandeState(volatile FSM_t * fsm, int16_t turns) {
             break;
             
         case S_SHOW_MEASURE: 
-            if (supVarData.msrVoltage.changed ||
+            if (updateMenu ||
+                    supVarData.msrVoltage.changed ||
                     supVarData.msrCurrent.changed ||
                     supVarData.msrTemperature.changed) {
                 
+                updateMenu = false;
                 menuUpdateMeasuredData(
                         supVarData.msrVoltage.value,
                         supVarData.msrCurrent.value,
@@ -390,8 +402,6 @@ void fsmHandeState(volatile FSM_t * fsm, int16_t turns) {
                 supVarData.setVoltage.changed = true;
             }
             if (supVarData.setVoltage.changed) { 
-                if (DEBUG_FSM) printf("Vs=%dmV\n", supVarData.setVoltage.value);
-                
                 // Update LCD and Supplies (I²C)
                 menuChangeVoltage(supVarData.setVoltage.value);
                 setVoltage(supVarData.setVoltage.value);
@@ -424,8 +434,6 @@ void fsmHandeState(volatile FSM_t * fsm, int16_t turns) {
                 supVarData.setCurrent.changed = true;
             }
             if (supVarData.setCurrent.changed) {
-                if (DEBUG_FSM) printf("Is=%dmA\n", supVarData.setVoltage.value);
-                
                 // Update LCD and Supplies (I²C)
                 menuChangeCurrent(supVarData.setCurrent.value);
                 setCurrent(supVarData.setCurrent.value);
@@ -473,28 +481,35 @@ int main(void) {
     DelayMs(100);
     timerEnable(true);
     
+    LED1 = 1;
+    LED2 = 0;
+    LED3 = 0;
+    
     if (DEBUG) printf("start\n");
-    fsmHandeState(S_INIT, 0);
+    //fsmHandeState(S_INIT, 0);
     
     while (1) {
         
         // Fetch measured data
         if (updateMsrData) {
             updateMsrData = false;
-            getVarData(&supVarData);
+            //getVarData(&supVarData);
         }
         
         // Execute FSM
         if (mainFsm.execute) {
             mainFsm.execute = false;
+            
             fsmCalculateNextState(&mainFsm, encTurns, encButtonState);
             
-            if (mainFsm.currentState != mainFsm.nextState) {
-                if (DEBUG_FSM) printf("FSM S%d>S%d\n", mainFsm.currentState, mainFsm.nextState);
+            if (DEBUG_FSM && (mainFsm.currentState != mainFsm.nextState || encTurns != 0)) {
+                printf("FSM S%d>S%d, %d, %d\n", mainFsm.currentState, mainFsm.nextState, encTurns, encButtonState);
             }
             
-            mainFsm.currentState = mainFsm.nextState;
             fsmHandeState(&mainFsm, encTurns);
+            
+            mainFsm.currentState = mainFsm.nextState;
+            
         }
         
     }
@@ -507,7 +522,6 @@ int main(void) {
  ******************************************************************************/
 void __attribute__ ( (interrupt, no_auto_psv) ) _T4Interrupt(void) {
     if (_T4IF) {
-        LED1 = !LED1;
         heartBeat();
         _T4IF = 0; // Clear interrupt
     }
