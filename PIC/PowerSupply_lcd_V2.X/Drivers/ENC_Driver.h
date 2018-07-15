@@ -9,13 +9,13 @@
 // ----------------------------------------------------------------------------
 
 #ifndef ENC_DECODER
-#  define ENC_DECODER     ENC_NORMAL
+#  define ENC_DECODER     ENC_FLAKY /* ENC_NORMAL */
 #endif
 
 #if ENC_DECODER == ENC_FLAKY
-#  ifndef ENC_HALFSTEP
-#    define ENC_HALFSTEP  1        // use table for half step per default
-#  endif
+//#  ifndef ENC_HALFSTEP
+//#    define ENC_HALFSTEP  1        // use table for half step per default
+//#  endif
 #endif
 
 // ----------------------------------------------------------------------------
