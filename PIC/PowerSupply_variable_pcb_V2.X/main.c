@@ -67,48 +67,39 @@
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
-typedef struct {
-    uint16_t setVoltage;
-    uint16_t msrVoltage;
-    uint16_t setCurrent;
-    uint16_t msrCurrent;
-    bool clip;
-} Measure_t;
 
 
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-static uint16_t setVoltage;     // Voltage send to DAC in mV
-static uint16_t varVoltage;     // Desired voltage in mV
-
-static uint16_t setCurrent;     // Voltage send to DAC in mV
-static uint16_t varCurrent;     // Desired max current
-
-static uint16_t msrVoltage;     // Measured voltage
-static uint16_t msrCurrent;     // Measured current
-static uint16_t msrTemperature; // Measured temperature
-
 static bool adcDone = false;
 static bool i2cDone = false;
-static uint16_t i2cError = 0;
+static i2cPackage_t i2cPackage;
 
-static uint16_t pidMode = AUTOMATIC;
-static float pidOutput;
+/**
+ * [0] - setVoltage [mV]
+ * [1] - setCurrent [mA]
+ * [2] - msrVoltage [mV]
+ * [3] - msrCurrent [mA]
+ * [4] - msrTemperature [°C]
+ */
+static uint16_t dataArray[5];
 
-Measure_t testBuffer[TEST_BUFFER_CNT];
+// Pointers for convenience
+static uint16_t * setVoltage;
+static uint16_t * setCurrent;
+static uint16_t * msrVoltage;
+static uint16_t * msrCurrent;
+static uint16_t * msrTemperature;
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
  ******************************************************************************/
 static void initialize();
 static void clipEnable(bool enable);
-
 static void ledTimerEnable(bool enable);
-static bool checkI2cState(i2cData_t data);
 
-static void onI2cMasterAnswer(i2cData_t * data);
-static void onI2cReadDone(i2cData_t data);
+static void onI2cDone(i2cPackage_t data);
 static void onAdcReadDone(uint16_t buffer, uint16_t * data);
 static void onUartReadDone(UartData_t data);
 
@@ -162,35 +153,6 @@ void ledTimerEnable(bool enable) {
     } 
 }
 
-bool checkI2cState(i2cData_t data) {
-    //if (data.status != i2cError) {
-        i2cError = data.status;
-        if (DEBUG & DEBUG_I2C) {
-            switch(i2cError) {
-                default: 
-                    printf("I2C_OK\n"); break;
-                    break;
-                case I2C_NOK: printf("I2C_NOK\n"); break;
-                case I2C_OVERFLOW: printf("I2C_OVERFLOW\n"); break;
-                case I2C_COLLISION: printf("I2C_COLLISION\n"); break;
-                case I2C_NO_ADR_ACK: printf("I2C_NO_ADR_ACK\n"); break;
-                case I2C_NO_DATA_ACK: printf("I2C_NO_DATA_ACK\n"); break;
-                case I2C_UNEXPECTED_DATA: printf("I2C_UNEXPECTED_DATA\n"); break;
-                case I2C_UNEXPECTED_ADR: printf("I2C_UNEXPECTED_ADR\n"); break;
-                case I2C_STILL_BUSY: printf("I2C_STILL_BUSY\n"); break;
-                //case I2C_TIMEOUT: printf("I2C_TIMEOUT\n"); break;
-            }
-        }
-    //}
-    
-    if (i2cError < I2C_OK) {
-        //i2cDriverReset();
-        return false;
-    } else {
-        return true; 
-    }
-}
-
 void onUartReadDone(UartData_t data) {
     
 }
@@ -204,67 +166,43 @@ void onUartReadDone(UartData_t data) {
 int main(void) {
     initialize();
     
+    setVoltage = &dataArray[0];
+    setCurrent = &dataArray[1];
+    msrVoltage = &dataArray[2];
+    msrCurrent = &dataArray[3];
+    msrTemperature = &dataArray[4];
+    
+    i2cPackage.data = dataArray;
+    i2cPackage.length = 5;
+    
     // Initialize
-    dacInit();
     uartDriverInit(UART1_BAUD, &onUartReadDone);
-    i2cInitSlave(ADDR_VAR, &onI2cMasterAnswer, &onI2cReadDone);
+    i2cDriverInit(&i2cPackage, &onI2cDone);
+    dacInit();
     adcInit(&onAdcReadDone);
     
-    dacEnable(true);
+    // Enable
     uartDriverEnable(DEBUG);
-    i2cEnable(true);
-//    pidSetTunings(60,   0.25, 0.002, 0.008,   0, 4095); 
+    i2cDriverEnable(true);
+    adcEnable(true);
+    dacEnable(true);
+    clipEnable(true);
     
     // Default
-    varVoltage = 0;
-    varCurrent = 4095;
-    setVoltage = 0;
-    setCurrent = 4095;
-    dacSetValueA(varVoltage);
-    dacSetValueB(varCurrent);
+    dacSetValueA(*setVoltage);
+    dacSetValueB(*setCurrent);
     
     DelayMs(10);
     if (DEBUG) printf("start\n");
-    
-    // Enable
-    adcEnable(true);
-    //ledTimerEnable(true);
-    clipEnable(true);
-    
     DelayMs(10);
-    
-    // TEST
-    //dacSetVoltageA(1);
-    // TEST
-    LED1 = 1;
     
     while(1) {
         
-        LED2 = !LED2;
-        DelayMs(500);
-        LED1 = !LED1;
-        DelayMs(500);
-       
         if (i2cDone) {
-            if (setVoltage != varVoltage) {
-                dacSetVoltageA(toDACvoltage(setVoltage));
-                varVoltage = setVoltage;
-            }
-            
-            if (setCurrent != varCurrent) {
-                dacSetVoltageB(toDACcurrent(setCurrent));
-                varCurrent = setCurrent;
-            }
             i2cDone = false;
             
-            if (DEBUG) {
-                printf("\n");
-                printf(" V = %d\n", setVoltage);
-                printf(" I = %d\n", setCurrent);
-                printf(" v = %d\n", (uint16_t)fromADCtoVoltage(msrVoltage));
-                printf(" i = %d\n", (uint16_t)fromADCtoCurrent(msrCurrent));
-            }
-            
+            dacSetValueA(*setVoltage);
+            dacSetValueB(*setCurrent);
         }
         
         if (adcDone) {
@@ -295,162 +233,58 @@ void __attribute__ ( (interrupt, no_auto_psv) ) _CNInterrupt(void) {
     }
 }
 
-void onI2cMasterAnswer(i2cData_t * data) {
-    uint16_t value = 0;
-    switch(data->command) {
-        case COM_GET_V:
-            value = (uint16_t)fromADCtoVoltage(msrVoltage);
-            split(value, &data->data1, &data->data2);
-            break;
-        case COM_GET_I:
-            value = (uint16_t)fromADCtoCurrent(msrCurrent);
-            split(value, &data->data1, &data->data2);
-            break;
-        case COM_GET_T:
-            value = (uint16_t)fromADCtoTemperature(msrTemperature);
-            split(value, &data->data1, &data->data2);
-            break;
-        default:
-            break;
-    }
-}
-
-void onI2cReadDone(i2cData_t data) {
-    // Check state
-    if (checkI2cState(data)) {
-        
-        // Set voltage
-        if (data.command == COM_SET_V) {
-            concatinate(data.data1, data.data2, &setVoltage);
-            i2cDone = true;
-        }
-
-        // Set current
-        if (data.command == COM_SET_I) {
-            concatinate(data.data1, data.data2, &setCurrent);
-            i2cDone = true;
-        }
-        
+void onI2cDone(i2cPackage_t data) {
+    if (data.status == I2C_MWRITE) {
+        i2cDone = true;
     }
 }
 
 void onAdcReadDone(uint16_t buffer, uint16_t * data) {
+    // TODO: average of the buffers -> set msr data
 //    msrVoltage = data.value0;
 //    msrCurrent = data.value1;
 //    msrTemperature = data.value2;
 //
 //    adcEnable(true); // Restart AD conversion
 //    adcDone = true;
-    
-    if (DEBUG && buffer == 1) {
-        LED1 = 1;
-        
-        int i = 0;
-        for (i=0; i<8; i++) {
-            printf("%d\n", *(data + 1));
-        }
-        
-        LED1 = 0;
-        
-    }
 }
 
 void voltageSweep() {
-    uint16_t cnt = 0;
-    uint16_t voltage = 0;
-    
-    while(cnt < TEST_BUFFER_CNT) { 
-
-        dacSetVoltageA(( ((float)voltage) / 5000));
-        DelayMs(500);
-        
-        adcEnable(true); // Restart AD conversion
-        
-        while(!adcDone);
-        adcDone = false;
-        
-        testBuffer[cnt].setVoltage = voltage;
-        testBuffer[cnt].setCurrent = 0;
-        testBuffer[cnt].msrVoltage = msrVoltage;
-        testBuffer[cnt].msrCurrent = msrCurrent;
-        testBuffer[cnt].clip = 0;
-        
-        cnt++;
-        voltage = cnt * TEST_VOLTAGE_STEP;
-    }
-    
-    cnt = 0;
-    while(cnt < TEST_BUFFER_CNT) { 
-        
-        printf("%d,%d,%d,%d,%d\n", 
-                testBuffer[cnt].setVoltage,
-                testBuffer[cnt].setCurrent,
-                testBuffer[cnt].msrVoltage,
-                testBuffer[cnt].msrCurrent,
-                testBuffer[cnt].clip);
-        
-        DelayUs(100);
-        
-        cnt++;
-    }
+//    uint16_t cnt = 0;
+//    uint16_t voltage = 0;
+//    
+//    while(cnt < TEST_BUFFER_CNT) { 
+//
+//        dacSetVoltageA(( ((float)voltage) / 5000));
+//        DelayMs(500);
+//        
+//        adcEnable(true); // Restart AD conversion
+//        
+//        while(!adcDone);
+//        adcDone = false;
+//        
+//        testBuffer[cnt].setVoltage = voltage;
+//        testBuffer[cnt].setCurrent = 0;
+//        testBuffer[cnt].msrVoltage = msrVoltage;
+//        testBuffer[cnt].msrCurrent = msrCurrent;
+//        testBuffer[cnt].clip = 0;
+//        
+//        cnt++;
+//        voltage = cnt * TEST_VOLTAGE_STEP;
+//    }
+//    
+//    cnt = 0;
+//    while(cnt < TEST_BUFFER_CNT) { 
+//        
+//        printf("%d,%d,%d,%d,%d\n", 
+//                testBuffer[cnt].setVoltage,
+//                testBuffer[cnt].setCurrent,
+//                testBuffer[cnt].msrVoltage,
+//                testBuffer[cnt].msrCurrent,
+//                testBuffer[cnt].clip);
+//        
+//        DelayUs(100);
+//        
+//        cnt++;
+//    }
 }
-
-
-
-
-//void printCalibration(uint16_t seq, uint16_t varVoltage, double msrVoltage) {
-//
-//        // 2048 / 16 = 128 values
-//        if (!calibrateAllDone && calibrateAdcDone) {
-//            calibrateAdcDone = false;
-//            if(varVoltage < 10) {
-//                dacSetVoltageA( (double)varVoltage / 5);
-//                
-//                DelayMs(1000);
-//                adcEnable(true);
-//            } else {
-//                calibrateAllDone = true;
-//            }
-//        }
-//        
-//        
-//        // ADC
-//        if (ADC_flag) {
-//            if (!calibrateAllDone) {
-//                uint16_t v = adcBuffer.value1;
-//
-//                printf("%d,%d,%d\n", calibrateSequence, varVoltage, v);
-//
-//                calibrateAdcDone = true;
-//                calibrateSequence++;
-//                varVoltage++;
-//            }
-//            ADC_flag = false;
-//        } 
-//}
-
-
-//        if (UART_flag) {
-//            UART_flag = false;
-//            READ_Data read = C_UART_Read();
-//            if (strcmp(read.command, "S") == 0) {
-//                D_ADC_Enable(true);
-//            } else if (strcmp(read.command, "V") == 0) {
-//                uint16_t val = atoi(read.message);
-//                C_DAC_Write(val);
-//            }
-//        }
-
-
-
-//            printf("ISense: %e\n", adcValueToVolage(adcBuffer.value0));
-//            DelayMs(10);
-//            printf("%e\n", adcValueToVolage(adcBuffer.value1) / (varVoltage / 1000));
-//            DelayMs(10);
-//            printf("Temp: %e\n", adcValueToVolage(adcBuffer.value2));
-//            DelayMs(10);
-//            printf("IMon, %e\n\n", adcValueToVolage(adcBuffer.value3));
-
-
-
-

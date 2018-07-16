@@ -11,10 +11,16 @@
 #define	I2C_DRIVER_H
 
 #include <xc.h> // include processor files - each processor file is guarded. 
+#include "../Settings.h"
+
+#define MAX_TIMEOUT   20
+#define MAX_RETRY     3
+#define MAX_BUFFER    16
 
 #define I2C_MWRITE          3
 #define I2C_MREAD           2
 #define I2C_OK              1
+#define I2C_IDLE            0
 #define I2C_NOK             -1     
 #define I2C_OVERFLOW        -2
 #define I2C_COLLISION       -3
@@ -25,27 +31,22 @@
 #define I2C_STILL_BUSY      -8  /* Writing or reading still in progress       */
 #define I2C_TIMEOUT         -9
 
-struct I2C_Data {
+typedef struct {
     uint8_t address;    /* Address (7-bit) of the slave                       */
     uint8_t command;    /* Command (8-bit) send from M -> S                   */
-    int8_t  status;     /* Status of R/W                                      */
-    uint8_t data1;      /* First data (8-bit) send from S -> M                */
-    uint8_t data2;      /* Second data (8-bit) send from S -> M               */
-};
-typedef struct I2C_Data i2cData_t;
+    int16_t  status;    /* Status of R/W                                      */
+    uint16_t length;    /* Length of data buffer                              */
+    uint16_t * data;    /* The data                                           */
+    
+} i2cPackage_t;
 
-/**
- * 
- */
-void i2cDriverInitMaster();
+#ifdef I2C_MASTER
+void i2cDriverInit();
+#endif
 
-/**
- * 
- * @param address
- * @param onI2cAnswer
- * @param onI2cReadDone
- */
-void i2cDriverInitSlave(uint16_t address, void (*onI2cAnswer)(i2cData_t * data), void (*onI2cReadDone)(i2cData_t data));
+#ifdef I2C_SLAVE
+void i2cDriverInit(i2cPackage_t * data, void (*onI2cEvent)(i2cPackage_t data)); 
+#endif
 
 /**
  * 
@@ -58,24 +59,21 @@ void i2cDriverEnable(bool enable);
  */
 void i2cDriverReset();
 
+#ifdef I2C_MASTER
 /**
  * Write data to slave.
  * @param data: i2cData_t containing address and data for and from the slave
  */
-void i2cDriverMasterWrite(i2cData_t *data);
+void i2cDriverWrite(i2cPackage_t *data);
+#endif
 
+#ifdef I2C_MASTER
 /**
  * Read data from slave
  * @param data
  */
-void i2cDriverMasterRead(i2cData_t *data);
-
-/**
- * Read data from master, after the Master has initiated a transaction.
- * @param data: i2cData_t containing data from master and answer from slave.
- */
-void i2cDriverSlaveRead(i2cData_t *data);
-
+void i2cDriverRead(i2cPackage_t *data);
+#endif
 
 
 #endif	/* XC_HEADER_TEMPLATE_H */
