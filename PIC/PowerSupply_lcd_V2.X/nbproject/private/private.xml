@@ -5,12 +5,15 @@
             <url>main.c</url>
             <bookmark id="1">
                 <name/>
-                <line>233</line>
+                <line>223</line>
                 <key/>
             </bookmark>
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/gebruiker/Documents/WALDO/PowerSupply/PowerSupply/PIC/PowerSupply_lcd_V2.X/Controllers/SUPPLIES_Controller.c</file>
+            <file>file:/C:/Users/gebruiker/Documents/WALDO/PowerSupply/PowerSupply/PIC/PowerSupply_lcd_V2.X/main.c</file>
+        </group>
     </open-files>
 </project-private>

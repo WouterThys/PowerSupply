@@ -80,7 +80,6 @@ static volatile int16_t prevTurns = 0;
 static volatile bool updateMsrData = false;
 static volatile bool updateMenu = true;
 
-static SupplyData_t supVarData;
 static LCD_Settings_t lcdSettings;
 
 static volatile int16_t commandCnt = -1;
@@ -182,40 +181,31 @@ bool getCommand(Command_t * command) {
 }
 
 bool executeCommand(Command_t command) {
-    switch (command.command) {
-        // Supply stuff
-        case C_SET_VOLTAGE:
-            supVarData.setVoltage.value = command.data;
-            supVarData.setVoltage.changed = true;
-            if (DEBUG) printf("Execute command: C_SET_VOLTAGE\n");
-            break;
-        case C_SET_CURRENT:
-            supVarData.setCurrent.value = command.data;
-            supVarData.setCurrent.changed = true;
-            if (DEBUG) printf("Execute command: C_SET_CURRENT\n");
-            break;
-
-        // LCD stuff
-        case C_LCD_CONTRAST:
-            lcdSetDisplayContrast(command.data); // 1 - 50
-            if (DEBUG) printf("Execute command: C_LCD_CONTRAST\n");
-            break;
-        case C_LCD_BRIGHTNESS:
-            lcdSetDisplayBrightness(command.data); // 1 - 8
-            if (DEBUG) printf("Execute command: C_LCD_BRIGHTNESS\n");
-            break;
-    }
+//    switch (command.command) {
+//        // Supply stuff
+//        case C_SET_VOLTAGE:
+//            supVarData.setVoltage.value = command.data;
+//            supVarData.setVoltage.changed = true;
+//            if (DEBUG) printf("Execute command: C_SET_VOLTAGE\n");
+//            break;
+//        case C_SET_CURRENT:
+//            supVarData.setCurrent.value = command.data;
+//            supVarData.setCurrent.changed = true;
+//            if (DEBUG) printf("Execute command: C_SET_CURRENT\n");
+//            break;
+//
+//        // LCD stuff
+//        case C_LCD_CONTRAST:
+//            lcdSetDisplayContrast(command.data); // 1 - 50
+//            if (DEBUG) printf("Execute command: C_LCD_CONTRAST\n");
+//            break;
+//        case C_LCD_BRIGHTNESS:
+//            lcdSetDisplayBrightness(command.data); // 1 - 8
+//            if (DEBUG) printf("Execute command: C_LCD_BRIGHTNESS\n");
+//            break;
+//    }
     return true;
 }
-
-void clearChange(SupplyData_t * supplyData)  {
-    supplyData->setVoltage.changed = false;
-    supplyData->setCurrent.changed = false;
-    supplyData->msrVoltage.changed = false;
-    supplyData->msrCurrent.changed = false;
-    supplyData->msrTemperature.changed = false;
-}
-
 
 
 void heartBeat() {
@@ -344,6 +334,8 @@ void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonS
 
 void fsmHandeState(volatile FSM_t * fsm, int16_t turns) {
     
+    SupplyData_t supVarData; // supplies get variable data
+    
     switch (fsm->currentState) {
         case S_INIT: 
             // Initialize LCD 
@@ -467,11 +459,6 @@ int main(void) {
     lcdSettings.contrast = 30;
     lcdSettings.brightness = 7;
     
-    supVarData.setVoltage.value = 1000;
-    supVarData.setVoltage.changed = true;
-    supVarData.setCurrent.value = 1000;
-    supVarData.setCurrent.changed = true;
-    
     mainFsm.execute = false;
     mainFsm.currentState = S_INIT;
     mainFsm.nextState = S_INIT;
@@ -486,7 +473,6 @@ int main(void) {
     LED3 = 0;
     
     if (DEBUG) printf("start\n");
-    //fsmHandeState(S_INIT, 0);
     
     while (1) {
         
