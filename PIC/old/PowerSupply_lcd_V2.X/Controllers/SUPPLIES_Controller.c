@@ -21,39 +21,41 @@
 /*******************************************************************************
  *          LOCAL FUNCTION DEFINES
  ******************************************************************************/
-static bool i2cCheckState(i2cData_t data);
+static bool i2cCheckState(i2cPackage_t data);
 
 
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-static i2cData_t i2cVar;
-static i2cData_t i2c5V0;
-static i2cData_t i2c3V3;
+static i2cPackage_t i2cPackage;
+
+/**
+ * [0] - setVoltage [mV]
+ * [1] - setCurrent [mA]
+ * [2] - msrVoltage [mV]
+ * [3] - msrCurrent [mA]
+ * [4] - msrTemperature [°C]
+ */
+static uint16_t dataArray[5];
+
+// Pointers for convenience
+static uint16_t * setVoltage;
+static uint16_t * setCurrent;
+static uint16_t * msrVoltage;
+static uint16_t * msrCurrent;
+static uint16_t * msrTemperature;
 
 static int8_t i2cError = I2C_OK;
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
  ******************************************************************************/
-void setVoltage(uint16_t voltage) {
-    split(voltage, &i2cVar.data1, &i2cVar.data2);
-    i2cVar.command = COM_SET_V;
-    i2cDriverMasterWrite(&i2cVar);
-    i2cCheckState(i2cVar);
-}
 
-void setCurrent(uint16_t current) {
-    split(current, &i2cVar.data1, &i2cVar.data2);
-    i2cVar.command = COM_SET_I;
-    i2cDriverMasterWrite(&i2cVar);
-    i2cCheckState(i2cVar);
-}
 
 /*******************************************************************************
  *          I²C
  ******************************************************************************/
-bool i2cCheckState(i2cData_t data) {
+bool i2cCheckState(i2cPackage_t data) {
     //if (data.status != i2cError) {
         i2cError = data.status;
         if (DEBUG_I2C) {
@@ -89,11 +91,9 @@ bool i2cCheckState(i2cData_t data) {
  ******************************************************************************/
 void suppliesInit() {
     
-    i2cVar.address = ADDR_VAR;
-    i2c5V0.address = ADDR_5V0;
-    i2c3V3.address = ADDR_3V3;
+    i2cPackage.address = ADDR_VAR;
     
-    i2cDriverInitMaster();
+    
     i2cDriverEnable(true);
 }
 

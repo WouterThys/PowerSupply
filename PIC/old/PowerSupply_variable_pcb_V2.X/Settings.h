@@ -6,8 +6,9 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include "Controllers/DAC_Controller.h"
 
-#define DEBUG       1
-#define DEBUG_I2C   1
+#define DEBUG       1           /* General debug enable                       */
+#define DEBUG_I2C  (1 & DEBUG)  /* I²C debug enable                           */
+#define DEBUG_FSM  (1 & DEBUG)  /* FSM debug enable                           */
     
 /**
  * Board constants
@@ -22,7 +23,7 @@
  * Interrupt priorities
  */
 
-#define MI2C_IP     7
+#define IP_I2C     7
 #define T3_IP       6    
 #define DMA1_IP     5
 
@@ -115,6 +116,10 @@
 /**
  * I²C
  */
+#define I2C_SLAVE       /* Or I2C_MASTER                                       */
+#define I2C_WORD_WIDE   /* All data is send as 16-bit                         */
+#define I2C_ADDRESS     0x55 
+
 #define I2C_SCL_Dir     TRISBbits.TRISB8        /* SCL Direction              */
 #define I2C_SDA_Dir     TRISBbits.TRISB9        /* SDA Direction              */
 
