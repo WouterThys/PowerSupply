@@ -34,3 +34,5 @@ funclist
 nbproject/Makefile-*
 disassembly/
 *.map
+/PIC/MainController.X/nbproject/private/
+/PIC/VariableSupply.X/nbproject/private/
