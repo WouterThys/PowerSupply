@@ -17,7 +17,8 @@
 #define I2C_COM_MSR_V   2
 #define I2C_COM_MSR_I   3
 #define I2C_COM_MSR_T   4
-
+#define I2C_COM_MSR_I_  5
+#define I2C_COM_STATUS  6
 
 
 /*******************************************************************************
@@ -33,12 +34,14 @@ static bool i2cCheckState(i2cPackage_t data);
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-static uint16_t dataArray[5];
+static uint16_t dataArray[7];
 static uint16_t * setVoltage;
 static uint16_t * setCurrent;
 static uint16_t * msrVoltage;
 static uint16_t * msrCurrent;
 static uint16_t * msrTemperature;
+static uint16_t * msrCurrent_;
+static uint16_t * supStatus;
 
 static i2cPackage_t i2cPackage;
 static int16_t i2cError;
@@ -90,6 +93,10 @@ void suppliesInit() {
     msrVoltage = &dataArray[I2C_COM_MSR_V];
     msrCurrent = &dataArray[I2C_COM_MSR_I];
     msrTemperature = &dataArray[I2C_COM_MSR_T];
+    msrCurrent_ = &dataArray[I2C_COM_MSR_I_];
+    supStatus = &dataArray[I2C_COM_STATUS];
+    
+    *setVoltage = 2000;
     
     // Initial values
     i2cPackage.address = I2C_ADDRESS;
@@ -108,8 +115,9 @@ void suppliesInit() {
 
 void splSetVoltage(uint16_t voltage) {
 
-    if (i2cError < I2C_OK) return;
+    *setVoltage = voltage;
     
+    // Send
     i2cPackage.length = 1;
     i2cPackage.command = I2C_COM_SET_V;
     i2cPackage.data = setVoltage;
@@ -121,8 +129,9 @@ void splSetVoltage(uint16_t voltage) {
 
 void splSetCurrent(uint16_t current) {
     
-    if (i2cError < I2C_OK) return;
+    *setCurrent = current;
     
+    // Send
     i2cPackage.length = 1;
     i2cPackage.command = I2C_COM_SET_I;
     i2cPackage.data = setCurrent;
@@ -134,8 +143,6 @@ void splSetCurrent(uint16_t current) {
 
 void splUpdateMeasuremnets() {
     
-    if (i2cError < I2C_OK) return;
-    
     i2cPackage.length = 3;
     i2cPackage.command = I2C_COM_MSR_V; // First thing to measure
     i2cPackage.data = &dataArray[I2C_COM_MSR_V];
@@ -145,3 +152,26 @@ void splUpdateMeasuremnets() {
     
 }
 
+void splUpdateData(SupplyData_t * data) {
+    
+    if (data->msrVoltage.value != *msrVoltage) {
+        data->msrVoltage.value = *msrVoltage;
+        data->msrVoltage.changed = true;
+    }
+    
+    if (data->msrCurrent.value != *msrCurrent) {
+        data->msrCurrent.value = *msrCurrent;
+        data->msrCurrent.changed = true;
+    }
+    
+    if (data->msrTemperature.value != *msrTemperature) {
+        data->msrTemperature.value = *msrTemperature;
+        data->msrTemperature.changed = true;
+    }
+    
+    if (data->status.value != *supStatus) {
+        data->status.value = *supStatus;
+        data->status.changed = true;
+    }
+    
+}

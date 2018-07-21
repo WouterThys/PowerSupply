@@ -26,6 +26,8 @@
 #define I2C_COM_MSR_V   2
 #define I2C_COM_MSR_I   3
 #define I2C_COM_MSR_T   4
+#define I2C_COM_MSR_I_  5
+#define I2C_COM_STATUS  6
 
 #define PID_TEST_CNT        128
 #define TEST_VOLTAGE_STEP   200
@@ -35,55 +37,36 @@
  *          MACRO FUNCTIONS
  ******************************************************************************/
 
-/**
- * From voltage v [mV] to DAC voltage for setting output voltage.
- * Vout = Vdac * Vgain
- * @param v: the desired voltage at the output 
- */
-#define toDACvoltage(v)         (((float)v) / (Vgain * 1000))
-
-/**
- * From current i [mA] to DAC voltage for setting maximum current.
- * Imax = Vdac / (Rs * Igain)
- * @param i: the desired maximum current
- */
-#define toDACcurrent(i)         (((float)i * Rs * Igain) / (1000))
-
-/**
- * From digital value v, measured as output voltage, to voltage [mV]
- * @param v: digital value from ADC 
- */
-#define fromADCtoVoltage(v)     ((adcValueToVoltage(v) * Vgain) * 1000)
-
-/**
- * From digital value v, measured as input current, to current [mA]
- * Imax = Vdac / (Rs * Igain)
- * @param v: digital value from ADC
- */
-#define fromADCtoCurrent(v)     (((adcValueToVoltage(v) / (Rs * Igain)) * 1000))
-
-/**
- * From digital value v, measured as temperature, to temperature [°C]
- * Vt = Rt * T * 10E-6
- */
-#define fromADCtoTemperature(v) ( (adcValueToVoltage(v)) / ((float)Rt * 10E-6))
-
 
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
+typedef struct {
+        unsigned statusCode : 4;
+        unsigned errorCode  : 4;
+        unsigned outputEnabled : 1;
+        unsigned currentClip   : 1;
+        unsigned            : 6;
+} SupplyStruct_t;
 
+typedef union {
+    SupplyStruct_t * s;
+    uint16_t * value;
+} SupplyStatus_t;
 
 
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-static uint16_t dataArray[5];
+static uint16_t dataArray[7];
 static uint16_t * setVoltage;
 static uint16_t * setCurrent;
 static uint16_t * msrVoltage;
 static uint16_t * msrCurrent;
 static uint16_t * msrTemperature;
+static uint16_t * msrCurrent_;
+
+static SupplyStatus_t status;
 
 static i2cPackage_t i2cPackage;
 static int16_t i2cError;
@@ -200,10 +183,17 @@ int main(void) {
     msrVoltage = &dataArray[I2C_COM_MSR_V];
     msrCurrent = &dataArray[I2C_COM_MSR_I];
     msrTemperature = &dataArray[I2C_COM_MSR_T];
+    msrCurrent_ = &dataArray[I2C_COM_MSR_I_];
+    status.value = &(dataArray[I2C_COM_STATUS]);
     
-    *msrVoltage = 0x0001;
-    *msrCurrent = 0x0002;
-    *msrTemperature = 0x0003;
+    status.s->statusCode = 1;
+    
+    *setVoltage = 0x0000;
+    *setCurrent = 0x0FFF; // Max
+    *msrVoltage = 0x0000;
+    *msrCurrent = 0x0000;
+    *msrTemperature = 0x0000;
+    *msrCurrent_ = 0x0000;
     
     // Initial values
     i2cPackage.address = I2C_ADDRESS;
@@ -215,11 +205,12 @@ int main(void) {
     dacInit();
     uartDriverInit(UART1_BAUD, &onUartReadDone);
     i2cDriverInit(&i2cPackage , &onI2cDone);
-    adcInit(&onAdcReadDone);
+    adcDriverInit(&onAdcReadDone);
     
     dacEnable(true);
     uartDriverEnable(DEBUG);
     i2cDriverEnable(true);
+    DelayMs(100);
     
     // Default
     dacSetValueA(*setVoltage);
@@ -229,31 +220,24 @@ int main(void) {
     if (DEBUG) printf("start\n");
     
     // Enable
-    adcEnable(true);
+    adcDriverEnable(true);
     clipEnable(true);
     
-    DelayMs(10);
-    
-    // TEST
-    //dacSetVoltageA(1);
-    // TEST
-    LED1 = 1;
-    
     while(1) {
-        
-        LED2 = !LED2;
-        DelayMs(500);
-        LED1 = !LED1;
-        DelayMs(500);
        
         if (i2cDone) {
             i2cDone = false;
             // TODO
+            
+            dacSetValueA(*setVoltage);
+            //dacSetValueB(*setCurrent);
         }
         
         if (adcDone) {
             adcDone = false;
             // TODO
+            
+            LED1 = !LED1;
         }
     }
 }
@@ -267,15 +251,11 @@ void __attribute__ ( (interrupt, no_auto_psv) ) _CNInterrupt(void) {
 }
 
 void onI2cDone(i2cPackage_t data) {
-    
+    i2cDone = (data.status == I2C_MWRITE);
 }
 
 void onAdcReadDone(uint16_t buffer, uint16_t * data) {
-//    msrVoltage = data.value0;
-//    msrCurrent = data.value1;
-//    msrTemperature = data.value2;
-//
-//    adcEnable(true); // Restart AD conversion
-//    adcDone = true;
+    dataArray[I2C_COM_MSR_V + buffer] = (uint16_t) average(data, ADC_BUFFER_SIZE);
+    adcDone = true;
 }
 

@@ -44,7 +44,7 @@
 static Button_e button;     
 static int16_t delta;
 static int16_t last;
-static uint8_t steps = 4;
+static uint8_t steps = 2;
 static uint16_t acceleration;
 
 static uint16_t keyDownTicks = 0;

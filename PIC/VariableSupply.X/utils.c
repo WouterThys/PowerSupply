@@ -3,6 +3,7 @@
 #include <stdint.h>        /* Includes uint16_t definition                    */
 #include <stdbool.h>       /* Includes true/false definition                  */
 #include <string.h>
+#include <math.h>
 
 #include "utils.h"
 
@@ -47,4 +48,23 @@ void concatinate(uint8_t msb, uint8_t lsb, uint16_t * out) {
 void split(uint16_t in, uint8_t * msb, uint8_t * lsb) {
     *msb = (uint8_t)(in >> 8);
     *lsb = (uint8_t)in;
+}
+
+double Log2( double n ) {  
+    // log(n)/log(2) is log2.  
+    return log( n ) / log( 2 );  
+}
+
+float average(uint16_t * values, uint16_t length) {
+    float av = 0;
+    
+    uint16_t i;
+    for (i = 0; i < length; i++) {
+        //av = av + *(values + i) / length;
+        av += *(values + i);
+    }
+    
+    av = av / length;
+    
+    return av;
 }

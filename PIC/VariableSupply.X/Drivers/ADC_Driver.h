@@ -7,9 +7,8 @@
 /* System Function Prototypes                                                 */
 /******************************************************************************/
 
-void adcInit(void (*onAdcReadDone)(uint16_t buffer, uint16_t * data));
-void adcEnable(bool enable);
-float adcValueToVoltage(uint16_t value);
+void adcDriverInit(void (*onAdcReadDone)(uint16_t buffer, uint16_t * data));
+void adcDriverEnable(bool enable);
 
 
 #endif

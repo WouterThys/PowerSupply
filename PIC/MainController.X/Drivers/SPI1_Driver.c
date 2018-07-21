@@ -37,8 +37,8 @@ void spi1Init() {
     SPI1CON1bits.CKE = 1;           // Serial output data changes on transition from Idle clock state to active clock state
     SPI1CON1bits.CKP = 0;           // Idle state for clock is a low level; active state is a high level mode
     SPI1CON1bits.MSTEN = 1;         // Master mode
-    SPI1CON1bits.SPRE = 0b001;      // Secondary pre-scale 2:1
-    SPI1CON1bits.PPRE = 0b01;       // Primary pre-scale 4:1
+    SPI1CON1bits.SPRE = 0b110;      // Secondary pre-scale 2:1
+    SPI1CON1bits.PPRE = 0b10;       // Primary pre-scale 4:1
 
     /* SPI1CON2 Register */
     SPI1CON2bits.FRMEN = 0;         // Framed SPI1 support is enabled (SSx pin used as frame sync pule input/output)

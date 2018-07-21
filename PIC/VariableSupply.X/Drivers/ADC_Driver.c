@@ -5,13 +5,14 @@
 #include <math.h>
 
 #include "../Settings.h"
-#include "ADC_Driver.h"
+#include "../utils.h"
 #include "SYSTEM_Driver.h"
+#include "ADC_Driver.h"
 
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
-#define N       pow(2, n)
+#define N       pow(2, ADC_n)
 
 /*******************************************************************************
  *          MACRO FUNCTIONS
@@ -20,8 +21,8 @@
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-unsigned int BufferA[64] __attribute__( (space(ymemory)) );
-unsigned int BufferB[64] __attribute__( (space(ymemory)) );
+unsigned int BufferA[ADC_CHANNELS * ADC_BUFFER_SIZE] __attribute__( (space(ymemory)) );
+unsigned int BufferB[ADC_CHANNELS * ADC_BUFFER_SIZE] __attribute__( (space(ymemory)) );
 
 uint16_t dmaBuffer = 0;
 
@@ -38,15 +39,22 @@ void initAdc1() {
 
     // AD1CON1 register -> configuration
     AD1CON1bits.ADON = 0;
-    AD1CON1bits.AD12B = 1;      // 12-bit mode
+#ifdef ADC_n
+    if (ADC_n == 12) {
+        AD1CON1bits.AD12B = 1;      // 12-bit mode
+    }
+#endif
+    AD1CON1bits.FORM = 0;       // Integer
     AD1CON1bits.ASAM = 1;       // Sampling begins immediately after the last conversion
     AD1CON1bits.SSRCG = 0;
-    AD1CON1bits.SSRC = 2;       // Timer3 compare ends sampling and starts conversion
-    AD1CON1bits.ADDMABM = 0;    // Scatter/Gather mode
+    AD1CON1bits.SSRC = 0b010;   // Timer3 compare ends sampling and starts conversion
+    AD1CON1bits.ADDMABM = 0;    // Scatter/Gather mode (Don't care -> DMA generates addresses)
+    AD1CON1bits.SIMSAM = 0;     // Samples multiple channels individually in sequence
     
     // AD1CON2 register -> addressing
+    AD1CON2bits.BUFM = 0;       // Always starts filling the buffer from the start address.
     AD1CON2bits.ALTS = 0;       // Always uses channel input selects for Sample MUXA
-    AD1CON2bits.SMPI = 3;       // Increment rate is 3, 4 inputs are converted
+    AD1CON2bits.SMPI = ADC_CHANNELS-1;       // Increment rate is 3, 4 inputs are converted
     AD1CON2bits.CHPS = 0;       // Converts CH0
     AD1CON2bits.CSCNA = 1;      // Scans inputs for CH0+ during Sample MUXA
     
@@ -56,7 +64,13 @@ void initAdc1() {
             
     // AD1CON4 register -> DMA
     AD1CON4bits.ADDMAEN = 1;    // Conversion results are stored in the ADC1BUF0 register for transfer to RAM using DMA
-    AD1CON4bits.DMABL = 4;      // Allocates 16 words of buffer to each analog input
+    AD1CON4bits.DMABL = Log2(ADC_BUFFER_SIZE);      // Allocates 8 words of buffer to each analog input
+    
+    // Input select
+    AD1CHS0bits.CH0NA = 0;      // MUXA -ve input selection (Vref-) for CH0
+    AD1CHS0bits.CH0SA = 0;      // 
+    AD1CHS123bits.CH123SA = 0;  // MUXA +ve input selection (AIN0) for CH1
+    AD1CHS123bits.CH123NA = 0;  // MUXA -ve input selection (Vref-) for CH1
     
     // Channel scan select
     AD1CSSH = 0x0000;           // No channel scan
@@ -80,12 +94,12 @@ void initTimer3() {
 
 void initDma0() {
     // DMA0CON registers
-    DMA0CONbits.AMODE = 2;  // Configure DMA for Peripheral indirect mode (together with ADC Scatter/Gather)
+    DMA0CONbits.AMODE = 2;  // Peripheral indirect with Post-Increment 
     DMA0CONbits.MODE = 2;   // Configure DMA for Continuous Ping-Pong mode
     
     // Tie it to ADC1
     DMA0PAD = (volatile uint16_t) &ADC1BUF0;
-    DMA0CNT = 63;           // 64 DMA requests (4 buffers with each 16 words)
+    DMA0CNT = 31;           // 32 DMA request
     DMA0REQ = 13;           // ADC1 as DMA request source
     
     DMA0STAL = (volatile uint16_t) &BufferA;
@@ -102,20 +116,20 @@ void initDma0() {
 /*******************************************************************************
  *          DRIVER FUNCTIONS
  ******************************************************************************/
-void adcInit(void (*onAdcReadDone)(uint16_t buffer, uint16_t * data)) {
+void adcDriverInit(void (*onAdcReadDone)(uint16_t buffer, uint16_t * data)) {
 
     /* Event function pointer */
     readDone = onAdcReadDone;
     
     /* Disable ADC */
-    adcEnable(false);
+    adcDriverEnable(false);
     
     initAdc1();
     initDma0();
     initTimer3();
 }
 
-void adcEnable(bool enable) {
+void adcDriverEnable(bool enable) {
     if (enable) {
         
         // Analog 
@@ -143,10 +157,6 @@ void adcEnable(bool enable) {
     }
 }
 
-float adcValueToVoltage(uint16_t value) {
-    return value * VREF / N;
-}
-
 /*******************************************************************************
  *          INTERRUPTS
  ******************************************************************************/
@@ -154,16 +164,15 @@ float adcValueToVoltage(uint16_t value) {
 //  DMA done
 void __attribute__ ( (interrupt, no_auto_psv) ) _DMA0Interrupt(void) {
     // Switch between primary and secondary Ping-Pong buffers
+    uint16_t c;
     if (dmaBuffer == 0) {
-        (*readDone)(0, &BufferA[0]);
-        (*readDone)(1, &BufferA[8]);
-        (*readDone)(2, &BufferA[16]);
-        (*readDone)(3, &BufferA[24]);
+        for (c = 0; c < ADC_CHANNELS; c++) {
+            (*readDone)(c, &BufferA[(c * ADC_BUFFER_SIZE)]);
+        }
     } else {
-        (*readDone)(0, &BufferB[0]);
-        (*readDone)(1, &BufferB[8]);
-        (*readDone)(2, &BufferB[16]);
-        (*readDone)(3, &BufferB[24]);
+        for (c = 0; c < ADC_CHANNELS; c++) {
+            (*readDone)(c, &BufferB[(c * ADC_BUFFER_SIZE)]);
+        }
     }
     
     dmaBuffer ^= 1; // Toggle

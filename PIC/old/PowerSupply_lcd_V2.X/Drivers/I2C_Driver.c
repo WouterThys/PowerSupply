@@ -218,7 +218,7 @@ void doFsm(i2cFsm_t * fsm) {
             if (masterInterrupt) {
                 masterInterrupt = false;
                 
-                *(fsm->data->data + fsm->dataCnt) = (uint8_t) i2cDataRead();
+                *(fsm->data->data + fsm->dataCnt) = i2cDataRead();
                 fsm->dataCnt++;
                 
                 if (fsm->dataCnt >= fsm->data->length) {
@@ -566,10 +566,8 @@ void i2cDriverWrite(i2cPackage_t *data) {
 void i2cDriverRead(i2cPackage_t * data) { 
     
 #ifdef I2C_WORD_WIDE
-    uint16_t * old = &data->data[0];
     data->length = data->length * 2;
-    uint16_t tmp[data->length];
-    data->data = &tmp[0];
+    
 #endif
     
     i2cFsm.data = data;
@@ -580,18 +578,18 @@ void i2cDriverRead(i2cPackage_t * data) {
     
 #ifdef I2C_WORD_WIDE
     
+//    data->length = data->length / 2;
+//    uint16_t i;
+//    for (i = 0; i < data->length; i++) {
+//        data->data[i] = 
+//                ((data->data[2*i]) & 0x00FF)  
+//                |
+//                (((data->data[2*i+1]) << 8) & 0xFF00);
+//    }
+    
     uint16_t i;
     for (i = 0; i < data->length; i++) {
-        printf(" - %d = %d\n", i, (uint8_t)tmp[i]);
-    }
-    
-    data->data = old;
-    data->length = data->length / 2;
-    for (i = 0; i < data->length; i++) {
-        data->data[i] = 
-                ((tmp[2*i]) & 0x00FF)  
-                |
-                (((tmp[2*i+1]) << 8) & 0xFF00);
+        printf(" - %d = %d\n", i, data->data[i]);
     }
     
 #endif

@@ -11,10 +11,25 @@
 #define	SETTINGS_H
 
 #include <xc.h> // include processor files - each processor file is guarded.  
+#include <math.h>
 
 #define DEBUG       1           /* General debug enable                       */
-#define DEBUG_I2C  (1 & DEBUG)  /* I²C debug enable                           */
-#define DEBUG_FSM  (1 & DEBUG)  /* FSM debug enable                           */
+#define DEBUG_I2C  (0 & DEBUG)  /* I²C debug enable                           */
+#define DEBUG_FSM  (0 & DEBUG)  /* FSM debug enable                           */
+
+
+/**
+ * Board constants
+ */    
+#define Rs          0.1     /* Sense resistance                               */
+#define Rt          68100   /* Temperature resitance                          */
+#define Igain       20      /* Current sense amplifier gain                   */
+#define Vgain       5       /* Voltage amplification from DAC to LT3080       */
+#define Vdivider    1/5     /* Voltage divider for sensing output voltage     */
+#define AdcN        pow(2, 12)
+#define DacN        pow(2, 12)
+#define Vref        2.048
+
 
 /**
  * Interrupt priorities (Highest (7) - Lowest(1))
@@ -106,9 +121,15 @@
 
 
 
-/**
- * ENCODER
- */
+/*******************************************************************************
+ *          MACRO FUNCTIONS
+ ******************************************************************************/
+#define digitalToVoltage(d) ((((float)d * (float)Vref) / ((float)AdcN)) * Vgain)
+#define voltageToDigital(v) ((((float)v * (float)DacN) / ((float)Vref)) * (1/Vgain))
+
+#define digitalToCurrent(d) (digitalToVoltage(d) / (Rs * Igain))
+#define currentToDigital(i) ()
+
 
     
 

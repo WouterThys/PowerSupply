@@ -19,33 +19,46 @@
 /*******************************************************************************
  *          TODO
  *******************************************************************************
- * - Timer which will update the measured data every 1/10(?) sec with one
- *   I²C call, that will get:
- *      - measured voltage
- *      - measured current
- *      - measured temperature
- *   and set the local measured values.
  * 
- * - Timer (T2) which will get the user input. Create FSM to handle user input
- *   and set the:
- *      - set voltage
- *      - set current
  * 
+ * Time measurements
+ * -----------------
+ * 
+ * -> FSM: 
+ *      - heartbeat: 1kHz
+ *      - 
+ * 
+ * -> I2C: clk = 200kHz
+ *      - set voltage: 200µs <-> 250µs
+ *      - set current: 200µs <-> 250µs
+ *      - get measurement: 600µs <-> 800µs
+ * 
+ * -> MCP
+ *      - get port: 18µs <-> 20µs
+ * 
+ * -> MENU
+ *      - draw measurement 1: 20ms <-> 25ms
+ *      - draw measurement 2: 6ms <-> 8ms
+ * 
+ *      - draw set voltage 1:
+ *      - draw set voltage 2:
+ * 
+ *      - draw ...
  * 
  * */
 
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
-#define VOLTAGE_STEP        100     /* Step size of voltage in [mV]           */
-#define VOLTAGE_MAX         10000   /* Maximum voltage in [mV]                */
-#define VOLTAGE_MIN         100     /* Minimum voltage in [mV]                */
-#define CURRENT_STEP        100     /* Step size of current in [mA]           */
-#define CURRENT_MAX         2000    /* Maximum current in [mA]                */
-#define CURRENT_MIN         100     /* Minimum current in [mA]                */
+#define VOLTAGE_STEP        40                      /* Step size in [mV]      */
+#define VOLTAGE_MAX         4000                    /* Maximum in [mV]        */
+#define VOLTAGE_MIN         40                      /* Minimum in [mV]        */
+#define CURRENT_STEP        40                      /* Step size in [mA]      */
+#define CURRENT_MAX         2000                    /* Maximum in [mA]        */
+#define CURRENT_MIN         0                       /* Minimum in [mA]        */
 
-#define FSM_PRE_SCALE       100     /* Timer with 1ms -> 200ms                */
-#define FSM_MAX_WAIT_CNT    100     /* FSM at 200ms -> wait of 5s             */ 
+#define FSM_PRE_SCALE       200     /* Timer with 1ms -> 200ms                */
+#define FSM_MAX_WAIT_CNT    15      /* FSM at 200ms -> wait of 3s             */ 
 
 #define COMMAND_BUFFER      5
 
@@ -66,9 +79,6 @@ typedef struct {
     uint16_t prescale;       // Pre-scale counter
 } FSM_t;
 
-/*******************************************************************************
- *          MACRO FUNCTIONS
- ******************************************************************************/
 
 /*******************************************************************************
  *          VARIABLES
@@ -80,7 +90,7 @@ static volatile int16_t prevTurns = 0;
 static volatile bool updateMsrData = false;
 static volatile bool updateMenu = true;
 
-static SupplyData_t supVarData;
+static SupplyData_t supplyData;
 static LCD_Settings_t lcdSettings;
 
 static volatile int16_t encTurns = 0;
@@ -141,13 +151,13 @@ bool putCommand(Command_t command) {
 }
 
 void heartBeat() {
+    
     // Check user inputs
     fsmCheckInputs();
     
     // Update measured data
     if (mainFsm.prescale == 0) {
         updateMsrData = true;
-        LED1 = !LED1;
     }
     
     // Check work
@@ -169,9 +179,8 @@ void heartBeat() {
         // Flag
         mainFsm.execute = true;
         
-        LED3 = LED2;
-        LED2 = !LED3;
     }
+    
 }
 
 void fsmCheckInputs() {
@@ -198,6 +207,7 @@ void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonS
     switch (fsm->currentState) {
         case S_INIT: // 0
             fsm->nextState = S_SHOW_MEASURE;
+            updateMenu = true;
             break;
             
         case S_SHOW_MEASURE: // 1 
@@ -214,6 +224,7 @@ void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonS
                 fsm->nextState = S_SEL_CURRENT;
                 fsm->waitCnt = 0;
             } else if (buttonState == Clicked) {
+                updateMenu = true;
                 fsm->nextState = S_CHA_VOLTAGE;
                 fsm->waitCnt = 0;
             } else {
@@ -240,6 +251,7 @@ void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonS
                 fsm->nextState = S_SEL_VOLTAGE;
                 fsm->waitCnt = 0;
             } else if (buttonState == Clicked) {
+                updateMenu = true;
                 fsm->nextState = S_CHA_CURRENT;
                 fsm->waitCnt = 0;
             } else {
@@ -266,6 +278,8 @@ void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonS
 
 void fsmHandeState(volatile FSM_t * fsm, int16_t turns) {
     
+    splUpdateData(&supplyData);
+    
     switch (fsm->currentState) {
         case S_INIT: 
             // Initialize LCD 
@@ -274,93 +288,91 @@ void fsmHandeState(volatile FSM_t * fsm, int16_t turns) {
             lcdSetDisplayBrightness(lcdSettings.brightness);
             lcdSetDisplayContrast(lcdSettings.contrast);
             
-            menuUpdateMeasuredData(
-                        supVarData.msrVoltage.value,
-                        supVarData.msrCurrent.value,
-                        supVarData.msrTemperature.value
-                        );
             break;
             
         case S_SHOW_MEASURE: 
             if (updateMenu ||
-                    supVarData.msrVoltage.changed ||
-                    supVarData.msrCurrent.changed ||
-                    supVarData.msrTemperature.changed) {
+                    supplyData.msrVoltage.changed ||
+                    supplyData.msrCurrent.changed ||
+                    supplyData.msrTemperature.changed) {
                 
                 updateMenu = false;
+                
                 menuUpdateMeasuredData(
-                        supVarData.msrVoltage.value,
-                        supVarData.msrCurrent.value,
-                        supVarData.msrTemperature.value
+                        supplyData.msrVoltage.value,
+                        supplyData.msrCurrent.value,
+                        supplyData.msrTemperature.value
                         );
                 
-                supVarData.msrVoltage.changed = false;
-                supVarData.msrCurrent.changed = false;
-                supVarData.msrTemperature.changed = false;
+                supplyData.msrVoltage.changed = false;
+                supplyData.msrCurrent.changed = false;
+                supplyData.msrTemperature.changed = false;
             }
             break;
             
         case S_SEL_VOLTAGE: 
-            menuSelectVoltage(supVarData.setVoltage.value);
+            menuSelectVoltage(supplyData.setVoltage.value);
             break;
             
         case S_CHA_VOLTAGE: 
             while (turns != 0) {
                 if (turns > 0) {
-                    if ((supVarData.setVoltage.value + VOLTAGE_STEP) < VOLTAGE_MAX) {
-                        supVarData.setVoltage.value += VOLTAGE_STEP;
+                    if ((supplyData.setVoltage.value + VOLTAGE_STEP) < VOLTAGE_MAX) {
+                        supplyData.setVoltage.value += VOLTAGE_STEP;
                     } else {
-                        supVarData.setVoltage.value = VOLTAGE_MAX;
+                        supplyData.setVoltage.value = VOLTAGE_MAX;
                     }
                     turns--;
                 } else {
-                    if ((supVarData.setVoltage.value - VOLTAGE_STEP) > VOLTAGE_MIN) {
-                        supVarData.setVoltage.value -= VOLTAGE_STEP;
+                    if ((supplyData.setVoltage.value - VOLTAGE_STEP) > VOLTAGE_MIN) {
+                        supplyData.setVoltage.value -= VOLTAGE_STEP;
                     } else {
-                        supVarData.setVoltage.value = VOLTAGE_MIN;
+                        supplyData.setVoltage.value = VOLTAGE_MIN;
                     }
                     turns++;
                 }
-                supVarData.setVoltage.changed = true;
+                supplyData.setVoltage.changed = true;
             }
-            if (supVarData.setVoltage.changed) { 
+            if (updateMenu || supplyData.setVoltage.changed) { 
                 // Update LCD and Supplies (I²C)
-                menuChangeVoltage(supVarData.setVoltage.value);
-                splSetVoltage(supVarData.setVoltage.value);
+                menuChangeVoltage(supplyData.setVoltage.value);
+                splSetVoltage(supplyData.setVoltage.value);
                 
-                supVarData.setVoltage.changed = false;
+                supplyData.setVoltage.changed = false;
+                updateMenu = false;
             }
             break;
             
         case S_SEL_CURRENT: 
-            menuSelectCurrent(supVarData.setCurrent.value);
+            menuSelectCurrent(supplyData.setCurrent.value);
             break;
             
         case S_CHA_CURRENT: 
             while (turns != 0) {
                 if (turns > 0) {
-                    if ((supVarData.setCurrent.value + CURRENT_STEP) < CURRENT_MAX) {
-                        supVarData.setCurrent.value += CURRENT_STEP;
+                    if ((supplyData.setCurrent.value + CURRENT_STEP) < CURRENT_MAX) {
+                        supplyData.setCurrent.value += CURRENT_STEP;
                     } else {
-                        supVarData.setCurrent.value = CURRENT_MAX;
+                        supplyData.setCurrent.value = CURRENT_MAX;
                     }
                     turns--;
                 } else {
-                    if ((supVarData.setCurrent.value - CURRENT_STEP) > CURRENT_MIN) {
-                        supVarData.setCurrent.value -= CURRENT_STEP;
+                    if ((supplyData.setCurrent.value - CURRENT_STEP) > CURRENT_MIN) {
+                        supplyData.setCurrent.value -= CURRENT_STEP;
                     } else {
-                        supVarData.setCurrent.value = CURRENT_MIN;
+                        supplyData.setCurrent.value = CURRENT_MIN;
                     }
                     turns++;
                 }
-                supVarData.setCurrent.changed = true;
+                supplyData.setCurrent.changed = true;
             }
-            if (supVarData.setCurrent.changed) {
+            if (updateMenu || supplyData.setCurrent.changed) {
                 // Update LCD and Supplies (I²C)
-                menuChangeCurrent(supVarData.setCurrent.value);
-                splSetCurrent(supVarData.setCurrent.value);
+                menuChangeCurrent(supplyData.setCurrent.value);
+                splSetCurrent(supplyData.setCurrent.value);
                 
-                supVarData.setCurrent.changed = false;
+                supplyData.setCurrent.changed = false;
+                updateMenu = false;
             }
             break;
             
@@ -389,11 +401,6 @@ int main(void) {
     lcdSettings.contrast = 30;
     lcdSettings.brightness = 7;
     
-    supVarData.setVoltage.value = 1000;
-    supVarData.setVoltage.changed = true;
-    supVarData.setCurrent.value = 1000;
-    supVarData.setCurrent.changed = true;
-    
     mainFsm.execute = false;
     mainFsm.currentState = S_INIT;
     mainFsm.nextState = S_INIT;
@@ -403,12 +410,11 @@ int main(void) {
     DelayMs(100);
     timerEnable(true);
     
-    LED1 = 1;
-    LED2 = 0;
-    LED3 = 0;
-    
-    if (DEBUG) printf("start\n");
-    //fsmHandeState(S_INIT, 0);
+    if (DEBUG)  {
+        printf("Start\n");
+        printf(" Voltage step = %d\n", VOLTAGE_STEP);
+        printf(" Voltage min = %d\n", VOLTAGE_MIN);
+    }
     
     while (1) {
         
@@ -422,10 +428,14 @@ int main(void) {
         if (mainFsm.execute) {
             mainFsm.execute = false;
             
+            if (DEBUG_FSM && (encTurns != 0 || encButtonState != Open)) {
+                printf("F T%d B%d\n", encTurns, encButtonState);
+            }
+            
             fsmCalculateNextState(&mainFsm, encTurns, encButtonState);
             
-            if (DEBUG_FSM && (mainFsm.currentState != mainFsm.nextState || encTurns != 0)) {
-                printf("FSM S%d>S%d, %d, %d\n", mainFsm.currentState, mainFsm.nextState, encTurns, encButtonState);
+            if (DEBUG_FSM && (mainFsm.currentState != mainFsm.nextState)) {
+                printf("F S%d>S%d\n", mainFsm.currentState, mainFsm.nextState);
             }
             
             fsmHandeState(&mainFsm, encTurns);

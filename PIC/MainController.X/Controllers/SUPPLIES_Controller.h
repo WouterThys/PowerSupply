@@ -15,6 +15,7 @@ typedef struct {
     SupplyValue_t msrVoltage; // Measured output voltage
     SupplyValue_t msrCurrent; // Measured output current
     SupplyValue_t msrTemperature; // Measured temperature of the LT3081
+    SupplyValue_t status;
 } SupplyData_t;
 
 
@@ -24,6 +25,7 @@ void splSetVoltage(uint16_t voltage);
 void splSetCurrent(uint16_t current);
 
 void splUpdateMeasuremnets();
+void splUpdateData(SupplyData_t * data);
 
 
 #endif	/* XC_HEADER_TEMPLATE_H */

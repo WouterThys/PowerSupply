@@ -55,7 +55,7 @@ void initializeRegisters(uint16_t baud) {
     U1MODEbits.WAKE = 0; // Wake-up is disabled
     U1MODEbits.LPBACK = 0; // Loop-back mode is disabled
     U1MODEbits.ABAUD = 0; // Baud rate measurement is disabled or complete
-    U1MODEbits.URXINV = 1; // UxRX Idle state is ?0?***************************
+    U1MODEbits.URXINV = 0; // UxRX Idle state is ?0?***************************
     U1MODEbits.BRGH = 0; // BRG generates 16 clocks per bit period (16x baud clock, Standard Speed mode)
     U1MODEbits.PDSEL = 0b00; // 8-bit data, no parity
     U1MODEbits.STSEL = 0; // 1 Stop bit
@@ -63,7 +63,7 @@ void initializeRegisters(uint16_t baud) {
     // U1STA register settings
     U1STAbits.UTXISEL0 = 0; // Interrupt is generated when any character is transferred to the Transmit Shift Register and the
     U1STAbits.UTXISEL1 = 0; // transmit buffer is empty (which implies at least one location is empty in the transmit buffer) 
-    U1STAbits.UTXINV = 1; // UxTX Idle state is ?0?*********************************
+    U1STAbits.UTXINV = 0; // UxTX Idle state is ?0?*********************************
     U1STAbits.UTXEN = 0; // UARTx transmitter is disabled; any pending transmission is aborted and the buffer is reset, UxTX pin is controlled by the port
     U1STAbits.URXISEL = 0b00; // Interrupt flag bit is set when a character is received
     U1STAbits.ADDEN = 0; // Address Detect mode is disabled

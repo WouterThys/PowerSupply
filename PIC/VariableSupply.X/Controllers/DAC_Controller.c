@@ -11,7 +11,7 @@
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
-#define N       pow(2, n)
+#define N       pow(2, DAC_n)
 
 /*******************************************************************************
  *          MACRO FUNCTIONS
@@ -31,7 +31,7 @@ static void writeToDac(DAC_Command_t command);
 
 
 uint16_t voltageToDigital(float voltage, float gain) {
-    return (uint16_t) ((voltage * N) / (VREF * gain));
+    return (uint16_t) ((voltage * N) / (DAC_VREF * gain));
 }
 
 void writeToDac(DAC_Command_t command) {
@@ -53,16 +53,16 @@ void dacInit() {
     spi2Init();
     
     // Settings
-    DAC_A.A_B = 0; 
-    DAC_A.BUF = 1;
-    DAC_A.GA = 1;
-    DAC_A.SHDN = 0; // Disable
-    DAC_A.data = 0x000;
+    DAC_A.A_B = 0;      // Channel A
+    DAC_A.BUF = 1;      // Buffered reference
+    DAC_A.GA = 1;       // 1x (Vout = Vref * D / 4096)
+    DAC_A.SHDN = 0;     // Disable
+    DAC_A.data = 0x000; // Data
     
-    DAC_B.A_B = 1; 
-    DAC_B.BUF = 1;
-    DAC_B.GA = 1;
-    DAC_B.SHDN = 0; // Disable
+    DAC_B.A_B = 1;      // Channel B
+    DAC_B.BUF = 1;      // Buffered reference
+    DAC_B.GA = 1;       // 1x
+    DAC_B.SHDN = 0;     // Disable
     DAC_B.data = 0x000;
 }
 
@@ -98,25 +98,25 @@ void dacShutDownB() {
     DAC_B.SHDN = 0;
 }
 
-void dacSetValueA(float value) {
+void dacSetValueA(uint16_t value) {
     if (value > (N-1)) {
         value = (N-1);
     }
     if (value < 0) {
         value = 0;
     }
-    DAC_A.data = (uint16_t)value;
+    DAC_A.data = value;
     writeToDac(DAC_A);
 }
 
-void dacSetValueB(float value) {
+void dacSetValueB(uint16_t value) {
     if (value > (N-1)) {
         value = (N-1);
     }
     if (value < 0) {
         value = 0;
     }
-    DAC_B.data = (uint16_t)value;
+    DAC_B.data = value;
     writeToDac(DAC_B);
 }
 

@@ -23,11 +23,10 @@
  */
 
 #define MI2C_IP     7
-#define T3_IP       6    
-#define DMA1_IP     5
-
-#define IP_U1RX     3
-#define SPI2_IP     2
+#define IP_U1RX     6
+#define SPI2_IP     5
+#define T3_IP       4    
+#define DMA1_IP     6
 #define IP_CN       1
 
     
@@ -45,18 +44,22 @@
 #define CLIP_PIN_Cn     CNENBbits.CNIEB5
 #define CLIP_LED_Dir    TRISBbits.TRISB13
 #define CLIP_LED        PORTBbits.RB13
-    
+
+
+/**
+ * DAC
+ */
+#define DAC_VREF        2.048
+#define DAC_n           12
+
 /**
  *  ADC
  */
-#define VREF            2.048
-#define n               10
+#define ADC_VREF        2.048
+#define ADC_n           12
     
 #define ADC_BUFFER_SIZE 8
-#define ADC_CHANNELS    4      
-    
-#define ADC_CURRENT     0
-#define ADC_TEMPERATURE 1    
+#define ADC_CHANNELS    4         
   
 #define ADC0_Asl        ANSELAbits.ANSA0        
 #define ADC0_Pin        PORTAbits.RA0

@@ -461,7 +461,7 @@ void i2cDriverInit() {
     I2CCON = 0x0000;
     I2CCONbits.SCLREL = 1; // Releases the SCLx clock
     I2CSTAT = 0x0000;
-    I2CBRG = 320;//180; // 100kHz clock
+    I2CBRG = 84;//180; // 100kHz clock
     
     /* Interrupts master */
     MI2CIF = 0; // Clear flag
@@ -581,8 +581,10 @@ void i2cDriverRead(i2cPackage_t * data) {
 #ifdef I2C_WORD_WIDE
     
     uint16_t i;
-    for (i = 0; i < data->length; i++) {
-        printf(" - %d = %d\n", i, (uint8_t)tmp[i]);
+    if (DEBUG_I2C) {
+        for (i = 0; i < data->length; i++) {
+            printf(" - %d = %d\n", i, (uint8_t)tmp[i]);
+        }
     }
     
     data->data = old;

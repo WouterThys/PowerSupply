@@ -39,5 +39,20 @@ void concatinate(uint8_t msb, uint8_t lsb, uint16_t * out);
  */
 void split(uint16_t in, uint8_t * msb, uint8_t * lsb);
 
+/**
+ * Calculate log2
+ * @param n
+ * @return 
+ */
+double Log2( double n );
+
+/**
+ * Calculate average of values array with length length
+ * @param values
+ * @param length
+ * @return 
+ */
+float average(uint16_t * values, uint16_t length);
+
 #endif	/* XC_HEADER_TEMPLATE_H */
 
