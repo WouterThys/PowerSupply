@@ -4,7 +4,6 @@
 #include <stdint.h>        /* Includes uint16_t definition                    */
 #include <stdbool.h>       /* Includes true/false definition                  */
 #include <string.h>
-#include <p33EP256GP502.h>
 
 #include "utils.h"
 #include "Settings.h"
@@ -46,13 +45,12 @@ static uint16_t * msrVoltage;
 static uint16_t * msrCurrent;
 static uint16_t * msrTemperature;
 static uint16_t * msrCurrent_;
-
-static SupplyStatus_t status;
+static SupplyStatus_t * status;
 
 static i2cPackage_t i2cPackage;
 static int16_t i2cError;
 
-static bool i2cDone = false;
+static uint16_t i2cDone = 0;
 static bool adcDone = false;
 
 /*******************************************************************************
@@ -60,7 +58,6 @@ static bool adcDone = false;
  ******************************************************************************/
 static void initialize();
 static void clipEnable(bool enable);
-static void updateStatus(SupplyStatus_t status);
 
 static void onI2cDone(i2cPackage_t data);
 static void onAdcReadDone(uint16_t buffer, uint16_t * data);
@@ -98,10 +95,6 @@ void onUartReadDone(UartData_t data) {
     
 }
 
-void updateStatus(SupplyStatus_t status) {
-    dataArray[I2C_COM_STATUS] = status.value;
-}
-
 /*******************************************************************************
  *          MAIN PROGRAM
  ******************************************************************************/
@@ -116,6 +109,7 @@ int main(void) {
     msrCurrent = &dataArray[I2C_COM_MSR_I];
     msrTemperature = &dataArray[I2C_COM_MSR_T];
     msrCurrent_ = &dataArray[I2C_COM_MSR_I_];
+    status = (SupplyStatus_t *) &dataArray[I2C_COM_STATUS];
     
     *setVoltage = 0x0000;
     *setCurrent = 0x0FFF; // Max
@@ -124,6 +118,10 @@ int main(void) {
     *msrTemperature = 0x0000;
     *msrCurrent_ = 0x0000;
     
+    status->statusCode = STAT_VOID;
+    status->currentClip = 0;
+    status->errorCode = 0;
+    status->outputEnabled = 0; 
     
     // Initial values
     i2cPackage.address = I2C_ADDRESS;
@@ -136,6 +134,7 @@ int main(void) {
     uartDriverInit(UART1_BAUD, &onUartReadDone);
     i2cDriverInit(&i2cPackage , &onI2cDone);
     adcDriverInit(&onAdcReadDone);
+    OUTPUT_ON_Dir = 1; // Input to check if output is enabled
     
     dacEnable(true);
     uartDriverEnable(DEBUG);
@@ -153,23 +152,36 @@ int main(void) {
     adcDriverEnable(true);
     clipEnable(true);
     
-    status.statusCode = STAT_RUNNING;
-    updateStatus(status);
+    // Set status running
+    status->statusCode = STAT_RUNNING;
     
     while(1) {
        
-        if (i2cDone) {
-            i2cDone = false;
-            // TODO: check status
+        if (i2cDone > 0) {
             
-            dacSetValueA(*setVoltage);
-            //dacSetValueB(*setCurrent);
+            if (DEBUG_I2C) printf("I2C: %d\n", i2cDone);
+            
+            switch(i2cDone) {
+                case I2C_COM_SET_V:
+                    dacSetValueA(*setVoltage);
+                    break;
+                case I2C_COM_SET_I:
+                    dacSetValueB(*setCurrent);
+                    break;
+                case I2C_COM_STATUS:
+                    break;
+                default:
+                    break;
+            }
+            
+            i2cDone = 0;
         }
         
         if (adcDone) {
             adcDone = false;
             // TODO
             
+            status->outputEnabled = OUTPUT_ON_Pin;
             LED1 = !LED1;
         }
     }
@@ -178,15 +190,17 @@ int main(void) {
 //  Clip interrupt
 void __attribute__ ( (interrupt, no_auto_psv) ) _CNInterrupt(void) {
     if (_CNIF) {
-        CLIP_LED = !CLIP_PIN;
+        bool clip = !CLIP_PIN;
+        status->currentClip = clip;
+        CLIP_LED = clip;
         _CNIF = 0; // Clear interrupt
     }
 }
 
 void onI2cDone(i2cPackage_t data) {
-    if (data.status == I2C_MWRITE) {
-        status.value = dataArray[I2C_COM_STATUS];
-        i2cDone = true;
+    // We are only interested in what master writes
+    if (data.status == I2C_MWRITE) { 
+        i2cDone = data.command - 1; // Command will be pointing to next element by now => - 1
     }
 }
 

@@ -36,14 +36,16 @@
  
 #define LED1            PORTBbits.RB15
 #define LED1_Dir        TRISBbits.TRISB15
-#define LED2            PORTBbits.RB14
-#define LED2_Dir        TRISBbits.TRISB14
+
+#define OUTPUT_ON_Pin   PORTBbits.RB14
+#define OUTPUT_ON_Dir   TRISBbits.TRISB14
     
+#define CLIP_LED_Dir    TRISBbits.TRISB13
+#define CLIP_LED        PORTBbits.RB13
+
 #define CLIP_PIN        PORTBbits.RB5    
 #define CLIP_PIN_Dir    TRISBbits.TRISB5
 #define CLIP_PIN_Cn     CNENBbits.CNIEB5
-#define CLIP_LED_Dir    TRISBbits.TRISB13
-#define CLIP_LED        PORTBbits.RB13
 
 
 /**

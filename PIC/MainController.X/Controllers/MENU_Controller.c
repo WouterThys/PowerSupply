@@ -16,7 +16,11 @@ typedef enum {
     SELECT_VOLTAGE,
     SELECT_CURRENT,
     CHANGE_VOLTAGE,
-    CHANGE_CURRENT
+    CHANGE_CURRENT,
+    SELECT_CALIBRATION,
+    CHANGE_CALIBRATION,
+    SELECT_SETTINGS,
+    CHANGE_SETTINGS
 } Menu_e;
 
 /*******************************************************************************
@@ -104,33 +108,71 @@ void menuUpdateMeasuredData(uint16_t msrVoltage, uint16_t msrCurrent, uint16_t m
 }
 
 void menuSelectVoltage(uint16_t selVoltage) {
-    if (currentMenu != SELECT_VOLTAGE) {
-        writeString(0,0, "S|Set voltage  V");
-        writeString(1,0, " |              ");
-        drawValue(1, 2, digitalToVoltage(selVoltage));
-        
+    if (currentMenu == SELECT_VOLTAGE || currentMenu == SELECT_CURRENT) {
+        drawValue(0, 13, digitalToVoltage(selVoltage));
+        lcdSetCursorPosition(0,2); // Underline 'V'
+    } else {
+        // Draw menu
+        writeString(0,0, "S|Set V:       V");
+        writeString(1,0, " |Set I:       A");
+        drawValue(0, 13, digitalToVoltage(selVoltage));
+       
         lcdCursorUnderlineOn(true);
         lcdTurnOnBlinkingCursor(false);
-        lcdSetCursorPosition(0,15); // Underline 'V'
-        
-        currentMenu = SELECT_VOLTAGE;
+        lcdSetCursorPosition(0,2); // Underline 'V'
+
     }
-    
+    currentMenu = SELECT_VOLTAGE;
 }
 
 void menuSelectCurrent(uint16_t selCurrent) {
-    if (currentMenu != SELECT_CURRENT) {
-        writeString(0,0, "S|Set current  I");
-        writeString(1,0, " |              ");
-        drawValue(1, 2, digitalToCurrent(selCurrent));
+    if (currentMenu == SELECT_VOLTAGE || currentMenu == SELECT_CURRENT) {
+        drawValue(1, 13, digitalToVoltage(selCurrent));
+        lcdSetCursorPosition(1,2); // Underline 'I'
+    } else {
+        // Draw menu
+        writeString(0,0, "S|Set V:       V");
+        writeString(1,0, " |Set I:       A");
+        drawValue(1, 13, digitalToVoltage(selCurrent));
+       
+        lcdCursorUnderlineOn(true);
+        lcdTurnOnBlinkingCursor(false);
+        lcdSetCursorPosition(1,2); // Underline 'I'
+
+    }
+    currentMenu = SELECT_CURRENT;
+}
+
+ void menuSelectCalibration() {
+    if (currentMenu == SELECT_CALIBRATION || currentMenu == SELECT_SETTINGS) {
+        lcdSetCursorPosition(0,2); 
+    } else {
+        // Draw menu 
+        writeString(0,0, "S|Calibration   ");
+        writeString(1,0, " |Settings      ");
         
         lcdCursorUnderlineOn(true);
         lcdTurnOnBlinkingCursor(false);
-        lcdSetCursorPosition(1,15); // Underline 'I'
-        
-        currentMenu = SELECT_CURRENT;
+        lcdSetCursorPosition(0,2); 
     }
-}
+    currentMenu = SELECT_CALIBRATION;
+ }
+    
+ void menuSelectSettings() {
+    if (currentMenu == SELECT_CALIBRATION || currentMenu == SELECT_SETTINGS) {
+        lcdSetCursorPosition(1,2); 
+    } else {
+        // Draw menu 
+        writeString(0,0, "S|Calibration   ");
+        writeString(1,0, " |Settings      ");
+        
+        lcdCursorUnderlineOn(true);
+        lcdTurnOnBlinkingCursor(false);
+        lcdSetCursorPosition(1,2); 
+    }
+    currentMenu = SELECT_SETTINGS;
+ }
+    
     
 void menuChangeVoltage(uint16_t selVoltage) {
     if (currentMenu != CHANGE_VOLTAGE) {
@@ -154,4 +196,18 @@ void menuChangeCurrent(uint16_t selCurrent) {
         currentMenu = CHANGE_CURRENT;
     }
     drawValue(1, 2, digitalToCurrent(selCurrent));
+}
+
+void menuChangeCalibration() {
+    if (currentMenu != CHANGE_CALIBRATION) {
+        
+        currentMenu = CHANGE_CALIBRATION;
+    }
+}
+    
+void menuChangeSettings() {
+    if (currentMenu != CHANGE_SETTINGS) {
+        
+        currentMenu = CHANGE_SETTINGS;
+    }
 }

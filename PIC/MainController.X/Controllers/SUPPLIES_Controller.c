@@ -35,8 +35,7 @@ static uint16_t * msrVoltage;
 static uint16_t * msrCurrent;
 static uint16_t * msrTemperature;
 static uint16_t * msrCurrent_;
-
-static SupplyStatus_t status;
+static SupplyStatus_t * status;
 
 static i2cPackage_t i2cPackage;
 static int16_t i2cError;
@@ -106,7 +105,7 @@ void suppliesInit() {
 }
 
 void splGetStatus(SupplyStatus_t * s) {
-    s = &status;
+    s = status;
 }
 
 void splSetStatus(SupplyStatus_t s) {
@@ -157,9 +156,6 @@ void splUpdateMeasuremnets() {
     
     i2cDriverRead(&i2cPackage);
     i2cCheckState(i2cPackage);
-    
-    status.value = dataArray[I2C_COM_STATUS];
-    
 }
 
 void splUpdateData(SupplyData_t * data) {
