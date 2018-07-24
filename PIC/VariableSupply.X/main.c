@@ -50,8 +50,8 @@ typedef struct {
 } SupplyStruct_t;
 
 typedef union {
-    SupplyStruct_t * s;
-    uint16_t * value;
+    SupplyStruct_t s;
+    uint16_t value;
 } SupplyStatus_t;
 
 
@@ -66,7 +66,7 @@ static uint16_t * msrCurrent;
 static uint16_t * msrTemperature;
 static uint16_t * msrCurrent_;
 
-static SupplyStatus_t status;
+static SupplyStatus_t * status;
 
 static i2cPackage_t i2cPackage;
 static int16_t i2cError;
@@ -184,9 +184,9 @@ int main(void) {
     msrCurrent = &dataArray[I2C_COM_MSR_I];
     msrTemperature = &dataArray[I2C_COM_MSR_T];
     msrCurrent_ = &dataArray[I2C_COM_MSR_I_];
-    status.value = &(dataArray[I2C_COM_STATUS]);
     
-    status.s->statusCode = 1;
+    (&status).value = &(dataArray[I2C_COM_STATUS]);
+
     
     *setVoltage = 0x0000;
     *setCurrent = 0x0FFF; // Max
