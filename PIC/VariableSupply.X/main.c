@@ -8,6 +8,7 @@
 
 #include "utils.h"
 #include "Settings.h"
+#include "../Common/CommonData.h"
 
 #include "Drivers/SYSTEM_Driver.h"
 #include "Drivers/UART_Driver.h"
@@ -21,14 +22,6 @@
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
-#define I2C_COM_SET_V   0
-#define I2C_COM_SET_I   1
-#define I2C_COM_MSR_V   2
-#define I2C_COM_MSR_I   3
-#define I2C_COM_MSR_T   4
-#define I2C_COM_MSR_I_  5
-#define I2C_COM_STATUS  6
-
 #define PID_TEST_CNT        128
 #define TEST_VOLTAGE_STEP   200
 #define TEST_BUFFER_CNT     50
@@ -41,18 +34,6 @@
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
-typedef struct {
-        unsigned statusCode : 4;
-        unsigned errorCode  : 4;
-        unsigned outputEnabled : 1;
-        unsigned currentClip   : 1;
-        unsigned            : 6;
-} SupplyStruct_t;
-
-typedef union {
-    SupplyStruct_t * s;
-    uint16_t * value;
-} SupplyStatus_t;
 
 
 /*******************************************************************************
@@ -79,9 +60,7 @@ static bool adcDone = false;
  ******************************************************************************/
 static void initialize();
 static void clipEnable(bool enable);
-
-static void ledTimerEnable(bool enable);
-static bool checkI2cState(i2cPackage_t data);
+static void updateStatus(SupplyStatus_t status);
 
 static void onI2cDone(i2cPackage_t data);
 static void onAdcReadDone(uint16_t buffer, uint16_t * data);
@@ -115,60 +94,13 @@ void clipEnable(bool enable) {
     }
 }
 
-void ledTimerEnable(bool enable) {
-    T2CONbits.TON = 0; // Disable
-    T2CONbits.TCS = 0; // Internal clock (Fp)
-    T2CONbits.T32 = 0; // 16-bit timer
-    T2CONbits.TCKPS = 0b11; // 1:256
-    
-    // Registers
-    TMR2 = 0x0000;
-    PR2 = 0xFFFF;
-    
-    // Interrupts
-    _T2IP = 1;
-    _T2IF = 0; // Clear
-    _T2IE = 1; // Enable
-    
-    if (enable) {
-        T2CONbits.TON = 1; // Enable
-    } 
-}
-
-bool checkI2cState(i2cPackage_t data) {
-    //if (data.status != i2cError) {
-        i2cError = data.status;
-        if (DEBUG & DEBUG_I2C) {
-            switch(i2cError) {
-                default: 
-                    printf("I2C_OK\n"); break;
-                    break;
-                case I2C_NOK: printf("I2C_NOK\n"); break;
-                case I2C_OVERFLOW: printf("I2C_OVERFLOW\n"); break;
-                case I2C_COLLISION: printf("I2C_COLLISION\n"); break;
-                case I2C_NO_ADR_ACK: printf("I2C_NO_ADR_ACK\n"); break;
-                case I2C_NO_DATA_ACK: printf("I2C_NO_DATA_ACK\n"); break;
-                case I2C_UNEXPECTED_DATA: printf("I2C_UNEXPECTED_DATA\n"); break;
-                case I2C_UNEXPECTED_ADR: printf("I2C_UNEXPECTED_ADR\n"); break;
-                case I2C_STILL_BUSY: printf("I2C_STILL_BUSY\n"); break;
-                //case I2C_TIMEOUT: printf("I2C_TIMEOUT\n"); break;
-            }
-        }
-    //}
-    
-    if (i2cError < I2C_OK) {
-        //i2cDriverReset();
-        return false;
-    } else {
-        return true; 
-    }
-}
-
 void onUartReadDone(UartData_t data) {
     
 }
 
-
+void updateStatus(SupplyStatus_t status) {
+    dataArray[I2C_COM_STATUS] = status.value;
+}
 
 /*******************************************************************************
  *          MAIN PROGRAM
@@ -184,9 +116,6 @@ int main(void) {
     msrCurrent = &dataArray[I2C_COM_MSR_I];
     msrTemperature = &dataArray[I2C_COM_MSR_T];
     msrCurrent_ = &dataArray[I2C_COM_MSR_I_];
-    status.value = &(dataArray[I2C_COM_STATUS]);
-    
-    status.s->statusCode = 1;
     
     *setVoltage = 0x0000;
     *setCurrent = 0x0FFF; // Max
@@ -194,6 +123,7 @@ int main(void) {
     *msrCurrent = 0x0000;
     *msrTemperature = 0x0000;
     *msrCurrent_ = 0x0000;
+    
     
     // Initial values
     i2cPackage.address = I2C_ADDRESS;
@@ -223,11 +153,14 @@ int main(void) {
     adcDriverEnable(true);
     clipEnable(true);
     
+    status.statusCode = STAT_RUNNING;
+    updateStatus(status);
+    
     while(1) {
        
         if (i2cDone) {
             i2cDone = false;
-            // TODO
+            // TODO: check status
             
             dacSetValueA(*setVoltage);
             //dacSetValueB(*setCurrent);
@@ -251,7 +184,10 @@ void __attribute__ ( (interrupt, no_auto_psv) ) _CNInterrupt(void) {
 }
 
 void onI2cDone(i2cPackage_t data) {
-    i2cDone = (data.status == I2C_MWRITE);
+    if (data.status == I2C_MWRITE) {
+        status.value = dataArray[I2C_COM_STATUS];
+        i2cDone = true;
+    }
 }
 
 void onAdcReadDone(uint16_t buffer, uint16_t * data) {
