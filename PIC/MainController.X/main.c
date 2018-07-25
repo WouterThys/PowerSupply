@@ -49,45 +49,29 @@
 
 /*******************************************************************************
  *          DEFINES
- ******************************************************************************/
-#define VOLTAGE_STEP        40                      /* Step size in [mV]      */
-#define VOLTAGE_MAX         4000                    /* Maximum in [mV]        */
-#define VOLTAGE_MIN         40                      /* Minimum in [mV]        */
-#define CURRENT_STEP        40                      /* Step size in [mA]      */
-#define CURRENT_MAX         2000                    /* Maximum in [mA]        */
-#define CURRENT_MIN         0                       /* Minimum in [mA]        */
+ ******************************************************************************/       
 
 #define FSM_PRE_SCALE       200     /* Timer with 1ms -> 200ms                */
 #define FSM_MAX_WAIT_CNT    15      /* FSM at 200ms -> wait of 3s             */ 
 
 #define COMMAND_BUFFER      5
 
-typedef enum {
-    S_INIT, // Initialize the LCD
-    S_SHOW_MEASURE, // Show measured data from I²C
-    S_SEL_VOLTAGE,  // Select the voltage
-    S_CHA_VOLTAGE,  // Change the voltage
-    S_SEL_CURRENT,  // Select the current
-    S_CHA_CURRENT,  // Change the current
-    S_SEL_CALIBRATION, // Select calibration
-    S_CHA_CALIBRATION, // Change calibration
-    S_SEL_SETTINGS, // Select settings
-    S_CHA_SETTINGS // Change settings
-} FSMState_e;
-
 typedef struct {
-    bool execute;            // Flag to indicate the FSM should execute
-    FSMState_e currentState; // Current state of the FSM
-    FSMState_e nextState;    // Next calculated state
-    uint16_t waitCnt;        // Delay count
-    uint16_t prescale;       // Pre-scale counter
-} FSM_t;
+    bool execute;                // Flag to indicate the FSM should execute
+    MainFSMState_e currentState; // Current state of the FSM
+    MainFSMState_e nextState;    // Next calculated state
+    MainFSMState_e saveState;    // Saved state when leaving main FSM
+    uint16_t waitCnt;            // Delay count
+    uint16_t prescale;           // Pre-scale counter
+} MainFSM_t;
 
 
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-static volatile FSM_t mainFsm;
+static volatile MainFSM_t mainFsm;
+static volatile CalibrationFSM_t calibrateFsm;
+
 static volatile Button_e prevBtnState = Open;
 static volatile Button_e tmpBtnState = Open;
 static volatile int16_t prevTurns = 0;
@@ -95,6 +79,7 @@ static volatile bool updateMsrData = false;
 static volatile bool updateMenu = true;
 
 static SupplyData_t supplyData;
+static SupplyStatus_t supplyStatus; 
 static LCD_Settings_t lcdSettings;
 
 static volatile int16_t encTurns = 0;
@@ -105,13 +90,15 @@ static volatile Button_e encButtonState;
  ******************************************************************************/
 static void initialize();
 static void timerEnable(bool enable);
+static void heartBeat();
+
+static void fsmCheckInputs();
+static void mainFsmCalculateNextState(volatile MainFSM_t * fsm, int16_t turns, Button_e buttonState);
+static void mainFsmHandeState(volatile MainFSM_t * fsm, int16_t turns);
+static void calibrateFsmCalcultateNextState(volatile CalibrationFSM_t * fsm, int16_t turns, Button_e buttonState);
+static void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns);
 
 static bool putCommand(Command_t command);
-
-static void heartBeat();
-static void fsmCheckInputs();
-static void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonState);
-static void fsmHandeState(volatile FSM_t * fsm, int16_t turns);
 
 void initialize() {
     sysInterruptEnable(false);
@@ -203,145 +190,148 @@ void fsmCheckInputs() {
     prevBtnState = newBtnState;
 }
 
-void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonState) {
+void mainFsmCalculateNextState(volatile MainFSM_t * fsm, int16_t turns, Button_e buttonState) {
     
     fsm->nextState = fsm->currentState;
     
     // Find next state
     switch (fsm->currentState) {
-        case S_INIT: // 0
-            fsm->nextState = S_SHOW_MEASURE;
+        case M_INIT: // 0
+            fsm->nextState = M_SHOW_MEASURE;
             updateMenu = true;
             break;
             
-        case S_SHOW_MEASURE: // 1 
+        case M_SHOW_MEASURE: // 1 
             // Stay in this state until user input change
             if ((turns != 0) || (buttonState != Open)) {
-                fsm->nextState = S_SEL_VOLTAGE;
+                fsm->nextState = M_SEL_VOLTAGE;
             }
             break;
             
-        case S_SEL_VOLTAGE: // 2
+        case M_SEL_VOLTAGE: // 2
             // Check if turn or click
             if (turns != 0) {
                 if (turns > 0) {
-                    fsm->nextState = S_SEL_CURRENT;
+                    fsm->nextState = M_SEL_CURRENT;
                 } else {
-                    fsm->nextState = S_SEL_SETTINGS;
+                    fsm->nextState = M_SEL_SETTINGS;
                 }
                 fsm->waitCnt = 0;
                 turns = 0;
             } else if (buttonState == Clicked) {
                 updateMenu = true;
-                fsm->nextState = S_CHA_VOLTAGE;
+                fsm->nextState = M_CHA_VOLTAGE;
                 fsm->waitCnt = 0;
             } else {
                 fsm->waitCnt++;
                 if (fsm->waitCnt >= FSM_MAX_WAIT_CNT) {
                     fsm->waitCnt = 0;
-                    fsm->nextState = S_SHOW_MEASURE;
+                    fsm->nextState = M_SHOW_MEASURE;
                     updateMenu = true;
                 }
             }
             break;
             
-        case S_CHA_VOLTAGE: // 3
+        case M_CHA_VOLTAGE: // 3
             // Go back when clicked
             if (buttonState == Clicked) {
-                fsm->nextState = S_SEL_VOLTAGE;
+                fsm->nextState = M_SEL_VOLTAGE;
             }
             break;
             
-        case S_SEL_CURRENT: 
+        case M_SEL_CURRENT: 
             // Check if turn or click
             if (turns != 0) {
                 if (turns > 0) {
-                    fsm->nextState = S_SEL_CALIBRATION;
+                    fsm->nextState = M_SEL_CALIBRATION;
                 } else {
-                    fsm->nextState = S_SEL_VOLTAGE;
+                    fsm->nextState = M_SEL_VOLTAGE;
                 }
                 fsm->waitCnt = 0;
                 turns = 0;
             } else if (buttonState == Clicked) {
                 updateMenu = true;
-                fsm->nextState = S_CHA_CURRENT;
+                fsm->nextState = M_CHA_CURRENT;
                 fsm->waitCnt = 0;
             } else {
                 fsm->waitCnt++;
                 if (fsm->waitCnt >= FSM_MAX_WAIT_CNT) {
                     fsm->waitCnt = 0;
-                    fsm->nextState = S_SHOW_MEASURE;
+                    fsm->nextState = M_SHOW_MEASURE;
                     updateMenu = true;
                 }
             }
             break;
             
-        case S_CHA_CURRENT: 
+        case M_CHA_CURRENT: 
              // Go back when clicked
             if (buttonState == Clicked) {
-                fsm->nextState = S_SEL_CURRENT;
+                fsm->nextState = M_SEL_CURRENT;
             }
             break;
             
-        case S_SEL_CALIBRATION:
+        case M_SEL_CALIBRATION:
              // Check if turn or click
             if (turns != 0) {
                 if (turns > 0) {
-                    fsm->nextState = S_SEL_SETTINGS;
+                    fsm->nextState = M_SEL_SETTINGS;
                 } else {
-                    fsm->nextState = S_SEL_CURRENT;
+                    fsm->nextState = M_SEL_CURRENT;
                 }
                 fsm->waitCnt = 0;
                 turns = 0;
             } else if (buttonState == Clicked) {
                 updateMenu = true;
-                fsm->nextState = S_CHA_CALIBRATION;
+                fsm->nextState = M_CHA_CALIBRATION;
                 fsm->waitCnt = 0;
             } else {
                 fsm->waitCnt++;
                 if (fsm->waitCnt >= FSM_MAX_WAIT_CNT) {
                     fsm->waitCnt = 0;
-                    fsm->nextState = S_SHOW_MEASURE;
+                    fsm->nextState = M_SHOW_MEASURE;
                     updateMenu = true;
                 }
             }
             break;
             
-        case S_CHA_CALIBRATION:
-             // Go back when clicked
-            if (buttonState == Clicked) {
-                fsm->nextState = S_SEL_CALIBRATION;
+        case M_CHA_CALIBRATION:
+            calibrateFsmCalcultateNextState(&calibrateFsm, encTurns, encButtonState);
+            if (calibrateFsm.nextState == C_STOP) {
+                calibrateFsm.nextState = C_INIT;
+                calibrateFsm.currentState = C_INIT;
+                
+                fsm->nextState = M_SEL_CALIBRATION;
             }
             break;
             
-        case S_SEL_SETTINGS:
+        case M_SEL_SETTINGS:
              // Check if turn or click
             if (turns != 0) {
                 if (turns > 0) {
-                    fsm->nextState = S_SEL_VOLTAGE;
+                    fsm->nextState = M_SEL_VOLTAGE;
                 } else {
-                    fsm->nextState = S_SEL_CALIBRATION;
+                    fsm->nextState = M_SEL_CALIBRATION;
                 }
                 fsm->waitCnt = 0;
                 turns = 0;
             } else if (buttonState == Clicked) {
                 updateMenu = true;
-                fsm->nextState = S_CHA_SETTINGS;
+                fsm->nextState = M_CHA_SETTINGS;
                 fsm->waitCnt = 0;
             } else {
                 fsm->waitCnt++;
                 if (fsm->waitCnt >= FSM_MAX_WAIT_CNT) {
                     fsm->waitCnt = 0;
-                    fsm->nextState = S_SHOW_MEASURE;
+                    fsm->nextState = M_SHOW_MEASURE;
                     updateMenu = true;
                 }
             }
             break;
             
-        case S_CHA_SETTINGS:
+        case M_CHA_SETTINGS:
              // Go back when clicked
             if (buttonState == Clicked) {
-                fsm->nextState = S_SEL_SETTINGS;
+                fsm->nextState = M_SEL_SETTINGS;
             }
             break;
             
@@ -350,12 +340,12 @@ void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonS
     }
 }
 
-void fsmHandeState(volatile FSM_t * fsm, int16_t turns) {
+void mainFsmHandeState(volatile MainFSM_t * fsm, int16_t turns) {
     
     splUpdateData(&supplyData);
     
     switch (fsm->currentState) {
-        case S_INIT: 
+        case M_INIT: 
             // Initialize LCD 
             lcdInit();
             lcdTurnDisplayOn(lcdSettings.on);
@@ -364,7 +354,7 @@ void fsmHandeState(volatile FSM_t * fsm, int16_t turns) {
             
             break;
             
-        case S_SHOW_MEASURE: 
+        case M_SHOW_MEASURE: 
             if (updateMenu ||
                     supplyData.msrVoltage.changed ||
                     supplyData.msrCurrent.changed ||
@@ -384,11 +374,11 @@ void fsmHandeState(volatile FSM_t * fsm, int16_t turns) {
             }
             break;
             
-        case S_SEL_VOLTAGE: 
+        case M_SEL_VOLTAGE: 
             menuSelectVoltage(supplyData.setVoltage.value);
             break;
             
-        case S_CHA_VOLTAGE: 
+        case M_CHA_VOLTAGE: 
             while (turns != 0) {
                 if (turns > 0) {
                     if ((supplyData.setVoltage.value + VOLTAGE_STEP) < VOLTAGE_MAX) {
@@ -417,11 +407,11 @@ void fsmHandeState(volatile FSM_t * fsm, int16_t turns) {
             }
             break;
             
-        case S_SEL_CURRENT: 
+        case M_SEL_CURRENT: 
             menuSelectCurrent(supplyData.setCurrent.value);
             break;
             
-        case S_CHA_CURRENT: 
+        case M_CHA_CURRENT: 
             while (turns != 0) {
                 if (turns > 0) {
                     if ((supplyData.setCurrent.value + CURRENT_STEP) < CURRENT_MAX) {
@@ -450,10 +440,148 @@ void fsmHandeState(volatile FSM_t * fsm, int16_t turns) {
             }
             break;
             
+        case M_SEL_CALIBRATION:
+            menuSelectCalibration();
+            break;
+            
+        case M_CHA_CALIBRATION:
+            calibrateFsmHandleState(&calibrateFsm, encTurns);
+            break;
+            
+        case M_SEL_SETTINGS:
+            menuSelectSettings();
+            break;
+            
+        case M_CHA_SETTINGS:
+            break;
+            
         default:
             break;
     }
     
+}
+
+void calibrateFsmCalcultateNextState(volatile CalibrationFSM_t * fsm, int16_t turns, Button_e buttonState) {
+    fsm->nextState = fsm->currentState;
+    splGetStatus(&supplyStatus);
+    
+    // Find next state
+    switch (fsm->currentState) {
+        case C_INIT:
+            fsm->acknowledgeState = C_INIT;
+            fsm->nextState = C_SEND_TO_SLAVE;
+            break;
+            
+        case C_SET_DESIRED:
+            fsm->acknowledgeState = C_SET_DESIRED;
+            fsm->nextState = C_SEND_TO_SLAVE;
+            break;
+            
+        case C_CALIBRATE:
+            if (buttonState == Clicked) {
+                fsm->nextState = C_SAVE;
+            }
+            break;
+            
+        case C_SAVE:
+            fsm->acknowledgeState = C_SAVE;
+            fsm->nextState = C_SEND_TO_SLAVE;
+            break;
+            
+        case C_DONE:
+            fsm->acknowledgeState = C_DONE;
+            fsm->nextState = C_SEND_TO_SLAVE;
+            break;
+            
+            
+        case C_SEND_TO_SLAVE:
+            fsm->nextState = C_WAIT_FOR_SLAVE;
+            break;
+            
+        case C_WAIT_FOR_SLAVE:
+            if (supplyStatus.calibrationSt == fsm->acknowledgeState) {
+                switch (fsm->acknowledgeState) {
+                    case C_INIT: 
+                        fsm->nextState = C_SET_DESIRED; 
+                        break;
+                    case C_SET_DESIRED: 
+                        fsm->nextState = C_CALIBRATE; 
+                        break;
+                    case C_SAVE:
+                        if (fsm->calibrationCount < 10) {
+                            fsm->calibrationCount++;
+                            fsm->nextState = C_SET_DESIRED;
+                        } else {
+                            fsm->nextState = C_DONE;
+                        }
+                        break;
+                    case C_DONE:
+                        fsm->nextState = C_STOP;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+            
+        default:
+            break;
+    }
+}
+
+void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns) {
+    
+    switch (fsm->currentState) {
+        case C_INIT:
+            fsm->calibrationCount = 0;
+            fsm->desiredVoltage = CALIB_MIN;
+            updateMenu = true;
+            break;
+            
+        case C_SET_DESIRED:
+            fsm->desiredVoltage = CALIB_MIN + (fsm->calibrationCount * CALIB_STEP);
+            fsm->calibratedVoltage = fsm->desiredVoltage;
+            splSetVoltage(fsm->calibratedVoltage);
+            updateMenu = true;
+            break;
+            
+        case C_CALIBRATE:
+            while (turns != 0) {
+                if (turns > 0) {
+                    fsm->calibratedVoltage += CALIB_mSTEP;
+                    turns--;
+                } else {
+                    fsm->calibratedVoltage -= CALIB_mSTEP;
+                    turns++;
+                }
+                updateMenu = true;
+            }
+            if (updateMenu) { 
+                // Update LCD and Supplies (I²C)
+                menuChangeCalibration(fsm->calibrationCount, supplyData.msrVoltage.value);
+                splSetVoltage(fsm->calibratedVoltage);
+                updateMenu = false;
+            }
+            break;
+            
+        case C_SAVE: 
+            fsm->calibrationCount += 1;
+            break;
+            
+        case C_DONE:
+            break;
+            
+            
+         case C_SEND_TO_SLAVE:
+            splSetCalibration(*fsm);
+            break;
+            
+        case C_WAIT_FOR_SLAVE:
+            break;
+            
+        default:
+            break;
+    }
 }
 
 /*******************************************************************************
@@ -476,8 +604,8 @@ int main(void) {
     lcdSettings.brightness = 7;
     
     mainFsm.execute = false;
-    mainFsm.currentState = S_INIT;
-    mainFsm.nextState = S_INIT;
+    mainFsm.currentState = M_INIT;
+    mainFsm.nextState = M_INIT;
     mainFsm.prescale = 0;
     mainFsm.waitCnt = 0;
     
@@ -506,13 +634,13 @@ int main(void) {
                 printf("F T%d B%d\n", encTurns, encButtonState);
             }
             
-            fsmCalculateNextState(&mainFsm, encTurns, encButtonState);
+            mainFsmCalculateNextState(&mainFsm, encTurns, encButtonState);
             
             if (DEBUG_FSM && (mainFsm.currentState != mainFsm.nextState)) {
                 printf("F S%d>S%d\n", mainFsm.currentState, mainFsm.nextState);
             }
             
-            fsmHandeState(&mainFsm, encTurns);
+            mainFsmHandeState(&mainFsm, encTurns);
             
             mainFsm.currentState = mainFsm.nextState;
             

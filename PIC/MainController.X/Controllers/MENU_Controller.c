@@ -198,16 +198,24 @@ void menuChangeCurrent(uint16_t selCurrent) {
     drawValue(1, 2, digitalToCurrent(selCurrent));
 }
 
-void menuChangeCalibration() {
+void menuChangeCalibration(uint16_t targetVoltage, uint16_t calibratedVoltage) {
     if (currentMenu != CHANGE_CALIBRATION) {
-        
+        lcdCursorUnderlineOn(false);
+        lcdTurnOnBlinkingCursor(false);
+        writeString(0,0, "A|Set to       V");
+        writeString(1,0, " |             V");
         currentMenu = CHANGE_CALIBRATION;
     }
+    drawValue(0, 8, digitalToVoltage(targetVoltage));
+    drawValue(1, 2, digitalToVoltage(calibratedVoltage));
 }
     
 void menuChangeSettings() {
     if (currentMenu != CHANGE_SETTINGS) {
-        
+        lcdCursorUnderlineOn(false);
+        lcdTurnOnBlinkingCursor(false);
+        writeString(0,0, "X|Settings     V");
+        writeString(1,0, " |             V");
         currentMenu = CHANGE_SETTINGS;
     }
 }

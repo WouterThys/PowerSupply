@@ -148,6 +148,19 @@ void splSetCurrent(uint16_t current) {
     
 }
 
+void splSetCalibration(CalibrationFSM_t fsm) {
+    
+    uint16_t data[2] = { fsm.currentState, fsm.calibrationCount };
+    
+    // Send
+    i2cPackage.length = 2;
+    i2cPackage.command = I2C_COM_CAL_STATE;
+    i2cPackage.data = &data[0];
+    
+    i2cDriverWrite(&i2cPackage);
+    i2cCheckState(i2cPackage);
+}
+
 void splUpdateMeasuremnets() {
     
     i2cPackage.length = 5; // Voltage, current, temperature, current_ and status
