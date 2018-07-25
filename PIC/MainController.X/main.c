@@ -68,7 +68,11 @@ typedef enum {
     S_SEL_VOLTAGE,  // Select the voltage
     S_CHA_VOLTAGE,  // Change the voltage
     S_SEL_CURRENT,  // Select the current
-    S_CHA_CURRENT   // Change the current
+    S_CHA_CURRENT,  // Change the current
+    S_SEL_CALIBRATION, // Select calibration
+    S_CHA_CALIBRATION, // Change calibration
+    S_SEL_SETTINGS, // Select settings
+    S_CHA_SETTINGS // Change settings
 } FSMState_e;
 
 typedef struct {
@@ -220,9 +224,13 @@ void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonS
         case S_SEL_VOLTAGE: // 2
             // Check if turn or click
             if (turns != 0) {
-                turns = 0;
-                fsm->nextState = S_SEL_CURRENT;
+                if (turns > 0) {
+                    fsm->nextState = S_SEL_CURRENT;
+                } else {
+                    fsm->nextState = S_SEL_SETTINGS;
+                }
                 fsm->waitCnt = 0;
+                turns = 0;
             } else if (buttonState == Clicked) {
                 updateMenu = true;
                 fsm->nextState = S_CHA_VOLTAGE;
@@ -247,9 +255,13 @@ void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonS
         case S_SEL_CURRENT: 
             // Check if turn or click
             if (turns != 0) {
-                turns = 0;
-                fsm->nextState = S_SEL_VOLTAGE;
+                if (turns > 0) {
+                    fsm->nextState = S_SEL_CALIBRATION;
+                } else {
+                    fsm->nextState = S_SEL_VOLTAGE;
+                }
                 fsm->waitCnt = 0;
+                turns = 0;
             } else if (buttonState == Clicked) {
                 updateMenu = true;
                 fsm->nextState = S_CHA_CURRENT;
@@ -267,7 +279,69 @@ void fsmCalculateNextState(volatile FSM_t * fsm, int16_t turns, Button_e buttonS
         case S_CHA_CURRENT: 
              // Go back when clicked
             if (buttonState == Clicked) {
-                fsm->nextState = S_SEL_VOLTAGE;
+                fsm->nextState = S_SEL_CURRENT;
+            }
+            break;
+            
+        case S_SEL_CALIBRATION:
+             // Check if turn or click
+            if (turns != 0) {
+                if (turns > 0) {
+                    fsm->nextState = S_SEL_SETTINGS;
+                } else {
+                    fsm->nextState = S_SEL_CURRENT;
+                }
+                fsm->waitCnt = 0;
+                turns = 0;
+            } else if (buttonState == Clicked) {
+                updateMenu = true;
+                fsm->nextState = S_CHA_CALIBRATION;
+                fsm->waitCnt = 0;
+            } else {
+                fsm->waitCnt++;
+                if (fsm->waitCnt >= FSM_MAX_WAIT_CNT) {
+                    fsm->waitCnt = 0;
+                    fsm->nextState = S_SHOW_MEASURE;
+                    updateMenu = true;
+                }
+            }
+            break;
+            
+        case S_CHA_CALIBRATION:
+             // Go back when clicked
+            if (buttonState == Clicked) {
+                fsm->nextState = S_SEL_CALIBRATION;
+            }
+            break;
+            
+        case S_SEL_SETTINGS:
+             // Check if turn or click
+            if (turns != 0) {
+                if (turns > 0) {
+                    fsm->nextState = S_SEL_VOLTAGE;
+                } else {
+                    fsm->nextState = S_SEL_CALIBRATION;
+                }
+                fsm->waitCnt = 0;
+                turns = 0;
+            } else if (buttonState == Clicked) {
+                updateMenu = true;
+                fsm->nextState = S_CHA_SETTINGS;
+                fsm->waitCnt = 0;
+            } else {
+                fsm->waitCnt++;
+                if (fsm->waitCnt >= FSM_MAX_WAIT_CNT) {
+                    fsm->waitCnt = 0;
+                    fsm->nextState = S_SHOW_MEASURE;
+                    updateMenu = true;
+                }
+            }
+            break;
+            
+        case S_CHA_SETTINGS:
+             // Go back when clicked
+            if (buttonState == Clicked) {
+                fsm->nextState = S_SEL_SETTINGS;
             }
             break;
             

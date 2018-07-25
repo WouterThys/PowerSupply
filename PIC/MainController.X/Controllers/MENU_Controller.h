@@ -55,6 +55,16 @@ extern "C" {
     
     /**
      * 
+     */
+    void menuSelectCalibration();
+    
+    /**
+     * 
+     */
+    void menuSelectSettings();
+    
+    /**
+     * 
      * @param selVoltage
      */
     void menuChangeVoltage(uint16_t selVoltage);
@@ -65,6 +75,16 @@ extern "C" {
      */
     void menuChangeCurrent(uint16_t selCurrent);
 
+    /**
+     * 
+     */
+    void menuChangeCalibration();
+    
+    /**
+     * 
+     */
+    void menuChangeSettings();
+    
 #ifdef	__cplusplus
 }
 #endif
