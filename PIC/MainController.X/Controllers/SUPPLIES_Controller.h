@@ -30,5 +30,7 @@ void splSetStatus(SupplyStatus_t status);
 void splUpdateMeasuremnets();
 void splUpdateData(SupplyData_t * data);
 
+void splSetCalibration(CalibrationFSM_t fsm);
+
 
 #endif	/* XC_HEADER_TEMPLATE_H */

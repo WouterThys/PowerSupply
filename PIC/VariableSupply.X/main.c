@@ -38,7 +38,7 @@
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-static uint16_t dataArray[7];
+static uint16_t dataArray[9];
 static uint16_t * setVoltage;
 static uint16_t * setCurrent;
 static uint16_t * msrVoltage;
@@ -46,6 +46,8 @@ static uint16_t * msrCurrent;
 static uint16_t * msrTemperature;
 static uint16_t * msrCurrent_;
 static SupplyStatus_t * status;
+static uint16_t * calibrationState;
+static uint16_t * calibrationCount;
 
 static i2cPackage_t i2cPackage;
 static int16_t i2cError;
@@ -53,11 +55,17 @@ static int16_t i2cError;
 static uint16_t i2cDone = 0;
 static bool adcDone = false;
 
+// Calibration
+static Calibration_t calibrateArray[10];
+
 /*******************************************************************************
  *          LOCAL FUNCTIONS
  ******************************************************************************/
 static void initialize();
 static void clipEnable(bool enable);
+
+static void findLookupPoint(uint16_t * searchArray, uint16_t length, uint16_t value, uint16_t * x0, uint16_t * y0, uint16_t *x1, uint16_t *y1);
+static float interpolate(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t value);
 
 static void onI2cDone(i2cPackage_t data);
 static void onAdcReadDone(uint16_t buffer, uint16_t * data);
@@ -91,9 +99,61 @@ void clipEnable(bool enable) {
     }
 }
 
-void onUartReadDone(UartData_t data) {
+void findLookupPoint(uint16_t * searchArray, uint16_t length, uint16_t value, uint16_t * x0, uint16_t *y0, uint16_t *x1, uint16_t *y1) {
     
+    *x0 = *x1 = *y0 = *y1 = -1;
+    
+    if (value < searchArray[0]) {
+        
+        *x0 = 0;
+        *x1 = 0;
+        
+        *y0 = searchArray[*x0];
+        *y1 = searchArray[*x1];
+        
+        return;
+    }
+    
+    if (value > searchArray[length-1]) {
+
+        *x0 = length-1;
+        *x1 = length-1;
+
+        *y0 = searchArray[*x0];
+        *y1 = searchArray[*x1];
+
+        return;
+    }
+        
+    uint16_t i;
+    for (i = 0; i < length-1; i++) {
+
+        if (value >= searchArray[i] && value < searchArray[i+1]) {
+
+            *x0 = i;
+            *x1 = i+1;
+
+            *y0 = searchArray[*x0];
+            *y1 = searchArray[*x1];
+
+            break;
+        }
+    }
+        
 }
+
+float interpolate(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x) {
+    float t;
+
+    if (x <= x0) { return y0; }
+    if (x >= x1) { return y1; }
+
+    t =  (x-x0);
+    t /= (x1-x0);
+
+    return y0 + t*(y1-y0);
+}
+
 
 /*******************************************************************************
  *          MAIN PROGRAM
@@ -110,6 +170,8 @@ int main(void) {
     msrTemperature = &dataArray[I2C_COM_MSR_T];
     msrCurrent_ = &dataArray[I2C_COM_MSR_I_];
     status = (SupplyStatus_t *) &dataArray[I2C_COM_STATUS];
+    calibrationState = &dataArray[I2C_COM_CAL_STATE];
+    calibrationCount = &dataArray[I2C_COM_CAL_COUNT];
     
     *setVoltage = 0x0000;
     *setCurrent = 0x0FFF; // Max
@@ -126,7 +188,7 @@ int main(void) {
     // Initial values
     i2cPackage.address = I2C_ADDRESS;
     i2cPackage.data = dataArray;
-    i2cPackage.length = 5;
+    i2cPackage.length = 7;
     i2cError = I2C_OK;
     
     // Initialize
@@ -168,7 +230,23 @@ int main(void) {
                 case I2C_COM_SET_I:
                     dacSetValueB(*setCurrent);
                     break;
-                case I2C_COM_STATUS:
+                case I2C_COM_CAL_STATE:
+                    status->calibrationSt = *calibrationState; // For ACK
+                    switch(*calibrationState) {
+                        case C_INIT:
+                            break;
+                        case C_SET_DESIRED:
+                            calibrateArray[*calibrationCount].desiredVoltage = CALIB_MIN + (*calibrationCount * CALIB_STEP);
+                            calibrateArray[*calibrationCount].calibratedVoltage = 0;
+                            calibrateArray[*calibrationCount].measuredCurrent = 0;
+                            break;
+                        case C_SAVE:
+                            calibrateArray[*calibrationCount].calibratedVoltage = *setVoltage;
+                            calibrateArray[*calibrationCount].measuredCurrent = *msrCurrent;
+                            break;
+                        case C_DONE:
+                            break;
+                    }
                     break;
                 default:
                     break;
@@ -179,8 +257,12 @@ int main(void) {
         
         if (adcDone) {
             adcDone = false;
-            // TODO
+            // TODO: PID
+            if (status->pidEnabled) {
+                //..
+            }
             
+            // TODO: do this with interrupt or timer
             status->outputEnabled = OUTPUT_ON_Pin;
             LED1 = !LED1;
         }
@@ -198,14 +280,23 @@ void __attribute__ ( (interrupt, no_auto_psv) ) _CNInterrupt(void) {
 }
 
 void onI2cDone(i2cPackage_t data) {
-    // We are only interested in what master writes
+    // We are only interested when master writes
     if (data.status == I2C_MWRITE) { 
         i2cDone = data.command - 1; // Command will be pointing to next element by now => - 1
     }
 }
 
 void onAdcReadDone(uint16_t buffer, uint16_t * data) {
-    dataArray[I2C_COM_MSR_V + buffer] = (uint16_t) average(data, ADC_BUFFER_SIZE);
+    if (status->calibrateEnabled) {
+        //..
+    } else {
+        dataArray[I2C_COM_MSR_V + buffer] = (uint16_t) average(data, ADC_BUFFER_SIZE);
+    }
     adcDone = true;
+}
+
+
+void onUartReadDone(UartData_t data) {
+    
 }
 

@@ -78,7 +78,7 @@ extern "C" {
     /**
      * 
      */
-    void menuChangeCalibration();
+    void menuChangeCalibration(uint16_t targetVoltage, uint16_t calibratedVoltage);
     
     /**
      * 
