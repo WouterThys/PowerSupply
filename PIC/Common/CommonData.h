@@ -12,7 +12,7 @@
 #define I2C_COM_MSR_I_      5
 #define I2C_COM_STATUS      6
 #define I2C_COM_CAL_STATE   7
-#define I2C_COM_CAL_COUNT 8
+#define I2C_COM_CAL_COUNT   8
 
 #define STAT_VOID           0
 #define STAT_RUNNING        1

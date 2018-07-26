@@ -15,7 +15,7 @@
 
 #define DEBUG       1           /* General debug enable                       */
 #define DEBUG_I2C  (0 & DEBUG)  /* I²C debug enable                           */
-#define DEBUG_FSM  (0 & DEBUG)  /* FSM debug enable                           */
+#define DEBUG_FSM  (1 & DEBUG)  /* FSM debug enable                           */
 
 
 /**

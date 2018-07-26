@@ -19,9 +19,7 @@ typedef struct {
 } SupplyData_t;
 
 
-void suppliesInit();
-
-void splGetStatus(SupplyStatus_t * status);
+void suppliesInit(SupplyStatus_t * status);
 
 void splSetVoltage(uint16_t voltage);
 void splSetCurrent(uint16_t current);

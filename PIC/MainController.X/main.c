@@ -80,6 +80,7 @@ static volatile bool updateMenu = true;
 
 static SupplyData_t supplyData;
 static SupplyStatus_t supplyStatus; 
+static uint16_t previousStatus = 0;
 static LCD_Settings_t lcdSettings;
 
 static volatile int16_t encTurns = 0;
@@ -91,6 +92,7 @@ static volatile Button_e encButtonState;
 static void initialize();
 static void timerEnable(bool enable);
 static void heartBeat();
+static void printStatus(SupplyStatus_t status);
 
 static void fsmCheckInputs();
 static void mainFsmCalculateNextState(volatile MainFSM_t * fsm, int16_t turns, Button_e buttonState);
@@ -139,6 +141,16 @@ void timerEnable(bool enable) {
 
 bool putCommand(Command_t command) {
     return true;
+}
+
+void printStatus(SupplyStatus_t status) {
+    printf("STATUS: \n");
+    printf(" - Code: %d\n", status.statusCode);
+    printf(" - Error: %d\n", status.errorCode);
+    printf(" - Calib: %d\n", status.calibrationSt);
+    printf(" - O EN: %d\n", status.outputEnabled);
+    printf(" - C EN: %d\n", status.calibrateEnabled);
+    printf(" - P EN: %d\n", status.pidEnabled);
 }
 
 void heartBeat() {
@@ -342,7 +354,7 @@ void mainFsmCalculateNextState(volatile MainFSM_t * fsm, int16_t turns, Button_e
 
 void mainFsmHandeState(volatile MainFSM_t * fsm, int16_t turns) {
     
-    splUpdateData(&supplyData);
+    splUpdateData(&supplyData); // Get measurement data
     
     switch (fsm->currentState) {
         case M_INIT: 
@@ -463,23 +475,25 @@ void mainFsmHandeState(volatile MainFSM_t * fsm, int16_t turns) {
 
 void calibrateFsmCalcultateNextState(volatile CalibrationFSM_t * fsm, int16_t turns, Button_e buttonState) {
     fsm->nextState = fsm->currentState;
-    splGetStatus(&supplyStatus);
     
     // Find next state
     switch (fsm->currentState) {
         case C_INIT:
             fsm->acknowledgeState = C_INIT;
             fsm->nextState = C_SEND_TO_SLAVE;
+            updateMenu = true;
             break;
             
         case C_SET_DESIRED:
             fsm->acknowledgeState = C_SET_DESIRED;
             fsm->nextState = C_SEND_TO_SLAVE;
+            updateMenu = true;
             break;
             
         case C_CALIBRATE:
             if (buttonState == Clicked) {
                 fsm->nextState = C_SAVE;
+                updateMenu = true;
             }
             break;
             
@@ -536,10 +550,9 @@ void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns) {
             fsm->calibrationCount = 0;
             fsm->desiredVoltage = CALIB_MIN;
             if (updateMenu) {
-                menuChangeCalibration(fsm->desiredVoltage, supplyData.msrVoltage.value);
+                menuChangeCalibration(fsm->desiredVoltage, fsm->calibratedVoltage);
                 updateMenu = false;
             }
-            updateMenu = true;
             break;
             
         case C_SET_DESIRED:
@@ -547,7 +560,7 @@ void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns) {
             fsm->calibratedVoltage = fsm->desiredVoltage;
             splSetVoltage(fsm->calibratedVoltage);
             if (updateMenu) {
-                menuChangeCalibration(fsm->desiredVoltage, supplyData.msrVoltage.value);
+                menuChangeCalibration(fsm->desiredVoltage, fsm->calibratedVoltage);
                 updateMenu = false;
             }
             break;
@@ -565,7 +578,7 @@ void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns) {
             }
             if (updateMenu) { 
                 // Update LCD and Supplies (I²C)
-                menuChangeCalibration(fsm->calibrationCount, supplyData.msrVoltage.value);
+                menuChangeCalibration(fsm->calibrationCount, fsm->calibratedVoltage);
                 splSetVoltage(fsm->calibratedVoltage);
                 updateMenu = false;
             }
@@ -601,7 +614,7 @@ int main(void) {
     
     uartInit(&putCommand);
     encDriverInit();
-    suppliesInit();
+    suppliesInit(&supplyStatus);
     menuInit(&putCommand);
     DelayMs(100);
     
@@ -648,6 +661,11 @@ int main(void) {
             }
             
             mainFsmHandeState(&mainFsm, encTurns);
+            
+            if (DEBUG_FSM && (previousStatus != supplyStatus.value)) {
+                printStatus(supplyStatus);
+                previousStatus = supplyStatus.value;
+            }
             
             mainFsm.currentState = mainFsm.nextState;
             

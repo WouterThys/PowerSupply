@@ -35,8 +35,8 @@ static uint16_t * msrVoltage;
 static uint16_t * msrCurrent;
 static uint16_t * msrTemperature;
 static uint16_t * msrCurrent_;
-static SupplyStatus_t * status;
 
+static SupplyStatus_t * status;
 static i2cPackage_t i2cPackage;
 static int16_t i2cError;
 
@@ -81,13 +81,14 @@ bool i2cCheckState(i2cPackage_t data) {
 /*******************************************************************************
  *          DRIVER FUNCTIONS
  ******************************************************************************/
-void suppliesInit() {
+void suppliesInit(SupplyStatus_t * s) {
     setVoltage = &dataArray[I2C_COM_SET_V];
     setCurrent = &dataArray[I2C_COM_SET_I];
     msrVoltage = &dataArray[I2C_COM_MSR_V];
     msrCurrent = &dataArray[I2C_COM_MSR_I];
     msrTemperature = &dataArray[I2C_COM_MSR_T];
     msrCurrent_ = &dataArray[I2C_COM_MSR_I_];
+    status = s;
     
     // Initial values
     i2cPackage.address = I2C_ADDRESS;
@@ -104,21 +105,17 @@ void suppliesInit() {
     printf("I2C ready \n");
 }
 
-void splGetStatus(SupplyStatus_t * s) {
-    s = status;
-}
-
-void splSetStatus(SupplyStatus_t s) {
-    // DONT SET LOCAL STATUS NOW, BUT WAIT WHEN READ BACK FROM SLAVE!!!
-    
-    // Send
-    i2cPackage.length = 1;
-    i2cPackage.command = I2C_COM_STATUS;
-    i2cPackage.data = &s.value;
-    
-    i2cDriverWrite(&i2cPackage);
-    i2cCheckState(i2cPackage);
-}
+//void splSetStatus(SupplyStatus_t s) {
+//    // DONT SET LOCAL STATUS NOW, BUT WAIT WHEN READ BACK FROM SLAVE!!!
+//    
+//    // Send
+//    i2cPackage.length = 1;
+//    i2cPackage.command = I2C_COM_STATUS;
+//    i2cPackage.data = &s.value;
+//    
+//    i2cDriverWrite(&i2cPackage);
+//    i2cCheckState(i2cPackage);
+//}
 
 void splSetVoltage(uint16_t voltage) {
 
@@ -169,6 +166,9 @@ void splUpdateMeasuremnets() {
     
     i2cDriverRead(&i2cPackage);
     i2cCheckState(i2cPackage);
+    
+    // Update status
+    status->value = dataArray[I2C_COM_STATUS];
 }
 
 void splUpdateData(SupplyData_t * data) {
