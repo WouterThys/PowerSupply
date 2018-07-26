@@ -108,7 +108,7 @@ void menuUpdateMeasuredData(uint16_t msrVoltage, uint16_t msrCurrent, uint16_t m
 }
 
 void menuSelectVoltage(uint16_t selVoltage) {
-    if (currentMenu == SELECT_VOLTAGE || currentMenu == SELECT_CURRENT) {
+    if (currentMenu == SELECT_CURRENT) { // Only change cursor position
         drawValue(0, 13, digitalToVoltage(selVoltage));
         lcdSetCursorPosition(0,2); // Underline 'V'
     } else {
@@ -126,8 +126,8 @@ void menuSelectVoltage(uint16_t selVoltage) {
 }
 
 void menuSelectCurrent(uint16_t selCurrent) {
-    if (currentMenu == SELECT_VOLTAGE || currentMenu == SELECT_CURRENT) {
-        drawValue(1, 13, digitalToVoltage(selCurrent));
+    if (currentMenu == SELECT_VOLTAGE) { // Only change cursor position
+        drawValue(1, 13, digitalToVoltage(selCurrent)); 
         lcdSetCursorPosition(1,2); // Underline 'I'
     } else {
         // Draw menu
@@ -144,7 +144,7 @@ void menuSelectCurrent(uint16_t selCurrent) {
 }
 
  void menuSelectCalibration() {
-    if (currentMenu == SELECT_CALIBRATION || currentMenu == SELECT_SETTINGS) {
+    if (currentMenu == SELECT_SETTINGS) { // Only change cursor position
         lcdSetCursorPosition(0,2); 
     } else {
         // Draw menu 
@@ -159,7 +159,7 @@ void menuSelectCurrent(uint16_t selCurrent) {
  }
     
  void menuSelectSettings() {
-    if (currentMenu == SELECT_CALIBRATION || currentMenu == SELECT_SETTINGS) {
+    if (currentMenu == SELECT_CALIBRATION) { // Only change cursor position
         lcdSetCursorPosition(1,2); 
     } else {
         // Draw menu 

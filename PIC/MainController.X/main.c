@@ -470,16 +470,19 @@ void calibrateFsmCalcultateNextState(volatile CalibrationFSM_t * fsm, int16_t tu
         case C_INIT:
             fsm->acknowledgeState = C_INIT;
             fsm->nextState = C_SEND_TO_SLAVE;
+            updateMenu = true;
             break;
             
         case C_SET_DESIRED:
             fsm->acknowledgeState = C_SET_DESIRED;
             fsm->nextState = C_SEND_TO_SLAVE;
+            updateMenu = true;
             break;
             
         case C_CALIBRATE:
             if (buttonState == Clicked) {
                 fsm->nextState = C_SAVE;
+                updateMenu = true;
             }
             break;
             
@@ -535,14 +538,20 @@ void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns) {
         case C_INIT:
             fsm->calibrationCount = 0;
             fsm->desiredVoltage = CALIB_MIN;
-            updateMenu = true;
+            if (updateMenu) {
+                menuChangeCalibration(fsm->desiredVoltage, fsm->calibratedVoltage);
+                updateMenu = false;
+            }
             break;
             
         case C_SET_DESIRED:
             fsm->desiredVoltage = CALIB_MIN + (fsm->calibrationCount * CALIB_STEP);
             fsm->calibratedVoltage = fsm->desiredVoltage;
             splSetVoltage(fsm->calibratedVoltage);
-            updateMenu = true;
+            if (updateMenu) {
+                menuChangeCalibration(fsm->desiredVoltage, fsm->calibratedVoltage);
+                updateMenu = false;
+            }
             break;
             
         case C_CALIBRATE:
@@ -558,7 +567,7 @@ void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns) {
             }
             if (updateMenu) { 
                 // Update LCD and Supplies (I²C)
-                menuChangeCalibration(fsm->calibrationCount, supplyData.msrVoltage.value);
+                menuChangeCalibration(fsm->calibrationCount, fsm->calibratedVoltage);
                 splSetVoltage(fsm->calibratedVoltage);
                 updateMenu = false;
             }
