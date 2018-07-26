@@ -535,6 +535,10 @@ void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns) {
         case C_INIT:
             fsm->calibrationCount = 0;
             fsm->desiredVoltage = CALIB_MIN;
+            if (updateMenu) {
+                menuChangeCalibration(fsm->desiredVoltage, supplyData.msrVoltage.value);
+                updateMenu = false;
+            }
             updateMenu = true;
             break;
             
@@ -542,7 +546,10 @@ void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns) {
             fsm->desiredVoltage = CALIB_MIN + (fsm->calibrationCount * CALIB_STEP);
             fsm->calibratedVoltage = fsm->desiredVoltage;
             splSetVoltage(fsm->calibratedVoltage);
-            updateMenu = true;
+            if (updateMenu) {
+                menuChangeCalibration(fsm->desiredVoltage, supplyData.msrVoltage.value);
+                updateMenu = false;
+            }
             break;
             
         case C_CALIBRATE:
