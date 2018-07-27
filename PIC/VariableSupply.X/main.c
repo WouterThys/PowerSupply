@@ -29,7 +29,6 @@
  *          MACRO FUNCTIONS
  ******************************************************************************/
 
-
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/
@@ -45,10 +44,10 @@ static uint16_t * msrVoltage;
 static uint16_t * msrCurrent;
 static uint16_t * msrTemperature;
 static uint16_t * msrCurrent_;
-static SupplyStatus_t * status;
 static uint16_t * calibrationState;
 static uint16_t * calibrationCount;
 
+static SupplyStatus_t status;
 static i2cPackage_t i2cPackage;
 static int16_t i2cError;
 
@@ -63,6 +62,7 @@ static Calibration_t calibrateArray[10];
  ******************************************************************************/
 static void initialize();
 static void clipEnable(bool enable);
+static void updateStatus(SupplyStatus_t status);
 
 static void findLookupPoint(uint16_t * searchArray, uint16_t length, uint16_t value, uint16_t * x0, uint16_t * y0, uint16_t *x1, uint16_t *y1);
 static float interpolate(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t value);
@@ -97,6 +97,10 @@ void clipEnable(bool enable) {
         CLIP_PIN_Cn = 0; // Disable change notification
         _CNIE = 0; // Disable interrupt
     }
+}
+
+void updateStatus(SupplyStatus_t status) {
+    dataArray[I2C_COM_STATUS] = status.value;
 }
 
 void findLookupPoint(uint16_t * searchArray, uint16_t length, uint16_t value, uint16_t * x0, uint16_t *y0, uint16_t *x1, uint16_t *y1) {
@@ -169,7 +173,6 @@ int main(void) {
     msrCurrent = &dataArray[I2C_COM_MSR_I];
     msrTemperature = &dataArray[I2C_COM_MSR_T];
     msrCurrent_ = &dataArray[I2C_COM_MSR_I_];
-    status = (SupplyStatus_t *) &dataArray[I2C_COM_STATUS];
     calibrationState = &dataArray[I2C_COM_CAL_STATE];
     calibrationCount = &dataArray[I2C_COM_CAL_COUNT];
     
@@ -180,10 +183,11 @@ int main(void) {
     *msrTemperature = 0x0000;
     *msrCurrent_ = 0x0000;
     
-    status->statusCode = STAT_VOID;
-    status->currentClip = 0;
-    status->errorCode = 0;
-    status->outputEnabled = 0; 
+    status.statusCode = STAT_VOID;
+    status.currentClip = 0;
+    status.errorCode = 0;
+    status.outputEnabled = 0; 
+    updateStatus(status);
     
     // Initial values
     i2cPackage.address = I2C_ADDRESS;
@@ -215,7 +219,8 @@ int main(void) {
     clipEnable(true);
     
     // Set status running
-    status->statusCode = STAT_RUNNING;
+    status.statusCode = STAT_RUNNING;
+    updateStatus(status);
     
     while(1) {
        
@@ -231,7 +236,8 @@ int main(void) {
                     dacSetValueB(*setCurrent);
                     break;
                 case I2C_COM_CAL_STATE:
-                    status->calibrationSt = *calibrationState; // For ACK
+                    status.calibrationSt = *calibrationState; // For ACK
+                    updateStatus(status);
                     switch(*calibrationState) {
                         case C_INIT:
                             break;
@@ -258,12 +264,12 @@ int main(void) {
         if (adcDone) {
             adcDone = false;
             // TODO: PID
-            if (status->pidEnabled) {
+            if (status.pidEnabled) {
                 //..
             }
             
             // TODO: do this with interrupt or timer
-            status->outputEnabled = OUTPUT_ON_Pin;
+            status.outputEnabled = OUTPUT_ON_Pin;
             LED1 = !LED1;
         }
     }
@@ -273,7 +279,8 @@ int main(void) {
 void __attribute__ ( (interrupt, no_auto_psv) ) _CNInterrupt(void) {
     if (_CNIF) {
         bool clip = !CLIP_PIN;
-        status->currentClip = clip;
+        status.currentClip = clip;
+        updateStatus(status);
         CLIP_LED = clip;
         _CNIF = 0; // Clear interrupt
     }
@@ -287,7 +294,7 @@ void onI2cDone(i2cPackage_t data) {
 }
 
 void onAdcReadDone(uint16_t buffer, uint16_t * data) {
-    if (status->calibrateEnabled) {
+    if (status.calibrateEnabled) {
         //..
     } else {
         dataArray[I2C_COM_MSR_V + buffer] = (uint16_t) average(data, ADC_BUFFER_SIZE);
