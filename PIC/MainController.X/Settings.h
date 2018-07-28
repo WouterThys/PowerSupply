@@ -30,6 +30,9 @@
 #define DacN        pow(2, 12)
 #define Vref        2.048
 
+#define DEFAULT_V   400
+#define DEFAULT_I   400
+
 
 /**
  * Interrupt priorities (Highest (7) - Lowest(1))
@@ -54,6 +57,8 @@
 /**
  * UART
  */      
+// Orange = RX
+// Geel = TX
 #define UART1_BAUD      57600 /* 57600 */
 #define UART1_ID        2   
 
@@ -127,8 +132,10 @@
 #define digitalToVoltage(d) ((((float)d * (float)Vref) / ((float)AdcN)) * Vgain)
 #define voltageToDigital(v) ((((float)v * (float)DacN) / ((float)Vref)) * (1/Vgain))
 
-#define digitalToCurrent(d) (digitalToVoltage(d) / (Rs * Igain))
+#define digitalToCurrent(d) (((((float)d * (float)Vref) / ((float)AdcN)) * 1000) / (Rs * Igain))
 #define currentToDigital(i) ()
+
+#define digitalToTemp(d) ((((float)d * (float)Vref) / (float)AdcN)) / ((float)Rt * 10E-6)
 
 
     

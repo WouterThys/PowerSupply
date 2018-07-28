@@ -7,7 +7,8 @@
 #include "Controllers/DAC_Controller.h"
 
 #define DEBUG       1
-#define DEBUG_I2C   1
+#define DEBUG_I2C   (0 & DEBUG)
+#define DEBUG_FSM   (1 & DEBUG)
     
 /**
  * Board constants
@@ -87,6 +88,8 @@
 /**
  * UART
  */    
+// Orange = RX
+// Geel = TX
 #define UART1_BAUD      57600 /* 57600 */
 #define UART1_ID        2   
 

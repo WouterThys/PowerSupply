@@ -332,12 +332,12 @@ void write(i2cPackage_t * p) {
 #ifdef I2C_WORD_WIDE
     uint8_t w = 0;
     if (wMSB) {                         // Write MSB
-        w = (uint8_t) ((p->data[p->command]) >> 8);
+        w = (uint8_t) ((p->data[p->bufferAdr]) >> 8);
         
         wMSB = false;
-        p->command++;                   // Increment pointer for next read
+        p->bufferAdr++;                   // Increment pointer for next read
     } else {                            // Write LSB
-        w = (uint8_t) p->data[p->command];
+        w = (uint8_t) p->data[p->bufferAdr];
         
         wMSB = true;                    // Don't increment command pointer
     }
@@ -346,10 +346,10 @@ void write(i2cPackage_t * p) {
     i2cSclRel();                        // Release SCL line
     while (i2cCheck(CHECK_TBF));        // Wait
 #else
-    i2cDataWrite(p->data[p->command]);  // Write the value of the buffer
+    i2cDataWrite(p->data[p->bufferAdr]);  // Write the value of the buffer
     i2cSclRel();                        // Release SCL line
     while (i2cCheck(CHECK_TBF));        // Wait
-    p->command++;                       // Increment pointer for next read
+    p->bufferAdr++;                       // Increment pointer for next read
 #endif
 }
 
@@ -359,16 +359,16 @@ void read(i2cPackage_t * p) {
     uint8_t r = (uint8_t) i2cDataRead();
     
     if (rMSB) {
-        p->data[p->command] |= (((uint16_t)r << 8) & 0xFF00);
+        p->data[p->bufferAdr] |= (((uint16_t)r << 8) & 0xFF00);
         rMSB = false;
-        p->command++;
+        p->bufferAdr++;
     } else {
-        p->data[p->command] = r;
+        p->data[p->bufferAdr] = r;
         rMSB = true;
     }
 #else
-    p->data[p->command] = (uint8_t) i2cDataRead();
-    p->command++;
+    p->data[p->bufferAdr] = (uint8_t) i2cDataRead();
+    p->bufferAdr++;
 #endif
 }
 
@@ -415,6 +415,7 @@ void doFsm(i2cFsm_t * fsm) {
                 
                 // Handle I2C
                 p->command = i2cDataRead(); // Set the pointer
+                p->bufferAdr = p->command;
                 wMSB = false;
                 rMSB = false;
             } else {                        // Read data into the buffer

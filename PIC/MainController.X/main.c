@@ -147,6 +147,7 @@ void printStatus(SupplyStatus_t status) {
     printf("STATUS: \n");
     printf(" - Code: %d\n", status.statusCode);
     printf(" - Error: %d\n", status.errorCode);
+    printf(" - Clip: %d\n", status.currentClip);
     printf(" - Calib: %d\n", status.calibrationSt);
     printf(" - O EN: %d\n", status.outputEnabled);
     printf(" - C EN: %d\n", status.calibrateEnabled);
@@ -209,18 +210,31 @@ void mainFsmCalculateNextState(volatile MainFSM_t * fsm, int16_t turns, Button_e
     // Find next state
     switch (fsm->currentState) {
         case M_INIT: // 0
-            fsm->nextState = M_SHOW_MEASURE;
+            fsm->nextState = M_SHOW_MEASURE1;
             updateMenu = true;
             break;
             
-        case M_SHOW_MEASURE: // 1 
+        case M_SHOW_MEASURE1: 
             // Stay in this state until user input change
-            if ((turns != 0) || (buttonState != Open)) {
+            if (buttonState != Open) {
                 fsm->nextState = M_SEL_VOLTAGE;
+            } else if (turns != 0) {
+                updateMenu = true;
+                fsm->nextState = M_SHOW_MEASURE2;
             }
             break;
             
-        case M_SEL_VOLTAGE: // 2
+        case M_SHOW_MEASURE2:  
+            // Stay in this state until user input change
+            if (buttonState != Open) {
+                fsm->nextState = M_SEL_VOLTAGE;
+            } else if (turns != 0) {
+                updateMenu = true;
+                fsm->nextState = M_SHOW_MEASURE1;
+            }
+            break;
+            
+        case M_SEL_VOLTAGE: 
             // Check if turn or click
             if (turns != 0) {
                 if (turns > 0) {
@@ -238,13 +252,13 @@ void mainFsmCalculateNextState(volatile MainFSM_t * fsm, int16_t turns, Button_e
                 fsm->waitCnt++;
                 if (fsm->waitCnt >= FSM_MAX_WAIT_CNT) {
                     fsm->waitCnt = 0;
-                    fsm->nextState = M_SHOW_MEASURE;
+                    fsm->nextState = M_SHOW_MEASURE1;
                     updateMenu = true;
                 }
             }
             break;
             
-        case M_CHA_VOLTAGE: // 3
+        case M_CHA_VOLTAGE: 
             // Go back when clicked
             if (buttonState == Clicked) {
                 fsm->nextState = M_SEL_VOLTAGE;
@@ -269,7 +283,7 @@ void mainFsmCalculateNextState(volatile MainFSM_t * fsm, int16_t turns, Button_e
                 fsm->waitCnt++;
                 if (fsm->waitCnt >= FSM_MAX_WAIT_CNT) {
                     fsm->waitCnt = 0;
-                    fsm->nextState = M_SHOW_MEASURE;
+                    fsm->nextState = M_SHOW_MEASURE1;
                     updateMenu = true;
                 }
             }
@@ -300,7 +314,7 @@ void mainFsmCalculateNextState(volatile MainFSM_t * fsm, int16_t turns, Button_e
                 fsm->waitCnt++;
                 if (fsm->waitCnt >= FSM_MAX_WAIT_CNT) {
                     fsm->waitCnt = 0;
-                    fsm->nextState = M_SHOW_MEASURE;
+                    fsm->nextState = M_SHOW_MEASURE1;
                     updateMenu = true;
                 }
             }
@@ -334,7 +348,7 @@ void mainFsmCalculateNextState(volatile MainFSM_t * fsm, int16_t turns, Button_e
                 fsm->waitCnt++;
                 if (fsm->waitCnt >= FSM_MAX_WAIT_CNT) {
                     fsm->waitCnt = 0;
-                    fsm->nextState = M_SHOW_MEASURE;
+                    fsm->nextState = M_SHOW_MEASURE1;
                     updateMenu = true;
                 }
             }
@@ -364,24 +378,34 @@ void mainFsmHandeState(volatile MainFSM_t * fsm, int16_t turns) {
             lcdSetDisplayBrightness(lcdSettings.brightness);
             lcdSetDisplayContrast(lcdSettings.contrast);
             
+            // Default values
+            supplyData.setVoltage.value = DEFAULT_V;
+            supplyData.setCurrent.value = DEFAULT_I;
+            splSetVoltage(supplyData.setVoltage.value);
+            splSetCurrent(supplyData.setCurrent.value);
             break;
             
-        case M_SHOW_MEASURE: 
+        case M_SHOW_MEASURE1: 
             if (updateMenu ||
                     supplyData.msrVoltage.changed ||
-                    supplyData.msrCurrent.changed ||
-                    supplyData.msrTemperature.changed) {
+                    supplyData.msrCurrent.changed) {
                 
                 updateMenu = false;
                 
-                menuUpdateMeasuredData(
+                menuUpdateMeasured1Data(
                         supplyData.msrVoltage.value,
-                        supplyData.msrCurrent.value,
-                        supplyData.msrTemperature.value
-                        );
+                        supplyData.msrCurrent.value);
                 
                 supplyData.msrVoltage.changed = false;
                 supplyData.msrCurrent.changed = false;
+            }
+            break;
+            
+        case M_SHOW_MEASURE2: 
+            if (updateMenu || supplyData.msrTemperature.changed) {
+                
+                updateMenu = false;
+                menuUpdateMeasured2Data(supplyData.msrTemperature.value, 0);
                 supplyData.msrTemperature.changed = false;
             }
             break;
@@ -523,7 +547,6 @@ void calibrateFsmCalcultateNextState(volatile CalibrationFSM_t * fsm, int16_t tu
                         break;
                     case C_SAVE:
                         if (fsm->calibrationCount < 10) {
-                            fsm->calibrationCount++;
                             fsm->nextState = C_SET_DESIRED;
                         } else {
                             fsm->nextState = C_DONE;
@@ -548,7 +571,7 @@ void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns) {
     switch (fsm->currentState) {
         case C_INIT:
             fsm->calibrationCount = 0;
-            fsm->desiredVoltage = CALIB_MIN;
+            fsm->desiredVoltage = 0;
             if (updateMenu) {
                 menuChangeCalibration(fsm->desiredVoltage, fsm->calibratedVoltage);
                 updateMenu = false;
@@ -556,7 +579,11 @@ void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns) {
             break;
             
         case C_SET_DESIRED:
-            fsm->desiredVoltage = CALIB_MIN + (fsm->calibrationCount * CALIB_STEP);
+            if (fsm->desiredVoltage == 0) {
+                fsm->desiredVoltage = CALIB_MIN;
+            } else {
+                fsm->desiredVoltage = fsm->desiredVoltage + CALIB_STEP;
+            }
             fsm->calibratedVoltage = fsm->desiredVoltage;
             splSetVoltage(fsm->calibratedVoltage);
             if (updateMenu) {
@@ -578,7 +605,7 @@ void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns) {
             }
             if (updateMenu) { 
                 // Update LCD and Supplies (I²C)
-                menuChangeCalibration(fsm->calibrationCount, fsm->calibratedVoltage);
+                menuChangeCalibration(fsm->desiredVoltage, fsm->calibratedVoltage);
                 splSetVoltage(fsm->calibratedVoltage);
                 updateMenu = false;
             }
@@ -650,14 +677,13 @@ int main(void) {
         if (mainFsm.execute) {
             mainFsm.execute = false;
             
-            if (DEBUG_FSM && (encTurns != 0 || encButtonState != Open)) {
-                printf("F T%d B%d\n", encTurns, encButtonState);
-            }
-            
             mainFsmCalculateNextState(&mainFsm, encTurns, encButtonState);
             
             if (DEBUG_FSM && (mainFsm.currentState != mainFsm.nextState)) {
-                printf("F S%d>S%d\n", mainFsm.currentState, mainFsm.nextState);
+                printf("M S%d>S%d\n", mainFsm.currentState, mainFsm.nextState);
+            }
+            if (DEBUG_FSM && (calibrateFsm.currentState != calibrateFsm.nextState)) {
+                printf("C S%d>S%d\n", calibrateFsm.currentState, calibrateFsm.nextState);
             }
             
             mainFsmHandeState(&mainFsm, encTurns);
@@ -667,8 +693,9 @@ int main(void) {
                 previousStatus = supplyStatus.value;
             }
             
+            // Update FSM
             mainFsm.currentState = mainFsm.nextState;
-            
+            calibrateFsm.currentState = calibrateFsm.nextState;
         }
         
     }

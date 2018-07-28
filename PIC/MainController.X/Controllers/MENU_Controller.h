@@ -37,9 +37,15 @@ extern "C" {
      * 
      * @param msrVoltage
      * @param msrCurrent
-     * @param msrTemperature
      */
-    void menuUpdateMeasuredData(uint16_t msrVoltage, uint16_t msrCurrent, uint16_t msrTemperature);
+    void menuUpdateMeasured1Data(uint16_t msrVoltage, uint16_t msrCurrent);
+    
+    /**
+     * 
+     * @param msrTemp
+     * @param msrCurrent_
+     */
+    void menuUpdateMeasured2Data(uint16_t msrTemp, uint16_t msrCurrent_);
     
     /**
      * 

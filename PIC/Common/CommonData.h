@@ -52,22 +52,23 @@ typedef struct {
 
 // Main FSM
 typedef enum {
-    M_INIT,         // Initialize the LCD
-    M_SHOW_MEASURE, // Show measured data from I²C
-    M_SEL_VOLTAGE,  // Select the voltage
-    M_CHA_VOLTAGE,  // Change the voltage
-    M_SEL_CURRENT,  // Select the current
-    M_CHA_CURRENT,  // Change the current
-    M_SEL_CALIBRATION, // Select calibration
-    M_CHA_CALIBRATION, // Change calibration
-    M_SEL_SETTINGS, // Select settings
-    M_CHA_SETTINGS  // Change settings
+    M_INIT,             // Initialize the LCD
+    M_SHOW_MEASURE1,    // Show measured V and I from I²C
+    M_SHOW_MEASURE2,    // Show measured T and I_ from I²C
+    M_SEL_VOLTAGE,      // Select the voltage
+    M_CHA_VOLTAGE,      // Change the voltage
+    M_SEL_CURRENT,      // Select the current
+    M_CHA_CURRENT,      // Change the current
+    M_SEL_CALIBRATION,  // Select calibration
+    M_CHA_CALIBRATION,  // Change calibration
+    M_SEL_SETTINGS,     // Select settings
+    M_CHA_SETTINGS      // Change settings
             
 } MainFSMState_e;
 
 // Calibrate FSM
 typedef enum {
-    C_INIT = 1,
+    C_INIT,
     C_SET_DESIRED,
     C_CALIBRATE,
     C_SAVE,

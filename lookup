@@ -6,6 +6,20 @@ FSM
 3: S_CHA_VOLTAGE,  // Change the voltage
 4: S_SEL_CURRENT,  // Select the current
 5: S_CHA_CURRENT   // Change the current
+6: M_SEL_CALIBRATION, // Select calibration
+7: M_CHA_CALIBRATION, // Change calibration
+8: M_SEL_SETTINGS, // Select settings
+9: M_CHA_SETTINGS  // Change settings
+
+Calib FSM
+0: C_INIT,
+1: C_SET_DESIRED,
+2: C_CALIBRATE,
+3: C_SAVE,
+4: C_DONE,
+5: C_STOP,
+6: C_SEND_TO_SLAVE,
+7: C_WAIT_FOR_SLAVE
 
 
 Button state

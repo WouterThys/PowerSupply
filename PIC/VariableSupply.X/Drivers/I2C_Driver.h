@@ -103,10 +103,10 @@
 typedef struct {
     uint8_t address;    /* Address (7-bit) of the slave                       */
     uint8_t command;    /* Command (8-bit) send from M -> S                   */
+    uint8_t bufferAdr;  /* Address in buffer                                  */
     int16_t  status;    /* Status of R/W                                      */
     uint16_t length;    /* Length of data buffer                              */
     uint16_t * data;    /* The data                                           */
-    
 } i2cPackage_t;
 
 #ifdef I2C_MASTER

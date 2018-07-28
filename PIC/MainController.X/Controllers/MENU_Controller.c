@@ -12,7 +12,8 @@
 
 typedef enum {
     INITIAL,
-    MEASURE_VALUES,
+    MEASURE1_VALUES,
+    MEASURE2_VALUES,
     SELECT_VOLTAGE,
     SELECT_CURRENT,
     CHANGE_VOLTAGE,
@@ -31,12 +32,12 @@ typedef enum {
 #define writeChar(x,y,c) lcdSetCursorPosition(x,y); lcdWriteChar(c)
 #define writeDigit(x,y,d) lcdSetCursorPosition(x,y); lcdWriteDigit(d)
 #define writeInt(x,y,d) lcdSetCursorPosition(x,y); lcdWriteInt(d)
-#define writeFloat(x,y,f) lcdSetCursorPosition(x,y); lcdWriteDouble(f, 3)
+#define writeFloat(x,y,f,p) lcdSetCursorPosition(x,y); lcdWriteDouble(f, p)
 
 /*******************************************************************************
  *          LOCAL FUNCTION DEFINES
  ******************************************************************************/
-static void drawValue(uint8_t line, uint8_t startPos, float value);
+
 /* Event function pointers */
 static bool (*putCommand)(Command_t data);
 
@@ -48,29 +49,7 @@ static Menu_e currentMenu;
 /*******************************************************************************
  *          LOCAL FUNCTIONS
  ******************************************************************************/
-// TODO put on top
-// TODO more edit
-void drawValue(uint8_t line, uint8_t startPos, float value) {
-//    uint16_t v = value / 10;
-//    uint8_t p = startPos;
-//    
-//    uint16_t d3 = v % 10;
-//    v /= 10;
-//    uint16_t d2 = v % 10;
-//    v /= 10;
-//    uint16_t d1 = v % 10;
-//    v /= 10;
-//    uint16_t d0 = v % 10;
-//    
-//    writeDigit(line, p++, d0);
-//    writeDigit(line, p++, d1);
-//    writeChar(line, p++, ',');
-//    writeDigit(line, p++, d2);
-//    writeDigit(line, p, d3);
-    
-    writeFloat(line, startPos, (double) value);
-    
-}
+
 
 /*******************************************************************************
  *          DRIVER FUNCTIONS
@@ -83,7 +62,7 @@ void menuInit(bool (*onPutCommand)(Command_t data)) {
     putCommand = onPutCommand;
     
     // Initial value
-    menuUpdateMeasuredData(0, 0, 0);
+    menuUpdateMeasured1Data(0, 0);
     currentMenu = INITIAL;
 }
 
@@ -92,30 +71,45 @@ void menuConfigure(uint8_t brightness, uint8_t contrast) {
     lcdSetDisplayContrast(contrast);
 }
 
-void menuUpdateMeasuredData(uint16_t msrVoltage, uint16_t msrCurrent, uint16_t msrTemperature) {
+void menuUpdateMeasured1Data(uint16_t msrVoltage, uint16_t msrCurrent) {
     
-    if (currentMenu != MEASURE_VALUES) {
+    if (currentMenu != MEASURE1_VALUES) {
         lcdCursorUnderlineOn(false);
         lcdTurnOnBlinkingCursor(false);
         writeString(0,0, "M|V:          V ");
-        writeString(1,0, " |I:          A ");
-        currentMenu = MEASURE_VALUES;
+        writeString(1,0, " |I:          mA");
+        currentMenu = MEASURE1_VALUES;
     }
     
-    drawValue(0, 4, digitalToVoltage(msrVoltage));
-    drawValue(1, 4, digitalToCurrent(msrCurrent));
+    writeFloat(0, 5, digitalToVoltage(msrVoltage), 2);
+    writeFloat(1, 5, digitalToCurrent(msrCurrent), 2);
+  
+}
+
+void menuUpdateMeasured2Data(uint16_t msrTemp, uint16_t msrCurrent_) {
+    
+    if (currentMenu != MEASURE2_VALUES) {
+        lcdCursorUnderlineOn(false);
+        lcdTurnOnBlinkingCursor(false);
+        writeString(0,0, "M|T:          °C");
+        writeString(1,0, " |i:          mA");
+        currentMenu = MEASURE2_VALUES;
+    }
+    
+    writeFloat(0, 5, digitalToVoltage(msrTemp), 2);
+    writeFloat(1, 5, digitalToCurrent(msrCurrent_), 2);
   
 }
 
 void menuSelectVoltage(uint16_t selVoltage) {
     if (currentMenu == SELECT_CURRENT) { // Only change cursor position
-        drawValue(0, 13, digitalToVoltage(selVoltage));
+        writeFloat(0, 11, digitalToVoltage(selVoltage), 2);
         lcdSetCursorPosition(0,2); // Underline 'V'
     } else if (currentMenu != SELECT_VOLTAGE) {
         // Draw menu
         writeString(0,0, "S|Set V:       V");
-        writeString(1,0, " |Set I:       A");
-        drawValue(0, 13, digitalToVoltage(selVoltage));
+        writeString(1,0, " |Set I:      mA");
+        writeFloat(0, 11, digitalToVoltage(selVoltage), 2);
        
         lcdCursorUnderlineOn(true);
         lcdTurnOnBlinkingCursor(false);
@@ -127,13 +121,13 @@ void menuSelectVoltage(uint16_t selVoltage) {
 
 void menuSelectCurrent(uint16_t selCurrent) {
     if (currentMenu == SELECT_VOLTAGE) { // Only change cursor position
-        drawValue(1, 13, digitalToVoltage(selCurrent)); 
+        writeFloat(1, 11, digitalToCurrent(selCurrent), 2);
         lcdSetCursorPosition(1,2); // Underline 'I'
     } else if (currentMenu != SELECT_CURRENT) {
         // Draw menu
         writeString(0,0, "S|Set V:       V");
-        writeString(1,0, " |Set I:       A");
-        drawValue(1, 13, digitalToVoltage(selCurrent));
+        writeString(1,0, " |Set I:      mA");
+        writeFloat(1, 11, digitalToCurrent(selCurrent), 2);
        
         lcdCursorUnderlineOn(true);
         lcdTurnOnBlinkingCursor(false);
@@ -183,7 +177,7 @@ void menuChangeVoltage(uint16_t selVoltage) {
         writeString(1,0, " |             V");
         currentMenu = CHANGE_VOLTAGE;
     }
-    drawValue(1, 2, digitalToVoltage(selVoltage));
+    writeFloat(1, 2, digitalToVoltage(selVoltage), 2);
 }
     
 void menuChangeCurrent(uint16_t selCurrent) {
@@ -195,7 +189,7 @@ void menuChangeCurrent(uint16_t selCurrent) {
         writeString(1,0, " |             A");
         currentMenu = CHANGE_CURRENT;
     }
-    drawValue(1, 2, digitalToCurrent(selCurrent));
+    writeFloat(1, 2, digitalToCurrent(selCurrent), 2);
 }
 
 void menuChangeCalibration(uint16_t targetVoltage, uint16_t calibratedVoltage) {
@@ -206,8 +200,8 @@ void menuChangeCalibration(uint16_t targetVoltage, uint16_t calibratedVoltage) {
         writeString(1,0, " |             V");
         currentMenu = CHANGE_CALIBRATION;
     }
-    drawValue(0, 8, digitalToVoltage(targetVoltage));
-    drawValue(1, 2, digitalToVoltage(calibratedVoltage));
+    writeFloat(0, 9, digitalToVoltage(targetVoltage), 2);
+    writeFloat(1, 3, digitalToVoltage(calibratedVoltage), 2);
 }
     
 void menuChangeSettings() {
