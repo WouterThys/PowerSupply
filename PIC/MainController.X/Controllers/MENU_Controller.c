@@ -21,7 +21,11 @@ typedef enum {
     SELECT_CALIBRATION,
     CHANGE_CALIBRATION,
     SELECT_SETTINGS,
-    CHANGE_SETTINGS
+    CHANGE_SETTINGS,
+    SELECT_BRIGHTNESS,
+    CHANGE_BRIGHTNESS,
+    SELECT_CONTRAST,
+    CHANGE_CONTRAST
 } Menu_e;
 
 /*******************************************************************************
@@ -171,7 +175,45 @@ void menuSelectCurrent(uint16_t selCurrent) {
         lcdSetCursorPosition(1,2); 
     }
     currentMenu = SELECT_SETTINGS;
- }
+}
+ 
+void menuSelectBrightness(uint16_t brightness, uint16_t contrast) {
+    if (currentMenu == SELECT_CONTRAST) {
+        lcdSetCursorPosition(0,2);
+    } else if (currentMenu != SELECT_BRIGHTNESS) {
+        // Draw menu
+        writeString(0,0, "X|Brightness    ");
+        writeString(1,0, " |Contrast      ");
+        
+        lcdCursorUnderlineOn(true);
+        lcdTurnOnBlinkingCursor(false);
+        
+        writeInt(0,13, brightness);
+        writeInt(1,13, contrast);
+        lcdSetCursorPosition(0,2); 
+    }
+
+    currentMenu = SELECT_BRIGHTNESS;
+}
+ 
+void menuSelectContrast(uint16_t brightness, uint16_t contrast) {
+    if (currentMenu == SELECT_BRIGHTNESS) {
+        lcdSetCursorPosition(1,2);
+    } else if (currentMenu != SELECT_CONTRAST) {
+        // Draw menu
+        writeString(0,0, "X|Brightness    ");
+        writeString(1,0, " |Contrast      ");
+        
+        writeInt(0,13, brightness);
+        writeInt(1,13, contrast);
+        
+        lcdSetCursorPosition(1,2); 
+        lcdCursorUnderlineOn(true);
+        lcdTurnOnBlinkingCursor(false);
+    }
+    
+    currentMenu = SELECT_CONTRAST;
+}
     
     
 void menuChangeVoltage(uint16_t selVoltage) {
@@ -218,4 +260,16 @@ void menuChangeSettings() {
         writeString(1,0, " |             V");
         currentMenu = CHANGE_SETTINGS;
     }
+}
+
+void menuChangeBrightness(uint16_t brightness) {
+    writeInt(0,13, brightness);
+    lcdSetCursorPosition(0,2); 
+    currentMenu = CHANGE_BRIGHTNESS;
+}
+ 
+void menuChangeContrast(uint16_t contrast) {
+    writeInt(1,13, contrast);
+    lcdSetCursorPosition(1,2); 
+    currentMenu = CHANGE_CONTRAST;
 }

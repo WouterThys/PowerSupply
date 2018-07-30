@@ -30,7 +30,6 @@
 #define CALIB_STEP          400                     /* Per 1V                 */
 #define CALIB_mSTEP         4                       /* 10mV adjusting step    */ 
 
-
 typedef union {
     struct {
         uint16_t statusCode       : 3;
@@ -43,12 +42,6 @@ typedef union {
     };
     uint16_t value;
 } SupplyStatus_t;
-
-typedef struct {
-    uint16_t desiredVoltage;        // Value it should be
-    uint16_t calibratedVoltage;     // Value it needs to get the desired output
-    uint16_t measuredCurrent;       // Measured current for the calibrated voltage    
-} Calibration_t;
 
 // Main FSM
 typedef enum {
@@ -79,14 +72,51 @@ typedef enum {
     C_WAIT_FOR_SLAVE
 } CalibrateFSMState_e;
 
+// Settings FSM
+typedef enum {
+    S_INIT,
+    S_SEL_BRIGHTNESS,
+    S_CHA_BRIGHTNESS,
+    S_SEL_CONTRAST,
+    S_CHA_CONTRAST,
+    S_STOP
+} SettingsFSMState_e;
+
+
 typedef struct {
-    CalibrateFSMState_e currentState;           /* Current state of FSM       */ 
-    CalibrateFSMState_e nextState;              /* Next state of FSM          */
-    CalibrateFSMState_e acknowledgeState;       /* State SLAVE needs to ACK   */
-    uint16_t calibrationCount;                  /* Calibration sequence count */
-    uint16_t desiredVoltage;                    /* Desired voltage            */
-    uint16_t calibratedVoltage;                 /* Adjustment to desired      */
+    uint16_t desiredVoltage;            /* Value it should be                 */
+    uint16_t calibratedVoltage;         /* Value calibrated                   */
+    uint16_t measuredCurrent;           /* Measured current                   */    
+} Calibration_t;
+
+
+
+typedef struct {
+    MainFSMState_e currentState;        /* Current state of the FSM           */
+    MainFSMState_e nextState;           /* Next calculated state              */
+    MainFSMState_e saveState;           /* Saved state when leaving main FSM  */
+    bool execute;                       /* FSM should execute                 */
+    uint16_t waitCnt;                   /* Delay count                        */
+    uint16_t prescale;                  /* Pre-scale counter                  */
+} MainFSM_t;
+
+typedef struct {
+    CalibrateFSMState_e currentState;   /* Current state of FSM               */ 
+    CalibrateFSMState_e nextState;      /* Next state of FSM                  */
+    CalibrateFSMState_e saveState;      /* State SLAVE needs to ACK           */
+    uint16_t calibrationCount;          /* Calibration sequence count         */
+    uint16_t desiredVoltage;            /* Desired voltage                    */
+    uint16_t calibratedVoltage;         /* Adjustment to desired              */
 } CalibrationFSM_t;
+
+typedef struct {
+    SettingsFSMState_e currentState;    /* Current state of FSM               */
+    SettingsFSMState_e nextState;       /* Next state of FSM                  */
+    SettingsFSMState_e saveState;       /* Save state                         */
+    uint16_t contrast;                  /* LCD contrast from 1 -> 50          */
+    uint16_t brightness;                /* LCD brightness from 1 -> 8         */
+} SettingsFSM_t;
+
 
 #endif	/* XC_HEADER_TEMPLATE_H */
 

@@ -13,13 +13,6 @@ extern "C" {
 #include "../Drivers/LCD_Driver.h"
 #include "../Drivers/ENC_Driver.h"
 #include "SUPPLIES_Controller.h"
-    
-    typedef struct {
-        uint16_t changed : 1;
-        uint16_t on : 1;
-        uint16_t contrast : 6;      // LCD contrast from 1 -> 50
-        uint16_t brightness : 4;    // LCD brightness from 1 -> 8
-    } LCD_Settings_t;
 
     /**
      * 
@@ -71,6 +64,20 @@ extern "C" {
     
     /**
      * 
+     * @param brightness
+     * @param contrast
+     */
+    void menuSelectBrightness(uint16_t brightness, uint16_t contrast);
+    
+    /**
+     * 
+     * @param brightness
+     * @param contrast
+     */
+    void menuSelectContrast(uint16_t brightness, uint16_t contrast);
+    
+    /**
+     * 
      * @param selVoltage
      */
     void menuChangeVoltage(uint16_t selVoltage);
@@ -90,6 +97,19 @@ extern "C" {
      * 
      */
     void menuChangeSettings();
+    
+        /**
+     * 
+     * @param brightness
+     */
+    void menuChangeBrightness(uint16_t brightness);
+    
+    /**
+     * 
+     * @param contrast
+     */
+    void menuChangeContrast(uint16_t contrast);
+    
     
 #ifdef	__cplusplus
 }

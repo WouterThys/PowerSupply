@@ -56,21 +56,13 @@
 
 #define COMMAND_BUFFER      5
 
-typedef struct {
-    bool execute;                // Flag to indicate the FSM should execute
-    MainFSMState_e currentState; // Current state of the FSM
-    MainFSMState_e nextState;    // Next calculated state
-    MainFSMState_e saveState;    // Saved state when leaving main FSM
-    uint16_t waitCnt;            // Delay count
-    uint16_t prescale;           // Pre-scale counter
-} MainFSM_t;
-
 
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
 static volatile MainFSM_t mainFsm;
 static volatile CalibrationFSM_t calibrateFsm;
+static volatile SettingsFSM_t settingsFsm;
 
 static volatile Button_e prevBtnState = Open;
 static volatile Button_e tmpBtnState = Open;
@@ -81,7 +73,6 @@ static volatile bool updateMenu = true;
 static SupplyData_t supplyData;
 static SupplyStatus_t supplyStatus; 
 static uint16_t previousStatus = 0;
-static LCD_Settings_t lcdSettings;
 
 static volatile int16_t encTurns = 0;
 static volatile Button_e encButtonState;
@@ -96,9 +87,11 @@ static void printStatus(SupplyStatus_t status);
 
 static void fsmCheckInputs();
 static void mainFsmCalculateNextState(volatile MainFSM_t * fsm, int16_t turns, Button_e buttonState);
-static void mainFsmHandeState(volatile MainFSM_t * fsm, int16_t turns);
+static void mainFsmHandeState(volatile MainFSM_t * fsm, volatile SettingsFSM_t * lcdSettings, int16_t turns);
 static void calibrateFsmCalcultateNextState(volatile CalibrationFSM_t * fsm, int16_t turns, Button_e buttonState);
 static void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns);
+static void settingsFsmCalculateNextState(volatile SettingsFSM_t * fsm, int16_t turns, Button_e buttonState);
+static void settingsFsmHandleState(volatile SettingsFSM_t * fsm, int16_t turns);
 
 static bool putCommand(Command_t command);
 
@@ -203,7 +196,10 @@ void fsmCheckInputs() {
     prevBtnState = newBtnState;
 }
 
-void mainFsmCalculateNextState(volatile MainFSM_t * fsm, int16_t turns, Button_e buttonState) {
+void mainFsmCalculateNextState(
+        volatile MainFSM_t * fsm, 
+        int16_t turns, 
+        Button_e buttonState) {
     
     fsm->nextState = fsm->currentState;
     
@@ -355,9 +351,12 @@ void mainFsmCalculateNextState(volatile MainFSM_t * fsm, int16_t turns, Button_e
             break;
             
         case M_CHA_SETTINGS:
-             // Go back when clicked
-            if (buttonState == Clicked) {
-                fsm->nextState = M_SEL_SETTINGS;
+            settingsFsmCalculateNextState(&settingsFsm, encTurns, encButtonState);
+            if (settingsFsm.nextState == S_STOP) {
+                settingsFsm.nextState = S_INIT;
+                settingsFsm.currentState = S_INIT;
+                
+                fsm->nextState = M_SEL_CALIBRATION;
             }
             break;
             
@@ -366,7 +365,10 @@ void mainFsmCalculateNextState(volatile MainFSM_t * fsm, int16_t turns, Button_e
     }
 }
 
-void mainFsmHandeState(volatile MainFSM_t * fsm, int16_t turns) {
+void mainFsmHandeState(
+        volatile MainFSM_t * fsm, 
+        volatile SettingsFSM_t * lcdSettings, 
+        int16_t turns) {
     
     splUpdateData(&supplyData); // Get measurement data
     
@@ -374,9 +376,9 @@ void mainFsmHandeState(volatile MainFSM_t * fsm, int16_t turns) {
         case M_INIT: 
             // Initialize LCD 
             lcdInit();
-            lcdTurnDisplayOn(lcdSettings.on);
-            lcdSetDisplayBrightness(lcdSettings.brightness);
-            lcdSetDisplayContrast(lcdSettings.contrast);
+            lcdTurnDisplayOn(true);
+            lcdSetDisplayBrightness(lcdSettings->brightness);
+            lcdSetDisplayContrast(lcdSettings->contrast);
             
             // Default values
             supplyData.setVoltage.value = DEFAULT_V;
@@ -490,6 +492,7 @@ void mainFsmHandeState(volatile MainFSM_t * fsm, int16_t turns) {
             break;
             
         case M_CHA_SETTINGS:
+            settingsFsmHandleState(&settingsFsm, encTurns);
             break;
             
         default:
@@ -498,19 +501,23 @@ void mainFsmHandeState(volatile MainFSM_t * fsm, int16_t turns) {
     
 }
 
-void calibrateFsmCalcultateNextState(volatile CalibrationFSM_t * fsm, int16_t turns, Button_e buttonState) {
+void calibrateFsmCalcultateNextState(
+        volatile CalibrationFSM_t * fsm, 
+        int16_t turns, 
+        Button_e buttonState) {
+    
     fsm->nextState = fsm->currentState;
     
     // Find next state
     switch (fsm->currentState) {
         case C_INIT:
-            fsm->acknowledgeState = C_INIT;
+            fsm->saveState = C_INIT;
             fsm->nextState = C_SEND_TO_SLAVE;
             updateMenu = true;
             break;
             
         case C_SET_DESIRED:
-            fsm->acknowledgeState = C_SET_DESIRED;
+            fsm->saveState = C_SET_DESIRED;
             fsm->nextState = C_SEND_TO_SLAVE;
             updateMenu = true;
             break;
@@ -523,12 +530,12 @@ void calibrateFsmCalcultateNextState(volatile CalibrationFSM_t * fsm, int16_t tu
             break;
             
         case C_SAVE:
-            fsm->acknowledgeState = C_SAVE;
+            fsm->saveState = C_SAVE;
             fsm->nextState = C_SEND_TO_SLAVE;
             break;
             
         case C_DONE:
-            fsm->acknowledgeState = C_DONE;
+            fsm->saveState = C_DONE;
             fsm->nextState = C_SEND_TO_SLAVE;
             break;
             
@@ -538,8 +545,8 @@ void calibrateFsmCalcultateNextState(volatile CalibrationFSM_t * fsm, int16_t tu
             break;
             
         case C_WAIT_FOR_SLAVE:
-            if (supplyStatus.calibrationSt == fsm->acknowledgeState) {
-                switch (fsm->acknowledgeState) {
+            if (supplyStatus.calibrationSt == fsm->saveState) {
+                switch (fsm->saveState) {
                     case C_INIT: 
                         fsm->nextState = C_SET_DESIRED; 
                         break;
@@ -632,6 +639,144 @@ void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns) {
     }
 }
 
+
+void settingsFsmCalculateNextState(
+        volatile SettingsFSM_t * fsm, 
+        int16_t turns, 
+        Button_e buttonState) {
+    
+    
+    fsm->nextState = fsm->currentState;
+    
+    // Find next state
+    switch (fsm->currentState) {
+        case S_INIT:
+            fsm->nextState = S_SEL_CONTRAST;
+            updateMenu = true;
+            break;
+            
+        case S_SEL_CONTRAST:
+            if (buttonState != Open) {
+                if (buttonState == DoubleClicked) {
+                    fsm->nextState = S_STOP;
+                } else {
+                    fsm->nextState = S_CHA_CONTRAST;
+                }
+            } else if (turns != 0) {
+                updateMenu = true;
+                fsm->nextState = S_SEL_BRIGHTNESS;
+            }
+            break;
+            
+        case S_CHA_CONTRAST:
+            if (buttonState == Clicked) {
+                fsm->nextState = S_SEL_CONTRAST;
+            }
+            break;
+            
+        case S_SEL_BRIGHTNESS:
+            if (buttonState != Open) {
+                if (buttonState == DoubleClicked) {
+                    fsm->nextState = S_STOP;
+                } else {
+                    fsm->nextState = S_CHA_BRIGHTNESS;
+                }
+            } else if (turns != 0) {
+                updateMenu = true;
+                fsm->nextState = S_SEL_CONTRAST;
+            }
+            break;
+            
+        case S_CHA_BRIGHTNESS:
+            if (buttonState == Clicked) {
+                fsm->nextState = S_SEL_BRIGHTNESS;
+            }
+            break;
+            
+        case S_STOP:
+            fsm->nextState = S_INIT;
+            break;
+            
+        default:
+            break;
+    }
+    
+}
+
+void settingsFsmHandleState(volatile SettingsFSM_t * fsm, int16_t turns) {
+    
+    switch (fsm->currentState) {
+        case S_INIT:
+            break;
+            
+        case S_SEL_CONTRAST:
+            if (updateMenu) {
+                menuSelectContrast(fsm->brightness, fsm->contrast);
+                updateMenu = false;
+            }
+            break;
+            
+        case S_CHA_CONTRAST:
+            while (turns != 0) {
+                if (turns > 0) {
+                    if (fsm->contrast < 50) {
+                        fsm->contrast += 1;
+                        updateMenu = true;
+                    }
+                    turns--;
+                } else {
+                    if (fsm->contrast > 1) {
+                        fsm->contrast -= 1;
+                        updateMenu = true;
+                    }
+                    turns++;
+                }
+            }
+            if (updateMenu) { 
+                // Update LCD 
+                menuChangeContrast(fsm->contrast);
+                lcdSetDisplayContrast(fsm->contrast);
+                updateMenu = false;
+            }
+            break;
+            
+        case S_SEL_BRIGHTNESS:
+            if (updateMenu) {
+                menuSelectBrightness(fsm->brightness, fsm->contrast);
+                updateMenu = false;
+            }
+            break;
+            
+        case S_CHA_BRIGHTNESS:
+             while (turns != 0) {
+                if (turns > 0) {
+                    if (fsm->brightness < 8) {
+                        fsm->brightness += 1;
+                        updateMenu = true;
+                    }
+                    turns--;
+                } else {
+                    if (fsm->brightness > 1) {
+                        fsm->brightness -= 1;
+                        updateMenu = true;
+                    }
+                    turns++;
+                }
+            }
+            if (updateMenu) { 
+                // Update LCD 
+                menuChangeBrightness(fsm->brightness);
+                lcdSetDisplayBrightness(fsm->brightness);
+                updateMenu = false;
+            }
+            break;
+            
+        default:
+            break;
+    }
+}
+
+
 /*******************************************************************************
  *          MAIN PROGRAM
  ******************************************************************************/
@@ -647,15 +792,21 @@ int main(void) {
     DelayMs(100);
     
     // Initial values
-    lcdSettings.on = 1;
-    lcdSettings.contrast = 30;
-    lcdSettings.brightness = 7;
-    
     mainFsm.execute = false;
     mainFsm.currentState = M_INIT;
     mainFsm.nextState = M_INIT;
     mainFsm.prescale = 0;
     mainFsm.waitCnt = 0;
+    
+    calibrateFsm.currentState = C_INIT;
+    calibrateFsm.nextState = C_INIT;
+    calibrateFsm.desiredVoltage = 0;
+    calibrateFsm.calibrationCount = 0;
+    
+    settingsFsm.currentState = S_INIT;
+    settingsFsm.nextState = S_INIT;
+    settingsFsm.brightness = 7;
+    settingsFsm.contrast = 30;
     
     DelayMs(100);
     timerEnable(true);
@@ -687,7 +838,7 @@ int main(void) {
                 printf("C S%d>S%d\n", calibrateFsm.currentState, calibrateFsm.nextState);
             }
             
-            mainFsmHandeState(&mainFsm, encTurns);
+            mainFsmHandeState(&mainFsm, &settingsFsm, encTurns);
             
             if (DEBUG_FSM && (previousStatus != supplyStatus.value)) {
                 printStatus(supplyStatus);
@@ -697,6 +848,7 @@ int main(void) {
             // Update FSM
             mainFsm.currentState = mainFsm.nextState;
             calibrateFsm.currentState = calibrateFsm.nextState;
+            settingsFsm.currentState = settingsFsm.nextState;
         }
         
     }

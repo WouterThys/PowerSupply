@@ -147,7 +147,7 @@ void splSetCurrent(uint16_t current) {
 
 void splSetCalibration(CalibrationFSM_t fsm) {
     
-    uint16_t data[2] = { fsm.acknowledgeState, fsm.calibrationCount };
+    uint16_t data[2] = { fsm.saveState, fsm.calibrationCount };
     
     // Send
     i2cPackage.length = 2;
