@@ -62,7 +62,7 @@ void menuInit(bool (*onPutCommand)(Command_t data)) {
     putCommand = onPutCommand;
     
     // Initial value
-    menuUpdateMeasured1Data(0, 0);
+    menuUpdateMeasured1Data(0, 0, 0);
     currentMenu = INITIAL;
 }
 
@@ -71,34 +71,40 @@ void menuConfigure(uint8_t brightness, uint8_t contrast) {
     lcdSetDisplayContrast(contrast);
 }
 
-void menuUpdateMeasured1Data(uint16_t msrVoltage, uint16_t msrCurrent) {
-    
+void menuUpdateMeasured1Data(uint16_t msrVoltage, uint16_t msrCurrent, bool clip) {
     if (currentMenu != MEASURE1_VALUES) {
         lcdCursorUnderlineOn(false);
         lcdTurnOnBlinkingCursor(false);
         writeString(0,0, "M|V:          V ");
         writeString(1,0, " |I:          mA");
         currentMenu = MEASURE1_VALUES;
+        
+        if (DEBUG_LCD) printf("D%d\n", currentMenu);
     }
     
     writeFloat(0, 5, digitalToVoltage(msrVoltage), 2);
     writeFloat(1, 5, digitalToCurrent(msrCurrent), 2);
-  
+    
+    if (clip) {
+        writeString(1, 11, "C!");
+    } else {
+        writeString(1, 11, "  ");
+    }
 }
 
 void menuUpdateMeasured2Data(uint16_t msrTemp, uint16_t msrCurrent_) {
-    
     if (currentMenu != MEASURE2_VALUES) {
         lcdCursorUnderlineOn(false);
         lcdTurnOnBlinkingCursor(false);
         writeString(0,0, "M|T:          °C");
         writeString(1,0, " |i:          mA");
         currentMenu = MEASURE2_VALUES;
+        
+        if (DEBUG_LCD) printf("D%d\n", currentMenu);
     }
     
-    writeFloat(0, 5, digitalToVoltage(msrTemp), 2);
+    writeFloat(0, 5, digitalToTemp(msrTemp), 2);
     writeFloat(1, 5, digitalToCurrent(msrCurrent_), 2);
-  
 }
 
 void menuSelectVoltage(uint16_t selVoltage) {

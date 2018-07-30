@@ -38,7 +38,7 @@ extern "C" {
      * @param msrVoltage
      * @param msrCurrent
      */
-    void menuUpdateMeasured1Data(uint16_t msrVoltage, uint16_t msrCurrent);
+    void menuUpdateMeasured1Data(uint16_t msrVoltage, uint16_t msrCurrent, bool clip);
     
     /**
      * 

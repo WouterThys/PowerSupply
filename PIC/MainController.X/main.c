@@ -394,7 +394,8 @@ void mainFsmHandeState(volatile MainFSM_t * fsm, int16_t turns) {
                 
                 menuUpdateMeasured1Data(
                         supplyData.msrVoltage.value,
-                        supplyData.msrCurrent.value);
+                        supplyData.msrCurrent.value,
+                        supplyStatus.currentClip);
                 
                 supplyData.msrVoltage.changed = false;
                 supplyData.msrCurrent.changed = false;
