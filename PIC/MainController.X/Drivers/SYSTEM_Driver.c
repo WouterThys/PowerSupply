@@ -11,6 +11,15 @@
 /*******************************************************************************
  *          MACRO FUNCTIONS
  ******************************************************************************/
+/* Prototype of the functions used in the file  */
+void __attribute__ ( (__interrupt__) )  _OscillatorFail ( void );
+void __attribute__ ( (__interrupt__) )  _AddressError( void );
+void __attribute__ ( (__interrupt__) )  _StackError( void );
+void __attribute__ ( (__interrupt__) )  _MathError( void );
+void __attribute__ ( (__interrupt__) )  _DMACError( void );
+
+/* Event function pointers */
+static void (*trapError)(int16_t code);
 
 /*******************************************************************************
  *          VARIABLES
@@ -81,3 +90,46 @@ void sysReset(uint16_t afterDelay) {
     }
     asm ("RESET");
 }
+
+void sysInitError(void (*onError)(int16_t code)) {
+    trapError = onError;
+}
+
+void __attribute__ ( (interrupt, no_auto_psv) ) _OscillatorFail( void ) {
+    INTCON1bits.OSCFAIL = 0;        //Clear the trap flag
+    if ((*trapError) != NULL) {
+        (*trapError)(TRAP_OSC);
+    }
+}
+
+void __attribute__ ( (interrupt, no_auto_psv) ) _AddressError( void ) {
+    INTCON1bits.ADDRERR = 0;        //Clear the trap flag
+    if ((*trapError) != NULL) {
+        (*trapError)(TRAP_ADDR);
+    }
+}
+
+void __attribute__ ( (interrupt, no_auto_psv) ) _StackError( void ) {
+    INTCON1bits.STKERR = 0;         //Clear the trap flag
+    if ((*trapError) != NULL) {
+        (*trapError)(TRAP_STACK);
+    }
+}
+
+void __attribute__ ( (interrupt, no_auto_psv) ) _MathError( void ) {
+    INTCON1bits.MATHERR = 0;        //Clear the trap flag
+    if ((*trapError) != NULL) {
+        (*trapError)(TRAP_MATH);
+    }
+}
+
+void __attribute__ ( (interrupt, no_auto_psv) ) _DMACError( void ) {
+    INTCON1bits.DMACERR = 0;        //Clear the trap flag
+    if ((*trapError) != NULL) {
+        (*trapError)(TRAP_DMA);
+    }
+}
+
+/*******************************************************************************
+ End of File
+*/

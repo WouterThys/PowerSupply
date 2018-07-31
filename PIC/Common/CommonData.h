@@ -36,7 +36,7 @@
 
 #define ERROR_TITLE_UNK     "UNKNOWN ERROR"
 #define ERROR_TITLE_I2C     "I2C ERROR"
-#define ERROR_TITLE_MATH    "MATH ERROR"
+#define ERROR_TITLE_SYS     "SYSTEM ERROR"
 
 #define E_MSG_I2C_NOK               "Not OK"
 #define E_MSG_I2C_OVERFLOW          "Overflow"
@@ -58,7 +58,7 @@
 typedef enum {
     ES_UNK = 0,          // Unknown source
     ES_I2C,              // Error from I²C
-    ES_MATH              // Math error
+    ES_SYS
 } Error_e;
 
 // Main FSM
@@ -107,7 +107,7 @@ typedef enum {
     E_INIT,
     E_UNK_ERROR,
     E_I2C_ERROR,
-    E_MATH_ERROR,
+    E_SYS_ERROR,
     E_RESET,
     E_STOP
 } ErrorFSMState_e;

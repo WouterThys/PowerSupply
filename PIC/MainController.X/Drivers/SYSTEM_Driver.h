@@ -23,6 +23,13 @@ extern "C" {
   { __delay32( (unsigned long) (((unsigned long long) d)*(FCY)/1000ULL)); }
 #define DelayUs(d) \
   { __delay32( (unsigned long) (((unsigned long long) d)*(FCY)/1000000ULL)); }
+    
+    
+#define TRAP_OSC    -100
+#define TRAP_MATH   -101
+#define TRAP_ADDR   -102
+#define TRAP_DMA    -103
+#define TRAP_STACK  -104
 
 /******************************************************************************/
 /* System Function Prototypes                                                 */
@@ -53,6 +60,12 @@ void sysInitInterrupts(void);
  * @param enable
  */
 void sysInterruptEnable(bool enable);
+
+/**
+ * 
+ * @param onError
+ */
+void sysInitError(void (*onError)(int16_t code));
 
 /**
  * Reset system after defined delay

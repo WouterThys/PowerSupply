@@ -52,7 +52,7 @@ static i2cPackage_t i2cPackage;
  ******************************************************************************/
 bool i2cCheckState(i2cPackage_t data) {
     if (data.status < I2C_OK) {
-        Error_t error = { ES_I2C, data.status };
+        Error_t error = { true, ES_I2C, data.status };
         (*onSupplyError)(error);
         return false;
     } 

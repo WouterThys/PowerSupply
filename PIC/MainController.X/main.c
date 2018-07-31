@@ -104,18 +104,20 @@ static void errorFsmHandleState(volatile ErrorFSM_t * fsm);
 
 static bool putCommand(Command_t command);
 static void onError(Error_t error);
+static void onSysError(int16_t error);
 
 void initialize() {
-    sysInterruptEnable(false);
-
+    // Interrupts
+    sysInitInterrupts();
+    sysInterruptEnable(true);
+    sysInitError(&onSysError);
+    
     // Initialize system
     sysInitPll();
     sysInitOscillator();
     sysInitPorts();
 
-    // Interrupts
-    sysInitInterrupts();
-    sysInterruptEnable(true);
+    
 }
 
 void timerEnable(bool enable) {
@@ -843,13 +845,13 @@ void errorFsmCalculateNextState(
                 case ES_I2C:
                     fsm->nextState = E_I2C_ERROR;
                     break;
-                case ES_MATH:
-                    fsm->nextState = E_MATH_ERROR;
+                case ES_SYS:
+                    fsm->nextState = E_SYS_ERROR;
                     break;
             }
             break;
             
-        case E_MATH_ERROR:
+        case E_SYS_ERROR:
         case E_I2C_ERROR:
         case E_UNK_ERROR:
             if (buttonState == Held) {
@@ -913,9 +915,9 @@ void errorFsmHandleState(volatile ErrorFSM_t * fsm) {
             }
             break;
             
-        case E_MATH_ERROR:
+        case E_SYS_ERROR:
             if (updateMenu) {
-                title = ERROR_TITLE_MATH;
+                title = ERROR_TITLE_SYS;
                 message = "";
                 menuShowError(title, message);
                 updateMenu = false;
@@ -998,6 +1000,12 @@ int main(void) {
             if (DEBUG_FSM && (calibrateFsm.currentState != calibrateFsm.nextState)) {
                 printf("C S%d>S%d\n", calibrateFsm.currentState, calibrateFsm.nextState);
             }
+            if (DEBUG_FSM && (settingsFsm.currentState != settingsFsm.nextState)) {
+                printf("X S%d>S%d\n", settingsFsm.currentState, settingsFsm.nextState);
+            }
+            if (DEBUG_FSM && (errorFsm.currentState != errorFsm.nextState)) {
+                printf("E S%d>S%d\n", errorFsm.currentState, errorFsm.nextState);
+            }
             
             mainFsmHandeState(&mainFsm, &settingsFsm, encTurns);
             
@@ -1006,10 +1014,16 @@ int main(void) {
                 previousStatus = supplyStatus.value;
             }
             
-            // Update FSM
+            // Update FSMs
             mainFsm.currentState = mainFsm.nextState;
             calibrateFsm.currentState = calibrateFsm.nextState;
             settingsFsm.currentState = settingsFsm.nextState;
+            errorFsm.currentState = errorFsm.nextState;
+            
+            // Error test
+            uint16_t a = 1;
+            uint16_t b = 0;
+            uint16_t c = a / b;
         }
         
     }
@@ -1038,6 +1052,11 @@ void onError(Error_t e) {
         errorFsm.lastError.source = e.source;
         errorFsm.lastError.code = e.code;
     }
+}
+
+void onSysError(int16_t e) {
+    Error_t error = {true, ES_SYS, e};
+    onError(error);
 }
 
 // UART
