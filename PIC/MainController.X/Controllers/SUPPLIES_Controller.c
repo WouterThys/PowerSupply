@@ -22,6 +22,10 @@
 /*******************************************************************************
  *          LOCAL FUNCTION DEFINES
  ******************************************************************************/
+
+/* Event function pointers */
+static void (*onSupplyError)(Error_t error);
+
 static bool i2cCheckState(i2cPackage_t data);
 
 
@@ -38,7 +42,6 @@ static uint16_t * msrCurrent_;
 
 static SupplyStatus_t * status;
 static i2cPackage_t i2cPackage;
-static int16_t i2cError;
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
@@ -48,40 +51,23 @@ static int16_t i2cError;
  *          I²C
  ******************************************************************************/
 bool i2cCheckState(i2cPackage_t data) {
-    //if (data.status != i2cError) {
-        i2cError = data.status;
-        if (DEBUG_I2C) {
-            switch(i2cError) {
-                default: 
-                    printf("I2C_OK\n"); break;
-                    break;
-                case I2C_NOK: printf("I2C_NOK\n"); break;
-                case I2C_OVERFLOW: printf("I2C_OVERFLOW\n"); break;
-                case I2C_COLLISION: printf("I2C_COLLISION\n"); break;
-                case I2C_NO_ADR_ACK: printf("I2C_NO_ADR_ACK\n"); break;
-                case I2C_NO_DATA_ACK: printf("I2C_NO_DATA_ACK\n"); break;
-                case I2C_UNEXPECTED_DATA: printf("I2C_UNEXPECTED_DATA\n"); break;
-                case I2C_UNEXPECTED_ADR: printf("I2C_UNEXPECTED_ADR\n"); break;
-                case I2C_STILL_BUSY: printf("I2C_STILL_BUSY\n"); break;
-                case I2C_TIMEOUT: printf("I2C_TIMEOUT\n"); break;
-            }
-        }
-    //}
-    
-    if (i2cError < I2C_OK) {
-        //LED1 = 1;
-        i2cDriverReset();
+    if (data.status < I2C_OK) {
+        Error_t error = { ES_I2C, data.status };
+        (*onSupplyError)(error);
         return false;
-    } else {
-        //LED1 = 0;
-        return true; 
-    }
+    } 
+    return true;
 }
 
 /*******************************************************************************
  *          DRIVER FUNCTIONS
  ******************************************************************************/
-void suppliesInit(SupplyStatus_t * s) {
+void suppliesInit(SupplyStatus_t * s, void (*onError)(Error_t error)) {
+    
+    // Event
+    onSupplyError = onError;
+    
+    // Initialize pointers to buffer
     setVoltage = &dataArray[I2C_COM_SET_V];
     setCurrent = &dataArray[I2C_COM_SET_I];
     msrVoltage = &dataArray[I2C_COM_MSR_V];
@@ -95,8 +81,6 @@ void suppliesInit(SupplyStatus_t * s) {
     i2cPackage.command = 0;
     i2cPackage.length = 0;
     i2cPackage.data = setVoltage;
-    
-    i2cError = I2C_OK;
     
     // I²C
     i2cDriverInit();

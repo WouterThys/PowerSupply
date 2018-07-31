@@ -110,6 +110,12 @@ extern "C" {
      */
     void menuChangeContrast(uint16_t contrast);
     
+    /**
+     * 
+     * @param title
+     * @param message
+     */
+    void menuShowError(const char * title, const char * message);
     
 #ifdef	__cplusplus
 }

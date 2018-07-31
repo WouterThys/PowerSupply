@@ -74,3 +74,10 @@ void sysInterruptEnable(bool enable) {
         _GIE = 0; // Global interrupt disable
     }
 }
+
+void sysReset(uint16_t afterDelay) {
+    if (afterDelay > 0) {
+        DelayMs(afterDelay);
+    }
+    asm ("RESET");
+}

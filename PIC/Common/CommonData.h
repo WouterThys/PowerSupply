@@ -4,6 +4,10 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include <stdint.h>
 
+/******************************************************************************/
+/*      COMMON DEFINES                                                        */
+/******************************************************************************/
+
 #define I2C_COM_SET_V       0
 #define I2C_COM_SET_I       1
 #define I2C_COM_MSR_V       2
@@ -30,18 +34,32 @@
 #define CALIB_STEP          400                     /* Per 1V                 */
 #define CALIB_mSTEP         4                       /* 10mV adjusting step    */ 
 
-typedef union {
-    struct {
-        uint16_t statusCode       : 3;
-        uint16_t errorCode        : 3;
-        uint16_t currentClip      : 1;
-        uint16_t outputEnabled    : 1;
-        uint16_t pidEnabled       : 1;
-        uint16_t calibrateEnabled : 1;
-        uint16_t calibrationSt    : 6;
-    };
-    uint16_t value;
-} SupplyStatus_t;
+#define ERROR_TITLE_UNK     "UNKNOWN ERROR"
+#define ERROR_TITLE_I2C     "I2C ERROR"
+#define ERROR_TITLE_MATH    "MATH ERROR"
+
+#define E_MSG_I2C_NOK               "Not OK"
+#define E_MSG_I2C_OVERFLOW          "Overflow"
+#define E_MSG_I2C_COLLISION         "Collision"
+#define E_MSG_I2C_NO_ADR_ACK        "No address"
+#define E_MSG_I2C_NO_DATA_ACK       "No data"
+#define E_MSG_I2C_UNEXPECTED_DATA   "Inv. data"
+#define E_MSG_I2C_UNEXPECTED_ADR    "Inv. address"
+#define E_MSG_I2C_STILL_BUSY        "Still busy"
+#define E_MSG_I2C_TIMEOUT           "Timeout"
+
+
+
+/******************************************************************************/
+/*      COMMON ENUMS                                                          */
+/******************************************************************************/
+
+// Errors
+typedef enum {
+    ES_UNK = 0,          // Unknown source
+    ES_I2C,              // Error from I²C
+    ES_MATH              // Math error
+} Error_e;
 
 // Main FSM
 typedef enum {
@@ -55,7 +73,9 @@ typedef enum {
     M_SEL_CALIBRATION,  // Select calibration
     M_CHA_CALIBRATION,  // Change calibration
     M_SEL_SETTINGS,     // Select settings
-    M_CHA_SETTINGS      // Change settings
+    M_CHA_SETTINGS,     // Change settings
+            
+    M_ERROR             // Error occurred     
             
 } MainFSMState_e;
 
@@ -82,6 +102,32 @@ typedef enum {
     S_STOP
 } SettingsFSMState_e;
 
+// Error FSM
+typedef enum {
+    E_INIT,
+    E_UNK_ERROR,
+    E_I2C_ERROR,
+    E_MATH_ERROR,
+    E_RESET,
+    E_STOP
+} ErrorFSMState_e;
+
+/******************************************************************************/
+/*      COMMON TYPES                                                          */
+/******************************************************************************/
+
+typedef union {
+    struct {
+        uint16_t statusCode       : 3;
+        uint16_t errorCode        : 3;
+        uint16_t currentClip      : 1;
+        uint16_t outputEnabled    : 1;
+        uint16_t pidEnabled       : 1;
+        uint16_t calibrateEnabled : 1;
+        uint16_t calibrationSt    : 6;
+    };
+    uint16_t value;
+} SupplyStatus_t;
 
 typedef struct {
     uint16_t desiredVoltage;            /* Value it should be                 */
@@ -89,7 +135,11 @@ typedef struct {
     uint16_t measuredCurrent;           /* Measured current                   */    
 } Calibration_t;
 
-
+typedef struct {
+    bool hasError;                      /* Flag to indicate error occurred    */
+    Error_e source;                     /* Source of the error                */
+    int16_t code;                       /* Error code                         */
+} Error_t;
 
 typedef struct {
     MainFSMState_e currentState;        /* Current state of the FSM           */
@@ -116,6 +166,12 @@ typedef struct {
     uint16_t contrast;                  /* LCD contrast from 1 -> 50          */
     uint16_t brightness;                /* LCD brightness from 1 -> 8         */
 } SettingsFSM_t;
+
+typedef struct {
+    ErrorFSMState_e currentState;       /* Current state of FSM               */
+    ErrorFSMState_e nextState;          /* Next state of FSM                  */
+    Error_t lastError;                  /* Last error values                  */
+} ErrorFSM_t;
 
 
 #endif	/* XC_HEADER_TEMPLATE_H */

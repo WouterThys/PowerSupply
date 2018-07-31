@@ -10,6 +10,7 @@
 #include "Settings.h"
 #include "Drivers/SYSTEM_Driver.h"
 #include "Drivers/ENC_Driver.h"
+#include "Drivers/I2C_Driver.h"
 #include "../Common/COM_Settings.h"
 
 #include "Controllers/MENU_Controller.h"
@@ -63,6 +64,7 @@
 static volatile MainFSM_t mainFsm;
 static volatile CalibrationFSM_t calibrateFsm;
 static volatile SettingsFSM_t settingsFsm;
+static volatile ErrorFSM_t errorFsm;
 
 static volatile Button_e prevBtnState = Open;
 static volatile Button_e tmpBtnState = Open;
@@ -84,16 +86,24 @@ static void initialize();
 static void timerEnable(bool enable);
 static void heartBeat();
 static void printStatus(SupplyStatus_t status);
+static void printI2CError(int16_t errorCode);
 
 static void fsmCheckInputs();
+// Main FSM
 static void mainFsmCalculateNextState(volatile MainFSM_t * fsm, int16_t turns, Button_e buttonState);
 static void mainFsmHandeState(volatile MainFSM_t * fsm, volatile SettingsFSM_t * lcdSettings, int16_t turns);
+// Calibration FSM
 static void calibrateFsmCalcultateNextState(volatile CalibrationFSM_t * fsm, int16_t turns, Button_e buttonState);
 static void calibrateFsmHandleState(volatile CalibrationFSM_t * fsm, int16_t turns);
+// Settings FSM
 static void settingsFsmCalculateNextState(volatile SettingsFSM_t * fsm, int16_t turns, Button_e buttonState);
 static void settingsFsmHandleState(volatile SettingsFSM_t * fsm, int16_t turns);
+// Error FSM
+static void errorFsmCalculateNextState(volatile ErrorFSM_t * fsm, int16_t turns, Button_e buttonState);
+static void errorFsmHandleState(volatile ErrorFSM_t * fsm);
 
 static bool putCommand(Command_t command);
+static void onError(Error_t error);
 
 void initialize() {
     sysInterruptEnable(false);
@@ -132,10 +142,6 @@ void timerEnable(bool enable) {
     } 
 }
 
-bool putCommand(Command_t command) {
-    return true;
-}
-
 void printStatus(SupplyStatus_t status) {
     printf("STATUS: \n");
     printf(" - Code: %d\n", status.statusCode);
@@ -145,6 +151,24 @@ void printStatus(SupplyStatus_t status) {
     printf(" - O EN: %d\n", status.outputEnabled);
     printf(" - C EN: %d\n", status.calibrateEnabled);
     printf(" - P EN: %d\n", status.pidEnabled);
+}
+
+void printI2CError(int16_t errorCode) {
+    printf("I2C ERROR!\n");
+    switch(errorCode) {
+        default: 
+            printf("I2C_OK\n"); break;
+            break;
+        case I2C_NOK: printf("I2C_NOK\n"); break;
+        case I2C_OVERFLOW: printf("I2C_OVERFLOW\n"); break;
+        case I2C_COLLISION: printf("I2C_COLLISION\n"); break;
+        case I2C_NO_ADR_ACK: printf("I2C_NO_ADR_ACK\n"); break;
+        case I2C_NO_DATA_ACK: printf("I2C_NO_DATA_ACK\n"); break;
+        case I2C_UNEXPECTED_DATA: printf("I2C_UNEXPECTED_DATA\n"); break;
+        case I2C_UNEXPECTED_ADR: printf("I2C_UNEXPECTED_ADR\n"); break;
+        case I2C_STILL_BUSY: printf("I2C_STILL_BUSY\n"); break;
+        case I2C_TIMEOUT: printf("I2C_TIMEOUT\n"); break;
+    }
 }
 
 void heartBeat() {
@@ -202,6 +226,14 @@ void mainFsmCalculateNextState(
         Button_e buttonState) {
     
     fsm->nextState = fsm->currentState;
+    
+    // Check errors
+    if (errorFsm.lastError.hasError) {
+        if (fsm->currentState != M_ERROR) {
+            fsm->saveState = fsm->currentState;
+        }
+        fsm->currentState = M_ERROR;
+    }
     
     // Find next state
     switch (fsm->currentState) {
@@ -360,6 +392,18 @@ void mainFsmCalculateNextState(
             }
             break;
             
+            
+        case M_ERROR:
+            errorFsmCalculateNextState(&errorFsm, encTurns, encButtonState);
+            if (errorFsm.nextState == E_STOP) {
+                errorFsm.currentState = E_INIT;
+                errorFsm.nextState = E_INIT;
+                
+                fsm->nextState = fsm->saveState;
+                fsm->saveState = 0;
+            }
+            break;
+            
         default:
             break;
     }
@@ -493,6 +537,10 @@ void mainFsmHandeState(
             
         case M_CHA_SETTINGS:
             settingsFsmHandleState(&settingsFsm, encTurns);
+            break;
+            
+        case M_ERROR:
+            errorFsmHandleState(&errorFsm);
             break;
             
         default:
@@ -777,6 +825,113 @@ void settingsFsmHandleState(volatile SettingsFSM_t * fsm, int16_t turns) {
 }
 
 
+void errorFsmCalculateNextState(
+        volatile ErrorFSM_t * fsm, 
+        int16_t turns, 
+        Button_e buttonState) {
+    
+     fsm->nextState = fsm->currentState;
+    
+    // Find next state
+    switch (fsm->currentState) {
+        case E_INIT:
+            switch (fsm->lastError.source) {
+                default:
+                case ES_UNK:
+                    fsm->nextState = E_UNK_ERROR;
+                    break;
+                case ES_I2C:
+                    fsm->nextState = E_I2C_ERROR;
+                    break;
+                case ES_MATH:
+                    fsm->nextState = E_MATH_ERROR;
+                    break;
+            }
+            break;
+            
+        case E_MATH_ERROR:
+        case E_I2C_ERROR:
+        case E_UNK_ERROR:
+            if (buttonState == Held) {
+                fsm->nextState = E_RESET;
+            } else if (buttonState == DoubleClicked) {
+                fsm->nextState = E_STOP;
+            }
+            break;
+            
+        case E_RESET:
+            fsm->nextState = E_STOP;
+            break;
+            
+        case E_STOP:
+            fsm->nextState = E_INIT;
+            break;
+            
+        default:
+            break;
+    }
+    
+}
+
+void errorFsmHandleState(volatile ErrorFSM_t * fsm) {
+    
+    static const char *title;
+    static const char *message;
+    
+     switch (fsm->currentState) {
+        case E_INIT:
+            updateMenu = true;
+            break;
+            
+        case E_UNK_ERROR:
+            if (updateMenu) {
+                title = ERROR_TITLE_UNK;
+                message = "";
+                menuShowError(title, message);
+                updateMenu = false;
+            }
+            break;
+            
+        case E_I2C_ERROR:
+            if (updateMenu) {
+                title = ERROR_TITLE_I2C;
+                switch (fsm->lastError.code) {
+                    case I2C_NOK: message = E_MSG_I2C_NOK; break;
+                    case I2C_OVERFLOW: message = E_MSG_I2C_OVERFLOW; break;
+                    case I2C_COLLISION: message = E_MSG_I2C_COLLISION; break;
+                    case I2C_NO_ADR_ACK: message = E_MSG_I2C_NO_ADR_ACK; break;
+                    case I2C_NO_DATA_ACK: message = E_MSG_I2C_NO_DATA_ACK; break;
+                    case I2C_UNEXPECTED_DATA: message = E_MSG_I2C_UNEXPECTED_DATA; break;
+                    case I2C_UNEXPECTED_ADR: message = E_MSG_I2C_UNEXPECTED_ADR; break;
+                    case I2C_STILL_BUSY: message = E_MSG_I2C_STILL_BUSY; break;
+                    case I2C_TIMEOUT: message = E_MSG_I2C_TIMEOUT; break;
+                }
+                menuShowError(title, message);
+                updateMenu = false;
+                
+                if (DEBUG_I2C) printI2CError(fsm->lastError.code);
+            }
+            break;
+            
+        case E_MATH_ERROR:
+            if (updateMenu) {
+                title = ERROR_TITLE_MATH;
+                message = "";
+                menuShowError(title, message);
+                updateMenu = false;
+            }
+            break;
+            
+         case E_RESET:
+             sysReset(10);
+             break;
+            
+        case E_STOP:
+            break;
+    }
+}
+
+
 /*******************************************************************************
  *          MAIN PROGRAM
  ******************************************************************************/
@@ -787,7 +942,7 @@ int main(void) {
     
     uartInit(&putCommand);
     encDriverInit();
-    suppliesInit(&supplyStatus);
+    suppliesInit(&supplyStatus, &onError);
     menuInit(&putCommand);
     DelayMs(100);
     
@@ -807,6 +962,12 @@ int main(void) {
     settingsFsm.nextState = S_INIT;
     settingsFsm.brightness = 7;
     settingsFsm.contrast = 30;
+    
+    errorFsm.currentState = E_INIT;
+    errorFsm.nextState = E_INIT;
+    errorFsm.lastError.hasError = false;
+    errorFsm.lastError.source = ES_UNK;
+    errorFsm.lastError.code = 0;
     
     DelayMs(100);
     timerEnable(true);
@@ -857,12 +1018,25 @@ int main(void) {
 
 
 /*******************************************************************************
- *          INTERRUPTS
+ *          INTERRUPTS AND EVENTS
  ******************************************************************************/
 void __attribute__ ( (interrupt, no_auto_psv) ) _T4Interrupt(void) {
     if (_T4IF) {
         heartBeat();
         _T4IF = 0; // Clear interrupt
+    }
+}
+
+
+bool putCommand(Command_t command) {
+    return true;
+}
+
+void onError(Error_t e) {
+    if (!errorFsm.lastError.hasError) { // Still working on previous error..
+        errorFsm.lastError.hasError = true;
+        errorFsm.lastError.source = e.source;
+        errorFsm.lastError.code = e.code;
     }
 }
 

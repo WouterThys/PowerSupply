@@ -25,7 +25,9 @@ typedef enum {
     SELECT_BRIGHTNESS,
     CHANGE_BRIGHTNESS,
     SELECT_CONTRAST,
-    CHANGE_CONTRAST
+    CHANGE_CONTRAST,
+            
+    ERROR
 } Menu_e;
 
 /*******************************************************************************
@@ -290,4 +292,17 @@ void menuChangeContrast(uint16_t contrast) {
     writeInt(1,13, contrast);
     lcdSetCursorPosition(1,2); 
     currentMenu = CHANGE_CONTRAST;
+}
+
+
+void menuShowError(const char * title, const char * message) {
+    if (currentMenu != ERROR) {
+        writeString(0,0, "E|             V");
+        writeString(1,0, " |             V");
+    }
+    
+    writeString(0,2, title);
+    writeString(1,2, message);
+    
+    currentMenu = ERROR;
 }

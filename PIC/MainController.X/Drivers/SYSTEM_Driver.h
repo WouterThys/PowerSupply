@@ -54,5 +54,11 @@ void sysInitInterrupts(void);
  */
 void sysInterruptEnable(bool enable);
 
+/**
+ * Reset system after defined delay
+ * @param afterDelay
+ */
+void sysReset(uint16_t afterDelay);
+
 
 #endif
