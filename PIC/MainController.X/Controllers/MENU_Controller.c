@@ -185,11 +185,12 @@ void menuSelectBrightness(uint16_t brightness, uint16_t contrast) {
         writeString(0,0, "X|Brightness    ");
         writeString(1,0, " |Contrast      ");
         
+        writeInt(0,13, brightness);
+        writeInt(1,13, contrast);
+        
         lcdCursorUnderlineOn(true);
         lcdTurnOnBlinkingCursor(false);
         
-        writeInt(0,13, brightness);
-        writeInt(1,13, contrast);
         lcdSetCursorPosition(0,2); 
     }
 
@@ -207,9 +208,10 @@ void menuSelectContrast(uint16_t brightness, uint16_t contrast) {
         writeInt(0,13, brightness);
         writeInt(1,13, contrast);
         
-        lcdSetCursorPosition(1,2); 
         lcdCursorUnderlineOn(true);
         lcdTurnOnBlinkingCursor(false);
+        
+        lcdSetCursorPosition(1,2); 
     }
     
     currentMenu = SELECT_CONTRAST;
@@ -218,11 +220,13 @@ void menuSelectContrast(uint16_t brightness, uint16_t contrast) {
     
 void menuChangeVoltage(uint16_t selVoltage) {
     if (currentMenu != CHANGE_VOLTAGE) {
+        writeString(0,0, "C|Set voltage  V");
+        writeString(1,0, " |             V");
+        
         lcdCursorUnderlineOn(true);
         lcdTurnOnBlinkingCursor(true);
         lcdSetCursorPosition(1,7);
-        writeString(0,0, "C|Set voltage  V");
-        writeString(1,0, " |             V");
+        
         currentMenu = CHANGE_VOLTAGE;
     }
     writeFloat(1, 2, digitalToVoltage(selVoltage), 2);
@@ -230,11 +234,13 @@ void menuChangeVoltage(uint16_t selVoltage) {
     
 void menuChangeCurrent(uint16_t selCurrent) {
     if (currentMenu != CHANGE_CURRENT) {
+        writeString(0,0, "C|Set current  I");
+        writeString(1,0, " |             A");
+        
         lcdCursorUnderlineOn(true);
         lcdTurnOnBlinkingCursor(true);
         lcdSetCursorPosition(1,7);
-        writeString(0,0, "C|Set current  I");
-        writeString(1,0, " |             A");
+        
         currentMenu = CHANGE_CURRENT;
     }
     writeFloat(1, 2, digitalToCurrent(selCurrent), 2);
@@ -242,10 +248,12 @@ void menuChangeCurrent(uint16_t selCurrent) {
 
 void menuChangeCalibration(uint16_t targetVoltage, uint16_t calibratedVoltage) {
     if (currentMenu != CHANGE_CALIBRATION) {
-        lcdCursorUnderlineOn(false);
-        lcdTurnOnBlinkingCursor(false);
         writeString(0,0, "A|Set to       V");
         writeString(1,0, " |             V");
+        
+        lcdCursorUnderlineOn(false);
+        lcdTurnOnBlinkingCursor(false);
+        
         currentMenu = CHANGE_CALIBRATION;
     }
     writeFloat(0, 9, digitalToVoltage(targetVoltage), 2);
@@ -254,21 +262,31 @@ void menuChangeCalibration(uint16_t targetVoltage, uint16_t calibratedVoltage) {
     
 void menuChangeSettings() {
     if (currentMenu != CHANGE_SETTINGS) {
-        lcdCursorUnderlineOn(false);
-        lcdTurnOnBlinkingCursor(false);
         writeString(0,0, "X|Settings     V");
         writeString(1,0, " |             V");
+        
+        lcdCursorUnderlineOn(false);
+        lcdTurnOnBlinkingCursor(false);
+        
         currentMenu = CHANGE_SETTINGS;
     }
 }
 
 void menuChangeBrightness(uint16_t brightness) {
+    if (currentMenu != CHANGE_BRIGHTNESS) {
+        lcdCursorUnderlineOn(true);
+        lcdTurnOnBlinkingCursor(true);
+    }
     writeInt(0,13, brightness);
     lcdSetCursorPosition(0,2); 
     currentMenu = CHANGE_BRIGHTNESS;
 }
  
 void menuChangeContrast(uint16_t contrast) {
+    if (currentMenu != CHANGE_CONTRAST) {
+        lcdCursorUnderlineOn(true);
+        lcdTurnOnBlinkingCursor(true);
+    }
     writeInt(1,13, contrast);
     lcdSetCursorPosition(1,2); 
     currentMenu = CHANGE_CONTRAST;

@@ -356,7 +356,7 @@ void mainFsmCalculateNextState(
                 settingsFsm.nextState = S_INIT;
                 settingsFsm.currentState = S_INIT;
                 
-                fsm->nextState = M_SEL_CALIBRATION;
+                fsm->nextState = M_SEL_SETTINGS;
             }
             break;
             
@@ -655,25 +655,6 @@ void settingsFsmCalculateNextState(
             updateMenu = true;
             break;
             
-        case S_SEL_CONTRAST:
-            if (buttonState != Open) {
-                if (buttonState == DoubleClicked) {
-                    fsm->nextState = S_STOP;
-                } else {
-                    fsm->nextState = S_CHA_CONTRAST;
-                }
-            } else if (turns != 0) {
-                updateMenu = true;
-                fsm->nextState = S_SEL_BRIGHTNESS;
-            }
-            break;
-            
-        case S_CHA_CONTRAST:
-            if (buttonState == Clicked) {
-                fsm->nextState = S_SEL_CONTRAST;
-            }
-            break;
-            
         case S_SEL_BRIGHTNESS:
             if (buttonState != Open) {
                 if (buttonState == DoubleClicked) {
@@ -693,6 +674,25 @@ void settingsFsmCalculateNextState(
             }
             break;
             
+        case S_SEL_CONTRAST:
+            if (buttonState != Open) {
+                if (buttonState == DoubleClicked) {
+                    fsm->nextState = S_STOP;
+                } else {
+                    fsm->nextState = S_CHA_CONTRAST;
+                }
+            } else if (turns != 0) {
+                updateMenu = true;
+                fsm->nextState = S_SEL_BRIGHTNESS;
+            }
+            break;
+            
+        case S_CHA_CONTRAST:
+            if (buttonState == Clicked) {
+                fsm->nextState = S_SEL_CONTRAST;
+            }
+            break;
+            
         case S_STOP:
             fsm->nextState = S_INIT;
             break;
@@ -707,37 +707,6 @@ void settingsFsmHandleState(volatile SettingsFSM_t * fsm, int16_t turns) {
     
     switch (fsm->currentState) {
         case S_INIT:
-            break;
-            
-        case S_SEL_CONTRAST:
-            if (updateMenu) {
-                menuSelectContrast(fsm->brightness, fsm->contrast);
-                updateMenu = false;
-            }
-            break;
-            
-        case S_CHA_CONTRAST:
-            while (turns != 0) {
-                if (turns > 0) {
-                    if (fsm->contrast < 50) {
-                        fsm->contrast += 1;
-                        updateMenu = true;
-                    }
-                    turns--;
-                } else {
-                    if (fsm->contrast > 1) {
-                        fsm->contrast -= 1;
-                        updateMenu = true;
-                    }
-                    turns++;
-                }
-            }
-            if (updateMenu) { 
-                // Update LCD 
-                menuChangeContrast(fsm->contrast);
-                lcdSetDisplayContrast(fsm->contrast);
-                updateMenu = false;
-            }
             break;
             
         case S_SEL_BRIGHTNESS:
@@ -767,6 +736,37 @@ void settingsFsmHandleState(volatile SettingsFSM_t * fsm, int16_t turns) {
                 // Update LCD 
                 menuChangeBrightness(fsm->brightness);
                 lcdSetDisplayBrightness(fsm->brightness);
+                updateMenu = false;
+            }
+            break;
+            
+        case S_SEL_CONTRAST:
+            if (updateMenu) {
+                menuSelectContrast(fsm->brightness, fsm->contrast);
+                updateMenu = false;
+            }
+            break;
+            
+        case S_CHA_CONTRAST:
+            while (turns != 0) {
+                if (turns > 0) {
+                    if (fsm->contrast < 50) {
+                        fsm->contrast += 1;
+                        updateMenu = true;
+                    }
+                    turns--;
+                } else {
+                    if (fsm->contrast > 1) {
+                        fsm->contrast -= 1;
+                        updateMenu = true;
+                    }
+                    turns++;
+                }
+            }
+            if (updateMenu) { 
+                // Update LCD 
+                menuChangeContrast(fsm->contrast);
+                lcdSetDisplayContrast(fsm->contrast);
                 updateMenu = false;
             }
             break;
