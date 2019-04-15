@@ -15,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L MyLib:dsPIC33EPXXXGP502 U5
+L SupplyMainDigital-rescue:dsPIC33EPXXXGP502-MyLib U5
 U 1 1 5932965F
 P 4750 3750
 F 0 "U5" H 5750 3300 50  0000 L CNN
@@ -59,7 +59,7 @@ F 3 "" H 8350 2600 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L MyLib:LT3081 U6
+L SupplyMainDigital-rescue:LT3081-MyLib U6
 U 1 1 5932A3A1
 P 8100 3500
 F 0 "U6" H 8450 3450 60  0000 C CNN
@@ -70,7 +70,7 @@ F 3 "" H 8100 3500 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L MyLib:MCP1501 U2
+L SupplyMainDigital-rescue:MCP1501-MyLib U2
 U 1 1 59330C43
 P 1300 3050
 F 0 "U2" H 1550 2800 60  0000 C CNN
@@ -180,7 +180,7 @@ F 3 "" H 2750 1950 50  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L MyLib:MCP1501 U3
+L SupplyMainDigital-rescue:MCP1501-MyLib U3
 U 1 1 593355E9
 P 1300 4700
 F 0 "U3" H 1550 4450 60  0000 C CNN
@@ -476,7 +476,7 @@ $EndComp
 Text Label 700  7200 2    60   ~ 0
 SPI_CS_DAC
 $Comp
-L MyLib:LM334Z U8
+L SupplyMainDigital-rescue:LM334Z-MyLib U8
 U 1 1 5934D471
 P 8800 4400
 F 0 "U8" H 9000 4450 60  0000 C CNN
@@ -730,7 +730,7 @@ F 3 "" H 2400 3150 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L MyLib:HEATSINK HS1
+L SupplyMainDigital-rescue:HEATSINK-MyLib HS1
 U 1 1 5935704C
 P 8700 3150
 F 0 "HS1" H 8700 3350 50  0000 C CNN

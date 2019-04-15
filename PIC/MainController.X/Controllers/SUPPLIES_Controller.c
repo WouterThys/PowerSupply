@@ -111,7 +111,7 @@ void splSetVoltage(uint16_t voltage) {
     i2cPackage.data = setVoltage;
     
     i2cDriverWrite(&i2cPackage);
-    i2cCheckState(i2cPackage);
+    //i2cCheckState(i2cPackage);
     
 }
 

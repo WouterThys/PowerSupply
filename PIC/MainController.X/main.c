@@ -1020,10 +1020,6 @@ int main(void) {
             settingsFsm.currentState = settingsFsm.nextState;
             errorFsm.currentState = errorFsm.nextState;
             
-            // Error test
-            uint16_t a = 1;
-            uint16_t b = 0;
-            uint16_t c = a / b;
         }
         
     }

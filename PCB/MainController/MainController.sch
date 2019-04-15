@@ -1,39 +1,6 @@
-EESchema Schematic File Version 2
-LIBS:power
-LIBS:device
-LIBS:switches
-LIBS:relays
-LIBS:motors
-LIBS:transistors
-LIBS:conn
-LIBS:linear
-LIBS:regul
-LIBS:74xx
-LIBS:cmos4000
-LIBS:adc-dac
-LIBS:memory
-LIBS:xilinx
-LIBS:microcontrollers
-LIBS:dsp
-LIBS:microchip
-LIBS:analog_switches
-LIBS:motorola
-LIBS:texas
-LIBS:intel
-LIBS:audio
-LIBS:interface
-LIBS:digital-audio
-LIBS:philips
-LIBS:display
-LIBS:cypress
-LIBS:siliconi
-LIBS:opto
-LIBS:atmel
-LIBS:contrib
-LIBS:valves
-LIBS:MyLib
+EESchema Schematic File Version 4
 LIBS:MainController-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -48,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L CP C4
+L Device:CP C4
 U 1 1 5B140ED8
 P 2150 1100
 F 0 "C4" H 2175 1200 50  0000 L CNN
@@ -59,7 +26,7 @@ F 3 "" H 2150 1100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR01
+L power:GND #PWR01
 U 1 1 5B140EE9
 P 2150 1350
 F 0 "#PWR01" H 2150 1100 50  0001 C CNN
@@ -70,7 +37,7 @@ F 3 "" H 2150 1350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Conn_01x04 J1
+L MainController-rescue:Conn_01x04 J1
 U 1 1 5B140EF1
 P 2650 1050
 F 0 "J1" H 2650 1250 50  0000 C CNN
@@ -81,7 +48,7 @@ F 3 "" H 2650 1050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L D D1
+L Device:D D1
 U 1 1 5B140EF9
 P 1850 1100
 F 0 "D1" H 1850 1200 50  0000 C CNN
@@ -92,7 +59,7 @@ F 3 "" H 1850 1100 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L +5V #PWR02
+L power:+5V #PWR02
 U 1 1 5B140F64
 P 2150 850
 F 0 "#PWR02" H 2150 700 50  0001 C CNN
@@ -103,7 +70,7 @@ F 3 "" H 2150 850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L MCP1700-3302E_TO92 U2
+L MainController-rescue:MCP1700-3302E_TO92 U2
 U 1 1 5B1413C5
 P 3750 1000
 F 0 "U2" H 3600 1250 50  0000 C CNN
@@ -114,7 +81,7 @@ F 3 "" H 3750 1000 50  0001 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L C C6
+L Device:C C6
 U 1 1 5B141640
 P 3200 1200
 F 0 "C6" H 3225 1300 50  0000 L CNN
@@ -125,7 +92,7 @@ F 3 "" H 3200 1200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR03
+L power:+5V #PWR03
 U 1 1 5B1416B5
 P 3050 850
 F 0 "#PWR03" H 3050 700 50  0001 C CNN
@@ -136,7 +103,7 @@ F 3 "" H 3050 850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR04
+L power:+3.3V #PWR04
 U 1 1 5B1416EC
 P 4550 850
 F 0 "#PWR04" H 4550 700 50  0001 C CNN
@@ -147,7 +114,7 @@ F 3 "" H 4550 850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CP C7
+L Device:CP C7
 U 1 1 5B141756
 P 4200 1200
 F 0 "C7" H 4225 1300 50  0000 L CNN
@@ -158,7 +125,7 @@ F 3 "" H 4200 1200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C8
+L Device:C C8
 U 1 1 5B14178B
 P 4450 1200
 F 0 "C8" H 4475 1300 50  0000 L CNN
@@ -169,7 +136,7 @@ F 3 "" H 4450 1200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR05
+L power:GND #PWR05
 U 1 1 5B1417DE
 P 3200 1400
 F 0 "#PWR05" H 3200 1150 50  0001 C CNN
@@ -180,7 +147,7 @@ F 3 "" H 3200 1400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR06
+L power:GND #PWR06
 U 1 1 5B141804
 P 4200 1400
 F 0 "#PWR06" H 4200 1150 50  0001 C CNN
@@ -191,7 +158,7 @@ F 3 "" H 4200 1400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR07
+L power:GND #PWR07
 U 1 1 5B14182A
 P 4450 1400
 F 0 "#PWR07" H 4450 1150 50  0001 C CNN
@@ -202,7 +169,7 @@ F 3 "" H 4450 1400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR08
+L power:GND #PWR08
 U 1 1 5B141850
 P 3750 1400
 F 0 "#PWR08" H 3750 1150 50  0001 C CNN
@@ -213,7 +180,7 @@ F 3 "" H 3750 1400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R2
+L Device:R R2
 U 1 1 5B141B19
 P 4800 1000
 F 0 "R2" V 4880 1000 50  0000 C CNN
@@ -224,7 +191,7 @@ F 3 "" H 4800 1000 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L LED D2
+L Device:LED D2
 U 1 1 5B141BC4
 P 5050 1250
 F 0 "D2" H 5050 1350 50  0000 C CNN
@@ -235,7 +202,7 @@ F 3 "" H 5050 1250 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L GND #PWR09
+L power:GND #PWR09
 U 1 1 5B141C92
 P 5050 1400
 F 0 "#PWR09" H 5050 1150 50  0001 C CNN
@@ -246,7 +213,7 @@ F 3 "" H 5050 1400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Rotary_Encoder_Switch SW6
+L MainController-rescue:Rotary_Encoder_Switch SW6
 U 1 1 5B141F3F
 P 4800 6200
 F 0 "SW6" H 4800 6460 50  0000 C CNN
@@ -257,7 +224,7 @@ F 3 "" H 4800 6460 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Conn_01x05 J2
+L MainController-rescue:Conn_01x05 J2
 U 1 1 5B1427C8
 P 6400 1100
 F 0 "J2" H 6400 1400 50  0000 C CNN
@@ -274,7 +241,7 @@ PGM_PGED
 Text Label 6600 1300 0    60   ~ 0
 PGM_PGEC
 $Comp
-L GND #PWR010
+L power:GND #PWR010
 U 1 1 5B142995
 P 7150 1150
 F 0 "#PWR010" H 7150 900 50  0001 C CNN
@@ -285,7 +252,7 @@ F 3 "" H 7150 1150 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR011
+L power:+3.3V #PWR011
 U 1 1 5B142A1D
 P 7150 950
 F 0 "#PWR011" H 7150 800 50  0001 C CNN
@@ -296,7 +263,7 @@ F 3 "" H 7150 950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R4
+L Device:R R4
 U 1 1 5B142FE9
 P 8100 600
 F 0 "R4" V 8180 600 50  0000 C CNN
@@ -307,7 +274,7 @@ F 3 "" H 8100 600 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R5
+L Device:R R5
 U 1 1 5B14316D
 P 8100 1250
 F 0 "R5" V 8180 1250 50  0000 C CNN
@@ -318,7 +285,7 @@ F 3 "" H 8100 1250 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R3
+L Device:R R3
 U 1 1 5B1431C8
 P 7900 1450
 F 0 "R3" V 7980 1450 50  0000 C CNN
@@ -330,7 +297,7 @@ F 3 "" H 7900 1450 50  0001 C CNN
 $EndComp
 NoConn ~ 7600 950 
 $Comp
-L GND #PWR012
+L power:GND #PWR012
 U 1 1 5B14328F
 P 7700 1300
 F 0 "#PWR012" H 7700 1050 50  0001 C CNN
@@ -345,7 +312,7 @@ SER_TX
 Text Label 7600 1150 0    60   ~ 0
 SER_RX
 $Comp
-L LED D3
+L Device:LED D3
 U 1 1 5B14369A
 P 8300 800
 F 0 "D3" H 8300 900 50  0000 C CNN
@@ -356,7 +323,7 @@ F 3 "" H 8300 800 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L GND #PWR013
+L power:GND #PWR013
 U 1 1 5B14398C
 P 8300 1000
 F 0 "#PWR013" H 8300 750 50  0001 C CNN
@@ -367,7 +334,7 @@ F 3 "" H 8300 1000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D4
+L Device:LED D4
 U 1 1 5B143A80
 P 8300 1450
 F 0 "D4" H 8300 1550 50  0000 C CNN
@@ -378,7 +345,7 @@ F 3 "" H 8300 1450 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L GND #PWR014
+L power:GND #PWR014
 U 1 1 5B143BF4
 P 7900 1650
 F 0 "#PWR014" H 7900 1400 50  0001 C CNN
@@ -389,7 +356,7 @@ F 3 "" H 7900 1650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR015
+L power:GND #PWR015
 U 1 1 5B143C4D
 P 8300 1650
 F 0 "#PWR015" H 8300 1400 50  0001 C CNN
@@ -400,7 +367,7 @@ F 3 "" H 8300 1650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Conn_01x04 J3
+L MainController-rescue:Conn_01x04 J3
 U 1 1 5B1440BF
 P 7400 1050
 F 0 "J3" H 7400 1250 50  0000 C CNN
@@ -411,7 +378,7 @@ F 3 "" H 7400 1050 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L Conn_01x04 J4
+L MainController-rescue:Conn_01x04 J4
 U 1 1 5B14430D
 P 8600 1150
 F 0 "J4" H 8600 1350 50  0000 C CNN
@@ -422,7 +389,7 @@ F 3 "" H 8600 1150 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L R R6
+L Device:R R6
 U 1 1 5B14455A
 P 9100 950
 F 0 "R6" V 9180 950 50  0000 C CNN
@@ -433,7 +400,7 @@ F 3 "" H 9100 950 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L R R7
+L Device:R R7
 U 1 1 5B14461E
 P 9300 950
 F 0 "R7" V 9380 950 50  0000 C CNN
@@ -444,7 +411,7 @@ F 3 "" H 9300 950 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L +3.3V #PWR016
+L power:+3.3V #PWR016
 U 1 1 5B144BE8
 P 8950 700
 F 0 "#PWR016" H 8950 550 50  0001 C CNN
@@ -455,7 +422,7 @@ F 3 "" H 8950 700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR017
+L power:GND #PWR017
 U 1 1 5B14511F
 P 8950 1400
 F 0 "#PWR017" H 8950 1150 50  0001 C CNN
@@ -470,7 +437,7 @@ I2C_SDA
 Text Label 8800 1250 0    60   ~ 0
 I2C_SCL
 $Comp
-L SW_Push SW1
+L MainController-rescue:SW_Push SW1
 U 1 1 5B145A6A
 P 2150 3000
 F 0 "SW1" H 2200 3100 50  0000 L CNN
@@ -481,7 +448,7 @@ F 3 "" H 2150 3200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R1
+L Device:R R1
 U 1 1 5B145AF7
 P 2150 2750
 F 0 "R1" V 2230 2750 50  0000 C CNN
@@ -492,7 +459,7 @@ F 3 "" H 2150 2750 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L CP C1
+L Device:CP C1
 U 1 1 5B145CCD
 P 950 2950
 F 0 "C1" H 975 3050 50  0000 L CNN
@@ -503,7 +470,7 @@ F 3 "" H 950 2950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C3
+L Device:C C3
 U 1 1 5B145D7E
 P 1350 2950
 F 0 "C3" H 1375 3050 50  0000 L CNN
@@ -514,7 +481,7 @@ F 3 "" H 1350 2950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR018
+L power:+3.3V #PWR018
 U 1 1 5B145E26
 P 1650 2700
 F 0 "#PWR018" H 1650 2550 50  0001 C CNN
@@ -525,7 +492,7 @@ F 3 "" H 1650 2700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR019
+L power:GND #PWR019
 U 1 1 5B146234
 P 950 3150
 F 0 "#PWR019" H 950 2900 50  0001 C CNN
@@ -536,7 +503,7 @@ F 3 "" H 950 3150 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR020
+L power:GND #PWR020
 U 1 1 5B1462F3
 P 1350 3150
 F 0 "#PWR020" H 1350 2900 50  0001 C CNN
@@ -547,7 +514,7 @@ F 3 "" H 1350 3150 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR021
+L power:GND #PWR021
 U 1 1 5B146358
 P 1900 3200
 F 0 "#PWR021" H 1900 2950 50  0001 C CNN
@@ -560,15 +527,15 @@ $EndComp
 Text Label 2400 2750 0    60   ~ 0
 RESET
 Wire Wire Line
-	2150 850  2150 950 
+	2150 850  2150 900 
 Wire Wire Line
 	2450 950  2400 950 
 Wire Wire Line
-	2400 900  2400 1050
+	2400 900  2400 950 
 Wire Wire Line
-	2150 1250 2150 1350
+	2150 1250 2150 1300
 Wire Wire Line
-	1650 900  2400 900 
+	1650 900  1850 900 
 Connection ~ 2150 900 
 Connection ~ 2150 1300
 Wire Wire Line
@@ -578,9 +545,9 @@ Wire Wire Line
 Wire Wire Line
 	2450 1250 2400 1250
 Wire Wire Line
-	2400 1300 2400 1150
+	2400 1300 2400 1250
 Wire Wire Line
-	1650 1300 2400 1300
+	1650 1300 1850 1300
 Wire Wire Line
 	2400 1150 2450 1150
 Connection ~ 2400 1250
@@ -590,9 +557,9 @@ Connection ~ 2400 950
 Wire Wire Line
 	3050 850  3050 1000
 Wire Wire Line
-	3050 1000 3450 1000
+	3050 1000 3200 1000
 Wire Wire Line
-	4050 1000 4650 1000
+	4050 1000 4200 1000
 Wire Wire Line
 	4550 1000 4550 850 
 Wire Wire Line
@@ -636,7 +603,7 @@ Wire Wire Line
 Wire Wire Line
 	7600 1150 7900 1150
 Wire Wire Line
-	7900 1150 7900 1300
+	7900 1150 7900 1250
 Wire Wire Line
 	7900 1250 7950 1250
 Connection ~ 7900 1250
@@ -657,13 +624,13 @@ Wire Wire Line
 Wire Wire Line
 	8300 1250 8300 1300
 Wire Wire Line
-	8950 700  8950 1050
+	8950 700  8950 750 
 Wire Wire Line
 	8950 1050 8800 1050
 Wire Wire Line
 	9100 800  9100 750 
 Wire Wire Line
-	8950 750  9300 750 
+	8950 750  9100 750 
 Connection ~ 8950 750 
 Wire Wire Line
 	9300 750  9300 800 
@@ -683,7 +650,7 @@ Wire Wire Line
 Wire Wire Line
 	950  2800 950  2750
 Wire Wire Line
-	950  2750 2000 2750
+	950  2750 1350 2750
 Wire Wire Line
 	1350 2800 1350 2750
 Connection ~ 1350 2750
@@ -696,14 +663,14 @@ Wire Wire Line
 Wire Wire Line
 	950  3150 950  3100
 Wire Wire Line
-	2300 2750 2750 2750
+	2300 2750 2550 2750
 Wire Wire Line
 	2350 3000 2550 3000
 Wire Wire Line
 	2550 3000 2550 2750
 Connection ~ 2550 2750
 Wire Wire Line
-	1650 2700 1650 3750
+	1650 2700 1650 2750
 Connection ~ 1650 2750
 Wire Wire Line
 	1650 3450 2750 3450
@@ -711,7 +678,7 @@ Wire Wire Line
 	1650 3750 2750 3750
 Connection ~ 1650 3450
 $Comp
-L CP C5
+L Device:CP C5
 U 1 1 5B146D7D
 P 2550 4300
 F 0 "C5" H 2575 4400 50  0000 L CNN
@@ -726,7 +693,7 @@ Wire Wire Line
 Wire Wire Line
 	2550 4050 2750 4050
 Wire Wire Line
-	2550 4450 2550 4800
+	2550 4450 2550 4550
 Wire Wire Line
 	2550 4550 2750 4550
 Wire Wire Line
@@ -736,7 +703,7 @@ Wire Wire Line
 	2550 4750 2750 4750
 Connection ~ 2550 4650
 $Comp
-L GND #PWR022
+L power:GND #PWR022
 U 1 1 5B147104
 P 2550 4800
 F 0 "#PWR022" H 2550 4550 50  0001 C CNN
@@ -788,7 +755,7 @@ LCD_SCK
 Wire Wire Line
 	1850 6200 1900 6200
 $Comp
-L +5V #PWR023
+L power:+5V #PWR023
 U 1 1 5B149988
 P 1200 6200
 F 0 "#PWR023" H 1200 6050 50  0001 C CNN
@@ -801,9 +768,9 @@ $EndComp
 Wire Wire Line
 	1900 6500 1200 6500
 Wire Wire Line
-	1200 6200 1200 6600
+	1200 6200 1200 6500
 $Comp
-L C C2
+L Device:C C2
 U 1 1 5B149ED8
 P 1200 6750
 F 0 "C2" H 1225 6850 50  0000 L CNN
@@ -814,7 +781,7 @@ F 3 "" H 1200 6750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR024
+L power:GND #PWR024
 U 1 1 5B14A0A0
 P 1200 7000
 F 0 "#PWR024" H 1200 6750 50  0001 C CNN
@@ -828,7 +795,7 @@ Wire Wire Line
 	1200 7000 1200 6900
 Connection ~ 1200 6500
 $Comp
-L GND #PWR025
+L power:GND #PWR025
 U 1 1 5B14A488
 P 1850 6600
 F 0 "#PWR025" H 1850 6350 50  0001 C CNN
@@ -854,7 +821,7 @@ SER_RX
 Wire Wire Line
 	5550 3950 5350 3950
 $Comp
-L R R10
+L Device:R R10
 U 1 1 5B14B8E7
 P 4100 5850
 F 0 "R10" V 4180 5850 50  0000 C CNN
@@ -865,7 +832,7 @@ F 3 "" H 4100 5850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R11
+L Device:R R11
 U 1 1 5B14BBC0
 P 4100 6550
 F 0 "R11" V 4180 6550 50  0000 C CNN
@@ -876,7 +843,7 @@ F 3 "" H 4100 6550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR026
+L power:GND #PWR026
 U 1 1 5B14BE8B
 P 4400 6400
 F 0 "#PWR026" H 4400 6150 50  0001 C CNN
@@ -891,11 +858,11 @@ Wire Wire Line
 Wire Wire Line
 	4400 6200 4500 6200
 Wire Wire Line
-	3950 6300 4500 6300
+	3950 6300 4100 6300
 Wire Wire Line
-	3950 6100 4500 6100
+	3950 6100 4100 6100
 $Comp
-L +5V #PWR027
+L power:+5V #PWR027
 U 1 1 5B14C17A
 P 4100 5650
 F 0 "#PWR027" H 4100 5500 50  0001 C CNN
@@ -906,7 +873,7 @@ F 3 "" H 4100 5650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R8
+L Device:R R8
 U 1 1 5B14C328
 P 3800 6100
 F 0 "R8" V 3880 6100 50  0000 C CNN
@@ -917,7 +884,7 @@ F 3 "" H 3800 6100 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R9
+L Device:R R9
 U 1 1 5B14C3D6
 P 3800 6300
 F 0 "R9" V 3880 6300 50  0000 C CNN
@@ -928,15 +895,15 @@ F 3 "" H 3800 6300 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	3500 6100 3650 6100
+	3500 6100 3550 6100
 Wire Wire Line
-	3500 6300 3650 6300
+	3500 6300 3550 6300
 Text Label 3500 6100 2    60   ~ 0
 ROT_R1
 Text Label 3500 6300 2    60   ~ 0
 ROT_R2
 $Comp
-L C C10
+L Device:C C10
 U 1 1 5B14C96D
 P 3550 5850
 F 0 "C10" H 3575 5950 50  0000 L CNN
@@ -947,7 +914,7 @@ F 3 "" H 3550 5850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C11
+L Device:C C11
 U 1 1 5B14CA92
 P 3550 6550
 F 0 "C11" H 3575 6650 50  0000 L CNN
@@ -958,7 +925,7 @@ F 3 "" H 3550 6550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR028
+L power:GND #PWR028
 U 1 1 5B14CBCC
 P 3550 6750
 F 0 "#PWR028" H 3550 6500 50  0001 C CNN
@@ -969,7 +936,7 @@ F 3 "" H 3550 6750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR029
+L power:GND #PWR029
 U 1 1 5B14CC49
 P 3550 5650
 F 0 "#PWR029" H 3550 5400 50  0001 C CNN
@@ -995,7 +962,7 @@ Wire Wire Line
 	4100 6000 4100 6100
 Connection ~ 4100 6100
 $Comp
-L +5V #PWR030
+L power:+5V #PWR030
 U 1 1 5B14D606
 P 4100 6750
 F 0 "#PWR030" H 4100 6600 50  0001 C CNN
@@ -1011,7 +978,7 @@ Wire Wire Line
 	4100 6400 4100 6300
 Connection ~ 4100 6300
 $Comp
-L R R12
+L Device:R R12
 U 1 1 5B14D97A
 P 5200 5800
 F 0 "R12" V 5280 5800 50  0000 C CNN
@@ -1022,7 +989,7 @@ F 3 "" H 5200 5800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR031
+L power:+5V #PWR031
 U 1 1 5B14DA31
 P 5200 5600
 F 0 "#PWR031" H 5200 5450 50  0001 C CNN
@@ -1037,7 +1004,7 @@ Wire Wire Line
 Wire Wire Line
 	5200 6100 5200 5950
 $Comp
-L GND #PWR032
+L power:GND #PWR032
 U 1 1 5B14DC04
 P 5200 6400
 F 0 "#PWR032" H 5200 6150 50  0001 C CNN
@@ -1087,7 +1054,7 @@ IO_INTA
 Text Label 5500 4850 0    60   ~ 0
 IO_INTB
 $Comp
-L MCP23S17 U4
+L MainController-rescue:MCP23S17 U4
 U 1 1 5B151102
 P 9650 3950
 F 0 "U4" H 9550 4975 50  0000 R CNN
@@ -1126,7 +1093,7 @@ IO_CS
 Text Label 9050 3150 2    60   ~ 0
 RESET
 $Comp
-L C C9
+L Device:C C9
 U 1 1 5B15398D
 P 8950 2550
 F 0 "C9" H 8975 2650 50  0000 L CNN
@@ -1137,7 +1104,7 @@ F 3 "" H 8950 2550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR033
+L power:GND #PWR033
 U 1 1 5B1542B9
 P 9650 4950
 F 0 "#PWR033" H 9650 4700 50  0001 C CNN
@@ -1148,7 +1115,7 @@ F 3 "" H 9650 4950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR034
+L power:GND #PWR034
 U 1 1 5B1546EE
 P 9100 4950
 F 0 "#PWR034" H 9100 4700 50  0001 C CNN
@@ -1159,7 +1126,7 @@ F 3 "" H 9100 4950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9100 4550 9100 4950
+	9100 4550 9100 4650
 Wire Wire Line
 	9100 4550 9150 4550
 Wire Wire Line
@@ -1169,7 +1136,7 @@ Wire Wire Line
 	9150 4750 9100 4750
 Connection ~ 9100 4750
 $Comp
-L SW_Push SW2
+L MainController-rescue:SW_Push SW2
 U 1 1 5B154EAF
 P 10700 3150
 F 0 "SW2" H 10850 3200 50  0000 L CNN
@@ -1180,7 +1147,7 @@ F 3 "" H 10700 3350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L SW_Push SW3
+L MainController-rescue:SW_Push SW3
 U 1 1 5B155C91
 P 10700 3250
 F 0 "SW3" H 10850 3300 50  0000 L CNN
@@ -1191,7 +1158,7 @@ F 3 "" H 10700 3450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L SW_Push SW4
+L MainController-rescue:SW_Push SW4
 U 1 1 5B155F1E
 P 10700 3350
 F 0 "SW4" H 10850 3400 50  0000 L CNN
@@ -1202,7 +1169,7 @@ F 3 "" H 10700 3550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L SW_Push SW5
+L MainController-rescue:SW_Push SW5
 U 1 1 5B155FA6
 P 10700 3450
 F 0 "SW5" H 10850 3500 50  0000 L CNN
@@ -1233,7 +1200,7 @@ Wire Wire Line
 Wire Wire Line
 	10500 3150 10150 3150
 $Comp
-L C C12
+L Device:C C12
 U 1 1 5B15706A
 P 5650 6500
 F 0 "C12" H 5675 6600 50  0000 L CNN
@@ -1244,7 +1211,7 @@ F 3 "" H 5650 6500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR035
+L power:GND #PWR035
 U 1 1 5B157132
 P 5650 6750
 F 0 "#PWR035" H 5650 6500 50  0001 C CNN
@@ -1260,7 +1227,7 @@ Wire Wire Line
 	5650 6100 5650 6350
 Connection ~ 5650 6100
 $Comp
-L R R13
+L Device:R R13
 U 1 1 5B157D43
 P 5450 6100
 F 0 "R13" V 5530 6100 50  0000 C CNN
@@ -1271,12 +1238,12 @@ F 3 "" H 5450 6100 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	5100 6100 5300 6100
+	5100 6100 5200 6100
 Wire Wire Line
-	5600 6100 5850 6100
+	5600 6100 5650 6100
 NoConn ~ 10150 3550
 $Comp
-L Conn_01x08 J5
+L MainController-rescue:Conn_01x08 J5
 U 1 1 5B158BF5
 P 10650 4450
 F 0 "J5" H 10650 4850 50  0000 C CNN
@@ -1319,7 +1286,7 @@ GPA6
 Text Label 10200 4750 0    60   ~ 0
 GPA7
 $Comp
-L Conn_01x04 J6
+L MainController-rescue:Conn_01x04 J6
 U 1 1 5B15A036
 P 5600 1150
 F 0 "J6" H 5600 1350 50  0000 C CNN
@@ -1332,12 +1299,12 @@ $EndComp
 Wire Wire Line
 	5800 950  5950 950 
 Wire Wire Line
-	5950 900  5950 1050
+	5950 900  5950 950 
 Wire Wire Line
 	5950 1050 5800 1050
 Connection ~ 5950 950 
 $Comp
-L GND #PWR036
+L power:GND #PWR036
 U 1 1 5B15AB2A
 P 5950 1300
 F 0 "#PWR036" H 5950 1050 50  0001 C CNN
@@ -1350,12 +1317,12 @@ $EndComp
 Wire Wire Line
 	5800 1150 5950 1150
 Wire Wire Line
-	5950 1150 5950 1300
+	5950 1150 5950 1250
 Wire Wire Line
 	5800 1250 5950 1250
 Connection ~ 5950 1250
 $Comp
-L GND #PWR037
+L power:GND #PWR037
 U 1 1 5B15AFED
 P 11000 3500
 F 0 "#PWR037" H 11000 3250 50  0001 C CNN
@@ -1366,7 +1333,7 @@ F 3 "" H 11000 3500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	11000 3150 11000 3500
+	11000 3150 11000 3250
 Wire Wire Line
 	11000 3150 10900 3150
 Wire Wire Line
@@ -1388,7 +1355,7 @@ Text Label 10200 3450 0    60   ~ 0
 BTN3
 NoConn ~ 5350 2950
 $Comp
-L Conn_01x01 J7
+L MainController-rescue:Conn_01x01 J7
 U 1 1 5B158601
 P 11100 700
 F 0 "J7" H 11100 800 50  0000 C CNN
@@ -1399,7 +1366,7 @@ F 3 "" H 11100 700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Conn_01x01 J8
+L MainController-rescue:Conn_01x01 J8
 U 1 1 5B1587EF
 P 11100 1000
 F 0 "J8" H 11100 1100 50  0000 C CNN
@@ -1410,7 +1377,7 @@ F 3 "" H 11100 1000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Conn_01x01 J9
+L MainController-rescue:Conn_01x01 J9
 U 1 1 5B158894
 P 10750 1250
 F 0 "J9" H 10750 1350 50  0000 C CNN
@@ -1424,7 +1391,7 @@ NoConn ~ 10900 700
 NoConn ~ 10900 1000
 NoConn ~ 10550 1250
 $Comp
-L dsPIC33EPXXXGP502 U3
+L MainController-rescue:dsPIC33EPXXXGP502 U3
 U 1 1 5B1FC9E1
 P 4050 4550
 F 0 "U3" H 2900 6600 50  0000 L CNN
@@ -1435,7 +1402,7 @@ F 3 "" H 3350 4150 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L NHD-0216K3Z U1
+L MainController-rescue:NHD-0216K3Z U1
 U 1 1 5B1FCCB6
 P 2300 6100
 F 0 "U1" H 2850 6350 60  0000 C CNN
@@ -1446,7 +1413,7 @@ F 3 "" H 2600 5800 60  0001 C CNN
 	0    -1   1    0   
 $EndComp
 $Comp
-L Jack-DC J10
+L MainController-rescue:Jack-DC J10
 U 1 1 5B1FEC81
 P 1150 1100
 F 0 "J10" H 1150 1310 50  0000 C CNN
@@ -1459,7 +1426,7 @@ $EndComp
 Wire Wire Line
 	1450 1200 1650 1200
 Wire Wire Line
-	1650 1100 1650 1300
+	1650 1100 1650 1200
 Connection ~ 1850 1300
 Wire Wire Line
 	1450 1000 1650 1000
@@ -1470,7 +1437,7 @@ Wire Wire Line
 	1450 1100 1650 1100
 Connection ~ 1650 1200
 $Comp
-L +3.3V #PWR038
+L power:+3.3V #PWR038
 U 1 1 5B200FD1
 P 5950 900
 F 0 "#PWR038" H 5950 750 50  0001 C CNN
@@ -1481,7 +1448,7 @@ F 3 "" H 5950 900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D5
+L Device:LED D5
 U 1 1 5B1FE46B
 P 6400 3800
 F 0 "D5" H 6400 3900 50  0000 C CNN
@@ -1492,7 +1459,7 @@ F 3 "" H 6400 3800 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L LED D6
+L Device:LED D6
 U 1 1 5B1FE53D
 P 6700 3800
 F 0 "D6" H 6700 3900 50  0000 C CNN
@@ -1503,7 +1470,7 @@ F 3 "" H 6700 3800 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L LED D7
+L Device:LED D7
 U 1 1 5B1FE5F8
 P 7000 3800
 F 0 "D7" H 7000 3900 50  0000 C CNN
@@ -1514,7 +1481,7 @@ F 3 "" H 7000 3800 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L R R16
+L Device:R R16
 U 1 1 5B1FEC88
 P 6100 3350
 F 0 "R16" V 6180 3350 50  0000 C CNN
@@ -1525,7 +1492,7 @@ F 3 "" H 6100 3350 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R15
+L Device:R R15
 U 1 1 5B1FEE00
 P 6100 2850
 F 0 "R15" V 6180 2850 50  0000 C CNN
@@ -1536,7 +1503,7 @@ F 3 "" H 6100 2850 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R14
+L Device:R R14
 U 1 1 5B1FEEC6
 P 6100 2750
 F 0 "R14" V 6180 2750 50  0000 C CNN
@@ -1566,7 +1533,7 @@ Wire Wire Line
 Wire Wire Line
 	7000 2750 7000 3650
 $Comp
-L GND #PWR039
+L power:GND #PWR039
 U 1 1 5B1FF76B
 P 6400 4050
 F 0 "#PWR039" H 6400 3800 50  0001 C CNN
@@ -1577,7 +1544,7 @@ F 3 "" H 6400 4050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR040
+L power:GND #PWR040
 U 1 1 5B1FF8F7
 P 6700 4050
 F 0 "#PWR040" H 6700 3800 50  0001 C CNN
@@ -1588,7 +1555,7 @@ F 3 "" H 6700 4050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR041
+L power:GND #PWR041
 U 1 1 5B1FF9A7
 P 7000 4050
 F 0 "#PWR041" H 7000 3800 50  0001 C CNN
@@ -1605,7 +1572,7 @@ Wire Wire Line
 Wire Wire Line
 	7000 3950 7000 4050
 $Comp
-L Conn_01x01 J12
+L MainController-rescue:Conn_01x01 J12
 U 1 1 5B22365B
 P 10750 950
 F 0 "J12" H 10750 1050 50  0000 C CNN
@@ -1616,7 +1583,7 @@ F 3 "" H 10750 950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Conn_01x01 J11
+L MainController-rescue:Conn_01x01 J11
 U 1 1 5B223739
 P 10750 650
 F 0 "J11" H 10750 750 50  0000 C CNN
@@ -1629,7 +1596,7 @@ $EndComp
 NoConn ~ 10550 950 
 NoConn ~ 10550 650 
 $Comp
-L Conn_01x05 J13
+L MainController-rescue:Conn_01x05 J13
 U 1 1 5B349CC6
 P 9600 1150
 F 0 "J13" H 9600 1450 50  0000 C CNN
@@ -1662,7 +1629,7 @@ Wire Wire Line
 Wire Wire Line
 	9800 1350 9900 1350
 $Comp
-L GND #PWR042
+L power:GND #PWR042
 U 1 1 5B34A257
 P 10250 1100
 F 0 "#PWR042" H 10250 850 50  0001 C CNN
@@ -1675,7 +1642,7 @@ $EndComp
 Wire Wire Line
 	10250 950  10250 900 
 $Comp
-L +3.3V #PWR043
+L power:+3.3V #PWR043
 U 1 1 5B34A19E
 P 10250 900
 F 0 "#PWR043" H 10250 750 50  0001 C CNN
@@ -1688,7 +1655,7 @@ $EndComp
 Wire Wire Line
 	9800 950  10250 950 
 $Comp
-L MCP1700-3302E_TO92 U5
+L MainController-rescue:MCP1700-3302E_TO92 U5
 U 1 1 5B432163
 P 8100 2350
 F 0 "U5" H 7950 2600 50  0000 C CNN
@@ -1699,7 +1666,7 @@ F 3 "" H 8100 2350 50  0001 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L C C13
+L Device:C C13
 U 1 1 5B432169
 P 7550 2550
 F 0 "C13" H 7575 2650 50  0000 L CNN
@@ -1710,7 +1677,7 @@ F 3 "" H 7550 2550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR044
+L power:+5V #PWR044
 U 1 1 5B43216F
 P 7400 2200
 F 0 "#PWR044" H 7400 2050 50  0001 C CNN
@@ -1721,7 +1688,7 @@ F 3 "" H 7400 2200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CP C14
+L Device:CP C14
 U 1 1 5B432175
 P 8550 2550
 F 0 "C14" H 8575 2650 50  0000 L CNN
@@ -1732,7 +1699,7 @@ F 3 "" H 8550 2550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR045
+L power:GND #PWR045
 U 1 1 5B43217B
 P 7550 2750
 F 0 "#PWR045" H 7550 2500 50  0001 C CNN
@@ -1743,7 +1710,7 @@ F 3 "" H 7550 2750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR046
+L power:GND #PWR046
 U 1 1 5B432181
 P 8550 2750
 F 0 "#PWR046" H 8550 2500 50  0001 C CNN
@@ -1754,7 +1721,7 @@ F 3 "" H 8550 2750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR047
+L power:GND #PWR047
 U 1 1 5B432187
 P 8100 2750
 F 0 "#PWR047" H 8100 2500 50  0001 C CNN
@@ -1767,9 +1734,9 @@ $EndComp
 Wire Wire Line
 	7400 2200 7400 2350
 Wire Wire Line
-	7400 2350 7800 2350
+	7400 2350 7550 2350
 Wire Wire Line
-	8400 2350 9650 2350
+	8400 2350 8550 2350
 Wire Wire Line
 	7550 2400 7550 2350
 Connection ~ 7550 2350
@@ -1785,7 +1752,7 @@ Wire Wire Line
 Wire Wire Line
 	9650 2350 9650 2950
 $Comp
-L GND #PWR048
+L power:GND #PWR048
 U 1 1 5B4341EC
 P 8950 2750
 F 0 "#PWR048" H 8950 2500 50  0001 C CNN
@@ -1808,4 +1775,86 @@ Text Notes 7350 7500 0    60   ~ 0
 PS MainController
 Text Notes 8150 7650 0    60   ~ 0
 09/07/2018
+Wire Wire Line
+	2150 900  2150 950 
+Wire Wire Line
+	2150 900  2400 900 
+Wire Wire Line
+	2150 1300 2150 1350
+Wire Wire Line
+	2150 1300 2400 1300
+Wire Wire Line
+	2400 1250 2400 1150
+Wire Wire Line
+	2400 950  2400 1050
+Wire Wire Line
+	3200 1000 3450 1000
+Wire Wire Line
+	4200 1000 4450 1000
+Wire Wire Line
+	4450 1000 4550 1000
+Wire Wire Line
+	4550 1000 4650 1000
+Wire Wire Line
+	7900 1250 7900 1300
+Wire Wire Line
+	8950 750  8950 1050
+Wire Wire Line
+	9100 750  9300 750 
+Wire Wire Line
+	1350 2750 1650 2750
+Wire Wire Line
+	2550 2750 2750 2750
+Wire Wire Line
+	1650 2750 1650 3450
+Wire Wire Line
+	1650 2750 2000 2750
+Wire Wire Line
+	1650 3450 1650 3750
+Wire Wire Line
+	2550 4550 2550 4650
+Wire Wire Line
+	2550 4650 2550 4750
+Wire Wire Line
+	2550 4750 2550 4800
+Wire Wire Line
+	1200 6500 1200 6600
+Wire Wire Line
+	3550 6100 3650 6100
+Wire Wire Line
+	3550 6300 3650 6300
+Wire Wire Line
+	4100 6100 4500 6100
+Wire Wire Line
+	4100 6300 4500 6300
+Wire Wire Line
+	5200 6100 5300 6100
+Wire Wire Line
+	9100 4650 9100 4750
+Wire Wire Line
+	9100 4750 9100 4950
+Wire Wire Line
+	5650 6100 5850 6100
+Wire Wire Line
+	5950 950  5950 1050
+Wire Wire Line
+	5950 1250 5950 1300
+Wire Wire Line
+	11000 3250 11000 3350
+Wire Wire Line
+	11000 3350 11000 3450
+Wire Wire Line
+	11000 3450 11000 3500
+Wire Wire Line
+	1850 1300 2150 1300
+Wire Wire Line
+	1850 900  2150 900 
+Wire Wire Line
+	1650 1200 1650 1300
+Wire Wire Line
+	7550 2350 7800 2350
+Wire Wire Line
+	8550 2350 8950 2350
+Wire Wire Line
+	8950 2350 9650 2350
 $EndSCHEMATC
