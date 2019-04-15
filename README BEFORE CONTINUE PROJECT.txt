@@ -1,0 +1,1 @@
+In SUPLLIES_Controller.c -> commented out all i2cCheckState(i2cPackage); because gave errors
