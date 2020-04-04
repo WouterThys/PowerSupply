@@ -25,3 +25,4 @@ funclist
 nbproject/Makefile-*
 disassembly/
 *.map
+/PIC/MainGLCDController.X/nbproject/private/
