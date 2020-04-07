@@ -26,3 +26,10 @@ nbproject/Makefile-*
 disassembly/
 *.map
 /PIC/MainGLCDController.X/nbproject/private/
+/PIC/GLCDTest.X/nbproject/private/
+/PIC/MainController.X/nbproject/private/
+/PCB/ConstantSupply/fp-info-cache
+/PCB/ControlBoard/fp-info-cache
+/PCB/MainController/fp-info-cache
+/PCB/SimpleSupply/fp-info-cache
+/PCB/V3/fp-info-cache

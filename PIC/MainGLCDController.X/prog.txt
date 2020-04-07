@@ -1,0 +1,6 @@
+Device PIC18F4550
+set system.disableerrormsg true
+Hwtool pickit3 -p
+Program "./dist/default/production/MainGLCDController.X.production.hex"
+Reset MCLR
+Quit
