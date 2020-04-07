@@ -48,7 +48,7 @@ MKDIR=mkdir
 CP=cp
 CCADMIN=CCadmin
 RANLIB=ranlib
-
+PROGRAMMER=./prog.txt
 
 # build
 build: .build-post
@@ -104,7 +104,8 @@ help: .help-post
 .help-post: .help-impl
 # Add your post 'help' code here...
 
-
+flash: build
+		/opt/microchip/mplabx/v4.05/mplab_ide/bin/mdb.sh $(PROGRAMMER)
 
 # include project implementation makefile
 include nbproject/Makefile-impl.mk
