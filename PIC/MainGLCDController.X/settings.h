@@ -17,7 +17,7 @@
 /**
  *  PIC
  */
-#define _XTAL_FREQ 20000000
+#define _XTAL_FREQ 48000000
  
 #define LED1            PORTAbits.RA0
 #define LED1_Dir        TRISAbits.TRISA0

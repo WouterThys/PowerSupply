@@ -1,21 +1,14 @@
 #include "MENU_Controller.h"
+#include <string.h>
 
-#define MENU_WIDTH      64
-#define TITLE_HEIGHT    10
-#define SETUP_HEIGHT    12
-#define READ_HEIGHT     32
+#define VALUE_NAME_LENGTH   3
+#define VALUE_DATA_LENGTH   8
+#define TITLE_NAME_LENGTH   6
 
-#define MENU_1_TITLE_START  (16)
-#define MENU_2_TITLE_START  (16 + MENU_WIDTH)
-#define MENU_3_TITLE_START  (16 + (2 * MENU_WIDTH))
-
-#define MENU_1_SETUP_START  (8)
-#define MENU_2_SETUP_START  (8 + MENU_WIDTH)
-#define MENU_3_SETUP_START  (8 + (2 * MENU_WIDTH))
-
-#define MENU_1_READ_START  (8)
-#define MENU_2_READ_START  (8 + MENU_WIDTH)
-#define MENU_3_READ_START  (8 + (2 * MENU_WIDTH))
+#define V_SET_VALUE         0
+#define I_SET_VALUE         1
+#define V_READ_VALUE        2
+#define I_READ_VALUE        3
 
 // Helpers
 typedef struct Pos {
@@ -57,23 +50,53 @@ typedef struct Menu {
 static void drawMenu(Menu_t * menu);
 static void drawTitle(Title_t * title);
 static void drawValue(Value_t * value);
-static void updateMenu(Menu_t * menu);
-static void updateTitle(Title_t * title);
-static void updateValue(Value_t * value);
 
-// Helpers
-static bool menu_1_selected;
-static bool menu_2_selected;
-static bool menu_3_selected;
+static void updateTitleStatus(Title_t * title, char status);
+static void updateTitleSelection(Title_t * title, bool selected);
+static void updateValueValue(Value_t * value, const char * data);
+static void updateValueState(Value_t * value, uint8_t state);
 
-static bool menu_1_v_selected;
-static bool menu_2_v_selected;
-static bool menu_3_v_selected;
 
-static bool menu_1_i_selected;
-static bool menu_2_i_selected;
-static bool menu_3_i_selected;
+static Menu_t menu1 = {
+    // Title
+    { "Sup 1", { 16, 1 }, 'I', { 56, 1 }, { 0, 0, 63, 10 }, false },
 
+    // Values
+    {
+        { "V:", { 4, 16 }, { 0 }, { 24, 16 }, STATE_NONE, { 1, 15, 12, 8 }, false  },
+        { "I:", { 4, 26 }, { 0 }, { 24, 26 }, STATE_NONE, { 1, 25, 12, 8 }, false  },
+        { "V=", { 5, 40 }, { 0 }, { 24, 40 }, STATE_NONE, { 1, 39, 12, 8 }, false  },
+        { "I=", { 5, 50 }, { 0 }, { 24, 50 }, STATE_NONE, { 1, 49, 12, 8 }, false  },
+    }
+};
+
+static Menu_t menu2 = {
+    // Title
+    { "Sup 2", { 80, 1 }, 'I', { 120, 1 }, { 64, 0, 63, 10 }, false },
+
+    // Values
+    {
+        { "V:", { 68, 16 }, { 0 }, { 88, 16 }, STATE_NONE, { 65, 15, 12, 8 }, false  },
+        { "I:", { 68, 26 }, { 0 }, { 88, 26 }, STATE_NONE, { 65, 25, 12, 8 }, false  },
+        { "V=", { 69, 40 }, { 0 }, { 88, 40 }, STATE_NONE, { 65, 39, 12, 8 }, false  },
+        { "I=", { 69, 50 }, { 0 }, { 88, 50 }, STATE_NONE, { 65, 49, 12, 8 }, false  },
+    }
+};
+
+static Menu_t menu3 = {
+    // Title
+    { "Sup 3", { 144, 1 }, 'I', { 184, 1 }, { 128, 0, 63, 10 }, false },
+
+    // Values
+    {
+        { "V:", { 132, 16 }, { 0 }, { 152, 16 }, STATE_NONE, { 129, 15, 12, 8 }, false  },
+        { "I:", { 132, 26 }, { 0 }, { 152, 26 }, STATE_NONE, { 129, 25, 12, 8 }, false  },
+        { "V=", { 133, 40 }, { 0 }, { 152, 40 }, STATE_NONE, { 129, 39, 12, 8 }, false  },
+        { "I=", { 133, 50 }, { 0 }, { 152, 50 }, STATE_NONE, { 129, 49, 12, 8 }, false  },
+    }
+};
+
+static Menu_t menus[3];
 
 void menuInit() {
 
@@ -82,281 +105,74 @@ void menuInit() {
     GLCD_SelectFont(font);
     GLCD_ClearScreen(BLACK);
 
-    // Print titles
-    GLCD_WriteText(MENU_1_TITLE_START, 1, menu_1_title);
-    GLCD_WriteText(MENU_2_TITLE_START, 1, menu_2_title);
-    GLCD_WriteText(MENU_3_TITLE_START, 1, menu_3_title);
-    
-    GLCD_WriteText(MENU_1_SETUP_START, SETUP_HEIGHT, menu_setup);
-    GLCD_WriteText(MENU_2_SETUP_START, SETUP_HEIGHT, menu_setup);
-    GLCD_WriteText(MENU_3_SETUP_START, SETUP_HEIGHT, menu_setup);
-    
-    GLCD_WriteText(MENU_1_SETUP_START-2, SETUP_HEIGHT + 8,  menu_voltage_is);
-    GLCD_WriteText(MENU_1_SETUP_START-2, SETUP_HEIGHT + 16, menu_current_is);
-    GLCD_WriteText(MENU_2_SETUP_START-2, SETUP_HEIGHT + 8,  menu_voltage_is);
-    GLCD_WriteText(MENU_2_SETUP_START-2, SETUP_HEIGHT + 16, menu_current_is);
-    GLCD_WriteText(MENU_3_SETUP_START-2, SETUP_HEIGHT + 8,  menu_voltage_is);
-    GLCD_WriteText(MENU_3_SETUP_START-2, SETUP_HEIGHT + 16, menu_current_is);
-    
-    GLCD_WriteText(MENU_1_READ_START-2, READ_HEIGHT + 8,  menu_voltage_read);
-    GLCD_WriteText(MENU_1_READ_START-2, READ_HEIGHT + 16, menu_current_read);
-    GLCD_WriteText(MENU_2_READ_START-2, READ_HEIGHT + 8,  menu_voltage_read);
-    GLCD_WriteText(MENU_2_READ_START-2, READ_HEIGHT + 16, menu_current_read);
-    GLCD_WriteText(MENU_3_READ_START-2, READ_HEIGHT + 8,  menu_voltage_read);
-    GLCD_WriteText(MENU_3_READ_START-2, READ_HEIGHT + 16, menu_current_read);
-    
+    menus[0] = menu1;
+    menus[1] = menu2;
+    menus[2] = menu3;
+
+    drawMenu(&menu1);
+    drawMenu(&menu2);
+    drawMenu(&menu3);
+
     // Draw lines
-    GLCD_DrawHoriLine(0, TITLE_HEIGHT, DISPLAY_WIDTH - 1);
-    GLCD_DrawVertLine(MENU_WIDTH, 0, DISPLAY_HEIGHT - 1,);
-    GLCD_DrawVertLine(2 * MENU_WIDTH, 0, DISPLAY_HEIGHT - 1);
+    GLCD_DrawHoriLine(0, 10, 191);
+    GLCD_DrawHoriLine(0, 36, 191);
+    GLCD_DrawHoriLine(0, 37, 191);
+    GLCD_DrawVertLine(64, 0, 63);
+    GLCD_DrawVertLine(128, 0, 63);
+    GLCD_DrawVertLine(0, 38, 26);
+    GLCD_DrawVertLine(65, 38, 26);
+    GLCD_DrawVertLine(129, 38, 26);
 
-    // Test
-    menuSelect(MENU_1);
-    menuPointVoltage(MENU_1);
-    menuPointVoltage(MENU_2);
-    menuPointCurrent(MENU_3);
-    menuPointCurrent(MENU_1);
 }
 
-void menuSelect(const uint8_t menu) {
-    switch (menu) {
-        default:
-        case MENU_1:
-            if (!menu_1_selected) {
-                GLCD_InvertRect(0, 0, MENU_WIDTH - 1, TITLE_HEIGHT - 1);
-                menu_1_selected = true;
-            }
-            break;
-            
-        case MENU_2:
-            if (!menu_2_selected) {
-                GLCD_InvertRect(MENU_WIDTH, 0, MENU_WIDTH - 1, TITLE_HEIGHT - 1);
-                menu_2_selected = true;
-            }
-            break;
-            
-        case MENU_3:
-            if (!menu_3_selected) {
-                GLCD_InvertRect(2*MENU_WIDTH, 0, MENU_WIDTH - 1, TITLE_HEIGHT - 1);
-                menu_3_selected = true;
-            }
-            break;
+void menuSelect(const uint8_t menu, bool selected) {
+    if (menus[menu].title.selected != selected) {
+        updateTitleSelection(&menus[menu].title, selected);
     }
 }
 
-void menuDeselect(const uint8_t menu) {
-    switch (menu) {
-        default:
-        case MENU_1:
-            if (menu_1_selected) {
-                GLCD_InvertRect(0, 0, MENU_WIDTH - 1, TITLE_HEIGHT - 1);
-                menu_1_selected = false;
-            }
-            break;
-            
-        case MENU_2:
-            if (menu_2_selected) {
-                GLCD_InvertRect(MENU_WIDTH, 0, MENU_WIDTH - 1, TITLE_HEIGHT - 1);
-                menu_2_selected = false;
-            }
-            break;
-            
-        case MENU_3:
-            if (menu_3_selected) {
-                GLCD_InvertRect(2*MENU_WIDTH, 0, MENU_WIDTH - 1, TITLE_HEIGHT - 1);
-                menu_3_selected = false;
-            }
-            break;
+void menuSetVoltageState(const uint8_t menu, const uint8_t state) {
+    if (menus[menu].values[V_SET_VALUE].state != state) {
+        updateValueState(&menus[menu].values[V_SET_VALUE], state);
     }
 }
 
-void menuPointVoltage(const uint8_t menu) {
-    switch (menu) {
-        default:
-        case MENU_1:
-            GLCD_ClearDot(MENU_1_SETUP_START-4, SETUP_HEIGHT + 20)
-            GLCD_DrawDot(MENU_1_SETUP_START-4, SETUP_HEIGHT + 12)
-            break;
-            
-        case MENU_2:
-            GLCD_ClearDot(MENU_2_SETUP_START-4, SETUP_HEIGHT + 20)
-            GLCD_DrawDot(MENU_2_SETUP_START-4, SETUP_HEIGHT + 12)
-            break;
-            
-        case MENU_3:
-            GLCD_ClearDot(MENU_3_SETUP_START-4, SETUP_HEIGHT + 20)
-            GLCD_DrawDot(MENU_3_SETUP_START-4, SETUP_HEIGHT + 12)
-            break;
+void menuSetCurrentState(const uint8_t menu, const uint8_t state) {
+    if (menus[menu].values[I_SET_VALUE].state != state) {
+        updateValueState(&menus[menu].values[I_SET_VALUE], state);
     }
 }
-
-void menuPointCurrent(const uint8_t menu) {
-    switch (menu) {
-        default:
-        case MENU_1:
-            GLCD_ClearDot(MENU_1_SETUP_START-4, SETUP_HEIGHT + 12)
-            GLCD_DrawDot(MENU_1_SETUP_START-4, SETUP_HEIGHT + 20)
-            break;
-            
-        case MENU_2:
-            GLCD_ClearDot(MENU_2_SETUP_START-4, SETUP_HEIGHT + 12)
-            GLCD_DrawDot(MENU_2_SETUP_START-4, SETUP_HEIGHT + 20)
-            break;
-            
-        case MENU_3:
-            GLCD_ClearDot(MENU_3_SETUP_START-4, SETUP_HEIGHT + 12)
-            GLCD_DrawDot(MENU_3_SETUP_START-4, SETUP_HEIGHT + 20)
-            break;
-    }
-}
-
-void menuSelectVoltage(const uint8_t menu) {
-    menuPointVoltage(menu);
-    switch (menu) {
-        default:
-        case MENU_1:
-            if (!menu_1_v_selected) {
-                if (menu_1_i_selected) {
-                    GLCD_InvertRect(MENU_1_SETUP_START - 5, SETUP_HEIGHT + 15, 14, 8); // Invert current
-                }
-                GLCD_InvertRect(MENU_1_SETUP_START - 5, SETUP_HEIGHT + 8, 14, 8); // Invert voltage
-                menu_1_v_selected = true;
-            }
-            break;
-            
-        case MENU_2:
-            if (!menu_2_v_selected) {
-                if (menu_2_i_selected) {
-                    GLCD_InvertRect(MENU_2_SETUP_START - 5, SETUP_HEIGHT + 15, 14, 8); // Invert current
-                }
-                GLCD_InvertRect(MENU_2_SETUP_START - 5, SETUP_HEIGHT + 8, 14, 8); // Invert voltage
-                menu_2_v_selected = true;
-            }
-            break;
-            
-        case MENU_3:
-            if (!menu_3_v_selected) {
-                if (menu_3_i_selected) {
-                    GLCD_InvertRect(MENU_3_SETUP_START - 5, SETUP_HEIGHT + 15, 14, 8); // Invert current
-                }
-                GLCD_InvertRect(MENU_3_SETUP_START - 5, SETUP_HEIGHT + 8, 14, 8); // Invert voltage
-                menu_3_v_selected = true;
-            }
-            break;
-    }
-}
-
-void menuSelectCurrent(const uint8_t menu) {
-    menuPointCurrent(menu);
-     switch (menu) {
-        default:
-        case MENU_1:
-            if (!menu_1_i_selected) {
-                if (menu_1_v_selected) {
-                    GLCD_InvertRect(MENU_1_SETUP_START - 5, SETUP_HEIGHT + 8, 14, 8); // Invert current
-                }
-                GLCD_InvertRect(MENU_1_SETUP_START - 5, SETUP_HEIGHT + 15, 14, 8); // Invert voltage
-                menu_1_i_selected = true;
-            }
-            break;
-            
-        case MENU_2:
-            if (!menu_2_i_selected) {
-                if (menu_2_v_selected) {
-                    GLCD_InvertRect(MENU_2_SETUP_START - 5, SETUP_HEIGHT + 8, 14, 8); // Invert current
-                }
-                GLCD_InvertRect(MENU_2_SETUP_START - 5, SETUP_HEIGHT + 15, 14, 8); // Invert voltage
-                menu_2_i_selected = true;
-            }
-            break;
-            
-        case MENU_3:
-            if (!menu_3_i_selected) {
-                if (menu_3_v_selected) {
-                    GLCD_InvertRect(MENU_3_SETUP_START - 5, SETUP_HEIGHT + 8, 14, 8); // Invert current
-                }
-                GLCD_InvertRect(MENU_3_SETUP_START - 5, SETUP_HEIGHT + 15, 14, 8); // Invert voltage
-                menu_3_i_selected = true;
-            }
-            break;
-    }
- }
 
 void menuSetVoltageSet(const uint8_t menu, const char * v) {
-    switch (menu) {
-        default:
-        case MENU_1:
-            GLCD_WriteText(MENU_1_SETUP_START + 11, SETUP_HEIGHT + 8, v);
-            break;
-            
-        case MENU_2:
-            GLCD_WriteText(MENU_2_SETUP_START + 11, SETUP_HEIGHT + 8, v);
-            break;
-            
-        case MENU_3:
-            GLCD_WriteText(MENU_3_SETUP_START + 11, SETUP_HEIGHT + 8, v);
-            break;
+    if (strcmp(menus[menu].values[V_SET_VALUE].value, v) != 0) {
+        updateValueValue(&menus[menu].values[V_SET_VALUE], v);
     }
 }
 
 void menuSetCurrentSet(const uint8_t menu, const char * i) {
-    switch (menu) {
-        default:
-        case MENU_1:
-            GLCD_WriteText(MENU_1_SETUP_START + 11, SETUP_HEIGHT + 16, i);
-            break;
-            
-        case MENU_2:
-            GLCD_WriteText(MENU_2_SETUP_START + 11, SETUP_HEIGHT + 16, i);
-            break;
-            
-        case MENU_3:
-            GLCD_WriteText(MENU_3_SETUP_START + 11, SETUP_HEIGHT + 16, i);
-            break;
+     if (strcmp(menus[menu].values[I_SET_VALUE].value, i) != 0) {
+        updateValueValue(&menus[menu].values[I_SET_VALUE], i);
     }
 }
 
 void menuSetVoltageRead(const uint8_t menu, const char * v) {
-    switch (menu) {
-        default:
-        case MENU_1:
-            GLCD_WriteText(MENU_1_READ_START + 11, READ_HEIGHT + 8, v);
-            break;
-            
-        case MENU_2:
-            GLCD_WriteText(MENU_2_READ_START + 11, READ_HEIGHT + 8, v);
-            break;
-            
-        case MENU_3:
-            GLCD_WriteText(MENU_3_READ_START + 11, READ_HEIGHT + 8, v);
-            break;
+     if (strcmp(menus[menu].values[V_READ_VALUE].value, v) != 0) {
+        updateValueValue(&menus[menu].values[V_READ_VALUE], v);
     }
 }
 
 void menuSetCurrentRead(const uint8_t menu, const char * i) {
-    switch (menu) {
-        default:
-        case MENU_1:
-            GLCD_WriteText(MENU_1_READ_START + 11, READ_HEIGHT + 16, i);
-            break;
-            
-        case MENU_2:
-            GLCD_WriteText(MENU_2_READ_START + 11, READ_HEIGHT + 16, i);
-            break;
-            
-        case MENU_3:
-            GLCD_WriteText(MENU_3_READ_START + 11, READ_HEIGHT + 16, i);
-            break;
+     if (strcmp(menus[menu].values[I_READ_VALUE].value, i) != 0) {
+        updateValueValue(&menus[menu].values[I_READ_VALUE], i);
     }
 }
 
-
 static void drawMenu(Menu_t * menu) {
     drawTitle(&menu->title);
-    drawValue(&menu->values[0]);
-    drawValue(&menu->values[1]);
-    drawValue(&menu->values[2]);
-    drawValue(&menu->values[3]);
+    drawValue(&menu->values[V_SET_VALUE]);
+    drawValue(&menu->values[I_SET_VALUE]);
+    drawValue(&menu->values[V_READ_VALUE]);
+    drawValue(&menu->values[I_READ_VALUE]);
 }
 
 static void drawTitle(Title_t * title) {
@@ -369,16 +185,49 @@ static void drawValue(Value_t * value) {
     GLCD_WriteText(value->nPos.x, value->nPos.y, value->name);
 }
 
-static void updateMenu(Menu_t * menu) {
-
+static void updateTitleStatus(Title_t * title, char status) {
+    title->status = status;
+    GLCD_GotoXY(title->sPos.x, title->sPos.y);
+    GLCD_PutChar(title->status);
 }
 
-static void updateTitle(Title_t * title) {
-
+static void updateTitleSelection(Title_t * title, bool selected) {
+    if (title->selected != selected) {
+        GLCD_InvertRect(title->sRect.x, title->sRect.y, title->sRect.w, title->sRect.h);
+        title->selected = selected;
+    }
 }
 
-static void updateValue(Value_t * value) { 
+static void updateValueValue(Value_t * value, const char * data) {
+    // Copy values into buffer
+    strcpy(value->value, data);
+    value->value[VALUE_DATA_LENGTH - 1] = 0; // Ensure termination
+    GLCD_WriteText(value->vPos.x, value->vPos.y, value->value); 
+}
 
+static void updateValueState(Value_t * value, uint8_t state) {
+    switch(state) {
+        case STATE_NONE:
+            GLCD_ClearDot(value->nPos.x - 2, value->nPos.y + 4);
+            if (value->state == STATE_SELECT) {
+                GLCD_InvertRect(value->sRect.x, value->sRect.y, value->sRect.w, value->sRect.h);
+            }
+            break;
+        case STATE_POINT:
+            GLCD_DrawDot(value->nPos.x - 2, value->nPos.y + 4);
+            if (value->state == STATE_SELECT) {
+                GLCD_InvertRect(value->sRect.x, value->sRect.y, value->sRect.w, value->sRect.h);
+            }
+            break;
+        case STATE_SELECT:
+            GLCD_DrawDot(value->nPos.x - 2, value->nPos.y + 4);
+            if (value->state < STATE_SELECT) {
+                GLCD_InvertRect(value->sRect.x, value->sRect.y, value->sRect.w, value->sRect.h);
+            }
+            break;
+
+    }
+    value->state = state;
 }
 
 

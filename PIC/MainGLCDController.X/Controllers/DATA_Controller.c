@@ -85,15 +85,31 @@ static void command (StateMachine_T *sm, uint8_t input) {
 
     // Do work: update command
     data_packet.command.cmd_bits = input;
+    data_count = 0;
 
     // State machine next state
-    if (data_packet.command.command == CMD_NONE) {
-        sm->current_state = done;
-    } else {
-        data_count = 0;
-        sm->current_state = v_set;
-    }
+    switch(data_packet.command.command) {
+        default:
+        case CMD_NONE:
+            sm->current_state = done;
+            break;
+        case CMD_SET_V_SET:
+            sm->current_state = v_set;
+            break;
+        case CMD_SET_I_SET:
+            sm->current_state = i_set;
+            break;
+        case CMD_SET_V_READ:
+            sm->current_state = v_read;
+            break;
+        case CMD_SET_I_READ:
+            sm->current_state = i_read;
+            break;
+        case CMD_SET_A_READ:
+            sm->current_state = v_read;
+            break;
 
+    }
 }
 
 static void v_set   (StateMachine_T *sm, uint8_t input) {
@@ -112,7 +128,7 @@ static void v_set   (StateMachine_T *sm, uint8_t input) {
         sm->current_state = v_set;
     } else {
         data_count = 0;
-        sm->current_state = i_set;
+        sm->current_state = done;
     }
 }
 
@@ -132,7 +148,7 @@ static void i_set   (StateMachine_T *sm, uint8_t input) {
         sm->current_state = i_set;
     } else {
         data_count = 0;
-        sm->current_state = v_read;
+        sm->current_state = done;
     }
 }
 
@@ -152,7 +168,11 @@ static void v_read  (StateMachine_T *sm, uint8_t input) {
         sm->current_state = v_read;
     } else {
         data_count = 0;
-        sm->current_state = i_read;
+        if (data_packet.command.command == CMD_SET_A_READ) {
+            sm->current_state = i_read;
+        } else {
+            sm->current_state = done;
+        }
     }
 
 }

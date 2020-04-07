@@ -17,17 +17,21 @@
 /******************************************************************************/
 /* Defines                                                                    */
 /******************************************************************************/ 
-#define MENU_1      0
-#define MENU_2      1
-#define MENU_3      2
+#define MENU_1       0
+#define MENU_2       1
+#define MENU_3       2
 
-#define MENU_1_V    0
-#define MENU_2_V    1
-#define MENU_3_V    2
+#define MENU_1_V     0
+#define MENU_2_V     1
+#define MENU_3_V     2
 
-#define MENU_1_I    0
-#define MENU_2_I    1
-#define MENU_3_I    2
+#define MENU_1_I     0
+#define MENU_2_I     1
+#define MENU_3_I     2
+
+#define STATE_NONE   0
+#define STATE_POINT  1
+#define STATE_SELECT 2
     
 /******************************************************************************/
 /* Variables                                                                  */
@@ -56,39 +60,20 @@ void menuInit();
  * Select current menu
  * @param menu
  */
-void menuSelect(const uint8_t menu);
+void menuSelect(const uint8_t menu, bool selected);
 
 /**
- * Deselect current menu
- * @param menu
+ * Set the state
  */
-void menuDeselect(const uint8_t menu);
+void menuSetVoltageState(const uint8_t menu, const uint8_t state);
+
 
 /**
- * Draw dot before voltage setting
- * @param menu
+ * Set the state
  */
-void menuPointVoltage(const uint8_t menu);
+void menuSetCurrentState(const uint8_t menu, const uint8_t state);
 
-/**
- * Draw dot before current setting
- * @param menu
- */
-void menuPointCurrent(const uint8_t menu);
-
-/**
- * Select voltage setting
- * @param menu
- */
-void menuSelectVoltage(const uint8_t menu);
-
-/**
- * Select current setting
- * @param menu
- */
-void menuSelectCurrent(const uint8_t menu);
-
-/**
+ /**
  * Set the voltage setting
  */
 void menuSetVoltageSet(const uint8_t menu, const char * v);

@@ -60,15 +60,22 @@ int main(void) {
     GIEL = 1;
 
     // TEST
+    
+    menuSelect(1, true);
+   
     menuSetVoltageSet(1, "5.00 V");
     menuSetCurrentSet(1, "0.10mA");
     menuSetVoltageRead(1,"4.89 V");
     menuSetCurrentRead(1,"0.08mA");
 
-    menuSelectCurrent(1);
-    menuSelectVoltage(1);
+    menuSetVoltageState(0, STATE_NONE);
+    menuSetCurrentState(1, STATE_POINT);
+    menuSetVoltageState(2, STATE_SELECT);
 
     while (1) {
+
+        LED1 = !LED1;
+        __delay_ms(1);
 
         if (dataReadFlag) {
             dataReadFlag = 0;
@@ -76,35 +83,47 @@ int main(void) {
             uint8_t menu = data_packet->command.menu;
 
             // Select or deselect menu
-            if (data_packet->command.selected) {
-                menuSelect(menu);
-            } else {
-                menuDeselect(menu);
-            }
+            menuSelect(menu, data_packet->command.selected);
 
             // Point and select
             switch (data_packet->command.pointSelect) {
                 default:
                 case POINT_TO_V:
-                    menuPointVoltage(menu);
+                    menuSetCurrentState(menu, STATE_NONE);
+                    menuSetVoltageState(menu, STATE_POINT);
                     break;
                 case POINT_TO_I:
-                    menuPointCurrent(menu);
+                    menuSetVoltageState(menu, STATE_NONE);
+                    menuSetCurrentState(menu, STATE_POINT);
                     break;
                 case SELECT_V:
-                    menuSelectVoltage(menu);
+                    menuSetCurrentState(menu, STATE_NONE);
+                    menuSetVoltageState(menu, STATE_SELECT);
                     break;
                 case SELECT_I:
-                    menuSelectCurrent(menu);
+                    menuSetVoltageState(menu, STATE_NONE);
+                    menuSetCurrentState(menu, STATE_SELECT);
                     break;
             }
 
+            // Set values
             switch (data_packet->command.command) {
+                default:
                 case CMD_NONE:
                     break;
-                default:
+                case CMD_SET_V_SET:
                     menuSetVoltageSet(menu, data_packet->v_set);
+                    break;
+                 case CMD_SET_I_SET:
                     menuSetCurrentSet(menu, data_packet->i_set);
+                    break;
+                case CMD_SET_V_READ:
+                    menuSetVoltageRead(menu, data_packet->v_rd);
+                    break;
+                case CMD_SET_I_READ:
+                    menuSetCurrentRead(menu, data_packet->i_rd);
+                    break;
+                case CMD_SET_A_READ:
                     menuSetVoltageRead(menu, data_packet->v_rd);
                     menuSetCurrentRead(menu, data_packet->i_rd);
                     break;

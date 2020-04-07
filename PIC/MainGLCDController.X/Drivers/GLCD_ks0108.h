@@ -146,9 +146,7 @@ void GLCD_DrawBitmap(const uint8_t *bitmap, uint8_t x, uint8_t y, uint8_t color)
 void GLCD_SelectFontEx(const uint8_t* font, uint8_t color, FontCallBack callback);
 int  GLCD_PutChar(char c);
 void GLCD_Puts(const char *str);
- Initialize uart module
-  Initialize uart module
-  void GLCD_PrintNumber(long n);
+void GLCD_PrintNumber(long n);
 void GLCD_PrintHexNumber(uint16_t n);
 void GLCD_PrintRealNumber(double n);
 void GLCD_CursorTo( uint8_t x, uint8_t y); // 0 based coordinates for fixed width fonts (i.e. systemFont5x7)
