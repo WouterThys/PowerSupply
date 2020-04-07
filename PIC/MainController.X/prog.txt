@@ -1,0 +1,6 @@
+Device DSPIC33EP32GP502
+set system.disableerrormsg true
+Hwtool pickit3 -p
+Program "./dist/default/production/MainController.X.production.hex"
+Reset MCLR
+Quit
