@@ -10,6 +10,7 @@
         <itemPath>Controllers/MENU_Controller.h</itemPath>
         <itemPath>Controllers/SUPPLIES_Controller.h</itemPath>
         <itemPath>Controllers/UART_Controller.h</itemPath>
+        <itemPath>Controllers/GLCD_Controller.h</itemPath>
       </logicalFolder>
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/ENC_Driver.h</itemPath>
@@ -36,6 +37,7 @@
         <itemPath>Controllers/MENU_Controller.c</itemPath>
         <itemPath>Controllers/SUPPLIES_Controller.c</itemPath>
         <itemPath>Controllers/UART_Controller.c</itemPath>
+        <itemPath>Controllers/GLCD_Controller.c</itemPath>
       </logicalFolder>
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/ENC_Driver.c</itemPath>

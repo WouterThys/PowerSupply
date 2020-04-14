@@ -943,6 +943,15 @@ int main(void) {
     DelayMs(100);
     
     uartInit(&putCommand);
+
+
+
+    while(1) {
+
+    }
+    return 0;
+
+    /*
     encDriverInit();
     suppliesInit(&supplyStatus, &onError);
     menuInit(&putCommand);
@@ -1024,6 +1033,7 @@ int main(void) {
         
     }
     return 0;
+    */
 }
 
 
