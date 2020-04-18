@@ -22,14 +22,15 @@ static void v_set   (StateMachine_T *sm, uint8_t input);
 static void i_set   (StateMachine_T *sm, uint8_t input);
 static void v_read  (StateMachine_T *sm, uint8_t input);
 static void i_read  (StateMachine_T *sm, uint8_t input);
-static void done    (StateMachine_T *sm, uint8_t input);
+
+static void done    (StateMachine_T *sm);
 
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
 static dataCallback callback;
 
-static DataPacket_t data_packet;
+static GLCD_DataPacket_t data_packet;
 static char v_set_arr[VALUE_LENGTH];
 static char i_set_arr[VALUE_LENGTH];
 static char v_rd_arr[VALUE_LENGTH];
@@ -41,6 +42,8 @@ static uint8_t data_count;
 /*******************************************************************************
  *          FUNCTIONS
  ******************************************************************************/
+
+static void printState(const char * state);
 
 void dataInit(dataCallback cb) {
     callback = cb;
@@ -54,10 +57,15 @@ void dataInit(dataCallback cb) {
 
     // UART init
     UART_Init(UART_BAUD, UART_INVERT, dataRead);
+
+    // State Machine Init
+    state_machine.current_state = idle;
+    (state_machine.current_state)(&state_machine, 0);
 }
 
 void dataRead(uint8_t data) {
     // Handle state
+    LED1 = !LED1;
     (state_machine.current_state)(&state_machine, data);
 }
 
@@ -91,7 +99,7 @@ static void command (StateMachine_T *sm, uint8_t input) {
     switch(data_packet.command.command) {
         default:
         case CMD_NONE:
-            sm->current_state = done;
+            done(sm);
             break;
         case CMD_SET_V_SET:
             sm->current_state = v_set;
@@ -128,7 +136,7 @@ static void v_set   (StateMachine_T *sm, uint8_t input) {
         sm->current_state = v_set;
     } else {
         data_count = 0;
-        sm->current_state = done;
+        done(sm);
     }
 }
 
@@ -148,7 +156,7 @@ static void i_set   (StateMachine_T *sm, uint8_t input) {
         sm->current_state = i_set;
     } else {
         data_count = 0;
-        sm->current_state = done;
+        done(sm);
     }
 }
 
@@ -171,7 +179,7 @@ static void v_read  (StateMachine_T *sm, uint8_t input) {
         if (data_packet.command.command == CMD_SET_A_READ) {
             sm->current_state = i_read;
         } else {
-            sm->current_state = done;
+            done(sm);
         }
     }
 
@@ -193,17 +201,13 @@ static void i_read  (StateMachine_T *sm, uint8_t input) {
         sm->current_state = i_read;
     } else {
         data_count = 0;
-        sm->current_state = done;
+        done(sm);
     }
 
 }
 
-static void done    (StateMachine_T *sm, uint8_t input) {
+static void done    (StateMachine_T *sm) {
     printState("Done");
-    if (input == UART_START_CHAR) {
-        sm->current_state = command;
-        return;
-    }
     
     // Do work: callback
     callback(&data_packet);

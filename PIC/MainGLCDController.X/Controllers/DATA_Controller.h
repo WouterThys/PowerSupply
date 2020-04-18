@@ -7,7 +7,7 @@
 #include "../../Common/DATA_Definitions.h"
 
 
-typedef void (*dataCallback)(DataPacket_t * data);
+typedef void (*dataCallback)(GLCD_DataPacket_t * data);
 
 /*******************************************************************************
  *          PROTOTYPES

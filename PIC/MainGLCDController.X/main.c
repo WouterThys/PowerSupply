@@ -17,14 +17,14 @@
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
-static DataPacket_t * data_packet;
+static GLCD_DataPacket_t * data_packet;
 static uint8_t dataReadFlag;
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
  ******************************************************************************/
 static void initialize();
-static void onDataPacketRead(DataPacket_t * data);
+static void onDataPacketRead(GLCD_DataPacket_t * data);
 static void delaySeconds(uint8_t seconds);
 
 static void initialize() {
@@ -59,28 +59,15 @@ int main(void) {
     GIEH = 1;
     GIEL = 1;
 
-    // TEST
-    
-    menuSelect(1, true);
-   
-    menuSetVoltageSet(1, "5.00 V");
-    menuSetCurrentSet(1, "0.10mA");
-    menuSetVoltageRead(1,"4.89 V");
-    menuSetCurrentRead(1,"0.08mA");
-
-    menuSetVoltageState(0, STATE_NONE);
-    menuSetCurrentState(1, STATE_POINT);
-    menuSetVoltageState(2, STATE_SELECT);
+    printf("Start!\n");
 
     while (1) {
-
-        LED1 = !LED1;
-        __delay_ms(1);
 
         if (dataReadFlag) {
             dataReadFlag = 0;
     
             uint8_t menu = data_packet->command.menu;
+            printf("cmd:%d\n", data_packet->command.cmd_bits);
 
             // Select or deselect menu
             menuSelect(menu, data_packet->command.selected);
@@ -135,7 +122,7 @@ int main(void) {
     return 0;
 }
 
-static void onDataPacketRead(DataPacket_t *data) {
+static void onDataPacketRead(GLCD_DataPacket_t *data) {
     data_packet = data;
     dataReadFlag = 1; 
 }

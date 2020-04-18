@@ -12,9 +12,10 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "../Settings.h"
+#include "../Drivers/SYSTEM_Driver.h"
 #include "../Drivers/UART_Driver.h"
 #include "../../Common/DATA_Definitions.h"
-
 
 
 void glcdInit();

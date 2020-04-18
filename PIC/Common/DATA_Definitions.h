@@ -26,15 +26,15 @@ typedef union Command {
         uint8_t command : 3;    // Command
     };
     uint8_t cmd_bits;
-} Command_t;
+} GLCD_Command_t;
 
 typedef struct DataPacket {
-    Command_t command;
-    const char * v_set;         // Value for V
-    const char * i_set;         // Value for I
-    const char * v_rd;          // Read value for V
-    const char * i_rd;          // Read value for I
-} DataPacket_t;
+    GLCD_Command_t command;
+    char * v_set;         // Value for V
+    char * i_set;         // Value for I
+    char * v_rd;          // Read value for V
+    char * i_rd;          // Read value for I
+} GLCD_DataPacket_t;
 
 #endif	/* DATA_CONTROLLER_H */
 

@@ -4,10 +4,10 @@
 /**
  * Select the message type, only one of these types should be selected!
  */
-//#define TYPE_TEXT
+#define TYPE_TEXT
 //#define TYPE_SIMPLE_SHORT
 //#define TYPE_SIMPLE_LONG
-#define TYPE_VARIABLE
+//#define TYPE_VARIABLE
 
 
 #define START_CHAR 0x24 /* $ */

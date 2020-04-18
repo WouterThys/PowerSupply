@@ -16,6 +16,7 @@
 #include "Controllers/MENU_Controller.h"
 #include "Controllers/UART_Controller.h"
 #include "Controllers/SUPPLIES_Controller.h"
+#include "Controllers/GLCD_Controller.h"
 
 /*******************************************************************************
  *          TODO
@@ -942,12 +943,25 @@ int main(void) {
     initialize();
     DelayMs(100);
     
-    uartInit(&putCommand);
+    //uartInit(&putCommand);
+    glcdInit();
+    LED1 = 1;
 
 
+    DelayMs(100);
+    glcdSelectMenu(0, true);
+    glcdWriteMenu(0);
 
     while(1) {
 
+        /* glcdSelectMenu(0, true); */
+        /* glcdWriteMenu(0); */
+        /* LED1 = !LED1; */
+        /* DelayMs(2000); */
+        /* glcdSelectMenu(0, false); */
+        /* glcdWriteMenu(0); */
+        /* LED1 = !LED1; */
+        /* DelayMs(2000); */
     }
     return 0;
 

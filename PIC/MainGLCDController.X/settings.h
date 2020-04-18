@@ -59,7 +59,7 @@
 #define UART_TX_Dir TRISCbits.RC6
 #define UART_RX_Dir TRISCbits.RC7
 
-#define UART_BAUD   9600
+#define UART_BAUD   57600
 #define UART_INVERT 0
 
 #endif	/* XC_HEADER_TEMPLATE_H */

@@ -3,12 +3,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/media/data/Geeken/Projects/PowerSupply/PIC/Common/CommonData.h</file>
-            <file>file:/media/data/Geeken/Projects/PowerSupply/PIC/MainController.X/Controllers/GLCD_Controller.c</file>
-            <file>file:/media/data/Geeken/Projects/PowerSupply/PIC/MainController.X/Controllers/MCP_Controller.h</file>
-            <file>file:/media/data/Geeken/Projects/PowerSupply/PIC/MainController.X/Controllers/MENU_Controller.h</file>
-            <file>file:/media/data/Geeken/Projects/PowerSupply/PIC/MainController.X/Controllers/GLCD_Controller.h</file>
-            <file>file:/media/data/Geeken/Projects/PowerSupply/PIC/MainController.X/Drivers/LCD_Driver.h</file>
+            <file>file:/media/data/Geeken/Projects/PowerSupply/PIC/MainController.X/main.c</file>
+            <file>file:/media/data/Geeken/Projects/PowerSupply/PIC/MainController.X/Settings.h</file>
         </group>
     </open-files>
 </project-private>

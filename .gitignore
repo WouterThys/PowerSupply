@@ -2,7 +2,7 @@
 .idea/
 
 
-
+*.swp
 *.d
 *.pre
 *.p1
