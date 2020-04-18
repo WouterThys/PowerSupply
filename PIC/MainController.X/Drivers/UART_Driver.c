@@ -295,6 +295,19 @@ void uartDriverEnable(bool enable) {
 void uartDriverWriteByte(uint8_t data) {
     U1TXREG = data;
     while(U1STAbits.TRMT == 0);
+    if (DEBUG) {
+        DelayUs(1000);
+    } else {
+        DelayUs(1);
+    }
+}
+
+void uartDriverWriteString(const char * str, uint8_t length) {
+    uint8_t i = 0;
+    for (i = 0; i < length; i++) {
+        uartDriverWriteByte(*(str + i));
+    }
+    uartDriverWriteByte(0); // Write 0 terminator
 }
 
 uint8_t uartReadByte() {

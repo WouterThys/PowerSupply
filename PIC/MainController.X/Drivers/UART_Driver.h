@@ -100,6 +100,13 @@ void uartDriverEnable(bool enable);
 void uartDriverWriteByte(uint8_t data);
 
 /**
+ * Write string to uart module
+ * @param str: pointer to string to write
+ * @param length: length of the string
+ */
+void uartDriverWriteString(const char * str, uint8_t length);
+
+/**
  * Write data to the TX pin of UART module. 
  * @param command: Command
  * @param data: Data string to write

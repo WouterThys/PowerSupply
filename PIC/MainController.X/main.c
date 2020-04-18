@@ -945,12 +945,16 @@ int main(void) {
     
     //uartInit(&putCommand);
     glcdInit();
-    LED1 = 1;
-
 
     DelayMs(100);
-    glcdSelectMenu(0, true);
-    glcdWriteMenu(0);
+    LED1 = 1;
+    glcdSelectMenu(1, true);
+    glcdSetVoltageState(1, SELECT_V);
+    glcdSetVoltageRead(1, "8,24 V");
+    glcdSetCurrentRead(1, "POG2 A");
+    glcdWriteMenu(1); 
+    LED1 = 0;
+    
 
     while(1) {
 

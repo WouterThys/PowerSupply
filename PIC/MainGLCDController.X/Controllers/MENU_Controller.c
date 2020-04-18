@@ -12,34 +12,34 @@
 
 // Helpers
 typedef struct Pos {
-    uint8_t x;          // X location on screen
-    uint8_t y;          // Y location on screen
+    const uint8_t x;          // X location on screen
+    const uint8_t y;          // Y location on screen
 } Pos_t;
 
 typedef struct Rect {
-    uint8_t x;          // X start position
-    uint8_t y;          // Y start position
-    uint8_t w;          // Width
-    uint8_t h;          // Height
+    const uint8_t x;          // X start position
+    const uint8_t y;          // Y start position
+    const uint8_t w;          // Width
+    const uint8_t h;          // Height
 } Rect_t;
 
 typedef struct Value {
-    char name[3];       // Display name
-    Pos_t nPos;         // Name position
-    char value[8];      // Display value
-    Pos_t vPos;         // Value position
-    uint8_t state;      // State
-    Rect_t sRect;       // Selection rectangle
-    bool selected;      // Selected
+    const char name[3];       // Display name
+    const Pos_t nPos;         // Name position
+    char value[8];            // Display value
+    const Pos_t vPos;         // Value position
+    uint8_t state;            // State
+    const Rect_t sRect;       // Selection rectangle
+    bool selected;            // Selected
 } Value_t;
 
 typedef struct Title {
-    char name[6];       // Display name
-    Pos_t nPos;         // Name position
-    char status;        // Status character
-    Pos_t sPos;         // Status position
-    Rect_t sRect;       // Selection rectangle
-    bool selected;      // Selected
+    const char name[6];       // Display name
+    const Pos_t nPos;         // Name position
+    char status;              // Status character
+    const Pos_t sPos;         // Status position
+    const Rect_t sRect;       // Selection rectangle
+    bool selected;            // Selected
 } Title_t;
 
 typedef struct Menu {

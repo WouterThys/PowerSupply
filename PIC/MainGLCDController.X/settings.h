@@ -13,6 +13,8 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include <math.h>
 
+#define DEBUG   1
+
     
 /**
  *  PIC

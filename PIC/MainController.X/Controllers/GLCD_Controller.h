@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #include "../Settings.h"
 #include "../Drivers/SYSTEM_Driver.h"
