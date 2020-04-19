@@ -10,6 +10,7 @@
 #include "Settings.h"
 #include "Drivers/SYSTEM_Driver.h"
 #include "Drivers/I2C_Driver.h"
+#include "Drivers/ENC_Driver.h"
 
 #include "Controllers/SUPPLIES_Controller.h"
 #include "Controllers/GLCD_Controller.h"
@@ -101,19 +102,30 @@ int main(void) {
     DelayMs(100);
     
     glcdInit();
+    encDriverInit();
 
-    DelayMs(100);
-    LED1 = 1;
-    glcdSelectMenu(1, true);
-    glcdSetVoltageState(1, SELECT_V);
-    glcdSetVoltageRead(1, "8,24 V");
-    glcdSetCurrentRead(1, "POG2 A");
-    glcdWriteMenu(1); 
-    LED1 = 0;
-    
+//    DelayMs(100);
+//    LED1 = 1;
+//    glcdSelectMenu(1, true);
+//    glcdSetVoltageState(1, SELECT_V);
+//    glcdSetVoltageRead(1, "8,24 V");
+//    glcdSetCurrentRead(1, "POG2 A");
+//    glcdWriteMenu(1); 
+//    LED1 = 0;
+
+    printf("Start\n");
+    Rotary_t rotary;    
 
     while(1) {
-
+        
+        DelayMs(1000);
+        encGetRotaryData(ROTARY1, &rotary);
+        if (rotary.button == Pressed) {
+            printf("btn pressed\n");
+        }
+        if (rotary.turns != 0) {
+            printf("%d turns\n", rotary.turns);
+        }
     }
     return 0;
 

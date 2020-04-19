@@ -41,9 +41,41 @@
 
 #define IP_U1RX      6
 #define IP_I2C       5
+#define IP_CN        3
 #define IP_MENU_TMR  2
 #define IP_MAIN_TMR  1
     
+
+
+/******************************************************************************/
+/*                  PORT MAPPINGS                                             */
+/******************************************************************************/  
+/*  RA0 /AN0    -> LED1    
+ *  RA1 /AN1    -> LED2
+ *  RA2         -> 
+ *  RA3         -> 
+ *  RA4 /RP20   -> TX
+ * 
+ *  RB0 /RPI32  -> 
+ *  RB1 /RPI33  ->
+ *  RB2 /RPI34  ->
+ *  RB3 /RP35   ->
+ *  RB4 /RP36   -> RX
+ *  RB5 /RP37   -> I2C-SDA
+ *  RB6 /RP38   -> I2C-SCL
+ *  RB7 /RP39   -> ROT3-D
+ *  RB8 /RP40   -> ROT3-B
+ *  RB9 /RP41   -> ROT3-A
+ *  RB10/RP42   -> ROT2-D
+ *  RB11/RP43   -> ROT2-B
+ *  RB12/RPI44  -> ROT2-A
+ *  RB13/RPI45  -> ROT1-D
+ *  RB14/RPI46  -> ROT1-B
+ *  RB15/RPI47  -> ROT1-A
+ * 
+ */
+
+
 /**
  *  PIC
  */
@@ -70,46 +102,6 @@
 #define UART1_TX_Map    RPOR0bits.RP20R     /* TX on RP20                     */
 
 
-/**
- * MCP
- */
-#define MCP_CS          PORTBbits.RB1
-#define MCP_CS_Dir      TRISBbits.TRISB1
-#define MCP_ADDR        0b01000000
-
-#define MCP_INTA        PORTBbits.RB14
-#define MCP_INTA_Dir    TRISBbits.TRISB14
-#define MCP_INTA_Pu     CNPUBbits.CNPUB14
-
-#define MCP_INTB        PORTBbits.RB15
-#define MCP_INTB_Dir    TRISBbits.TRISB15
-#define MCP_INTB_Pu     CNPUBbits.CNPUB15
-
-/**
- * LCD
- */
-#define LCD_SS_Dir      TRISBbits.TRISB13       /* SS on pin RB10             */
-#define LCD_SS_Pin      PORTBbits.RB13          /* SS pin                     */
-
-/**
- *  SPI1
- */
-    
-#define SPI1_SCK_Dir    TRISBbits.TRISB7        /* SCK pin on RB7             */
-#define SPI1_SDO_Dir    TRISBbits.TRISB8        /* SDO pin on RB8             */
-#define SPI1_SDI_Dir    TRISBbits.TRISB9        /* SDI pin on RB9             */
-
-/**
- *  SPI2
- */
-    
-#define SPI2_SCK_Dir    TRISBbits.TRISB10       /* SCK pin on RB7             */
-#define SPI2_SDO_Dir    TRISBbits.TRISB11       /* SDO pin on RB8             */
-#define SPI2_SDI_Dir    TRISBbits.TRISB12       /* SDI pin on RB9             */
-
-#define SPI2_SCK_Map    RPOR4bits.RP42R         /* RP42 Pin Assignment  SCK   */
-#define SPI2_SDO_Map    RPOR4bits.RP43R         /* RP43 Pin Assignment  SDO   */
-#define SPI2_SDI_Map    0b0101100               /* RPI44 Pin Assignment SDI   */
 
 /**
  * I²C
@@ -124,22 +116,41 @@
 
 #define I2C_SCL_Odc     ODCBbits.ODCB6          /* Open drain config for SCL  */
 #define I2C_SDA_Odc     ODCBbits.ODCB5          /* Open drain config for SDA  */
+ 
 
+/**
+ * ROTARY ENCODERS
+ */
+#define ROT1_A_Pin      PORTBbits.RB15
+#define ROT1_A_Dir      TRISBbits.TRISB15
+#define ROT1_A_Int      CNENBbits.CNIEB15 
+#define ROT1_B_Pin      PORTBbits.RB14
+#define ROT1_B_Dir      TRISBbits.TRISB14
+#define ROT1_B_Int      CNENBbits.CNIEB14 
+#define ROT1_D_Pin      PORTBbits.RB13
+#define ROT1_D_Dir      TRISBbits.TRISB13
+#define ROT1_D_Int      CNENBbits.CNIEB13
 
+#define ROT2_A_Pin      PORTBbits.RB12
+#define ROT2_A_Dir      TRISBbits.TRISB12
+#define ROT2_A_Int      CNENBbits.CNIEB12 
+#define ROT2_B_Pin      PORTBbits.RB11
+#define ROT2_B_Dir      TRISBbits.TRISB11
+#define ROT2_B_Int      CNENBbits.CNIEB11 
+#define ROT2_D_Pin      PORTBbits.RB10
+#define ROT2_D_Dir      TRISBbits.TRISB10
+#define ROT2_D_Int      CNENBbits.CNIEB10
 
-/*******************************************************************************
- *          MACRO FUNCTIONS
- ******************************************************************************/
-#define digitalToVoltage(d) ((((float)d * (float)Vref) / ((float)AdcN)) * Vgain)
-#define voltageToDigital(v) ((((float)v * (float)DacN) / ((float)Vref)) * (1/Vgain))
+#define ROT3_A_Pin      PORTBbits.RB9
+#define ROT3_A_Dir      TRISBbits.TRISB9
+#define ROT3_A_Int      CNENBbits.CNIEB9 
+#define ROT3_B_Pin      PORTBbits.RB8
+#define ROT3_B_Dir      TRISBbits.TRISB8
+#define ROT3_B_Int      CNENBbits.CNIEB8 
+#define ROT3_D_Pin      PORTBbits.RB7
+#define ROT3_D_Dir      TRISBbits.TRISB7
+#define ROT3_D_Int      CNENBbits.CNIEB7
 
-#define digitalToCurrent(d) (((((float)d * (float)Vref) / ((float)AdcN)) * 1000) / (Rs * Igain))
-#define currentToDigital(i) ()
-
-#define digitalToTemp(d) ((((float)d * (float)Vref) / (float)AdcN)) / ((float)Rt * 1E-6)
-
-
-    
 
 #endif	/* XC_HEADER_TEMPLATE_H */
 

@@ -12,6 +12,16 @@
 
 #include <xc.h> // include processor files - each processor file is guarded.  
 
+
+#define digitalToVoltage(d) ((((float)d * (float)Vref) / ((float)AdcN)) * Vgain)
+#define voltageToDigital(v) ((((float)v * (float)DacN) / ((float)Vref)) * (1/Vgain))
+
+#define digitalToCurrent(d) (((((float)d * (float)Vref) / ((float)AdcN)) * 1000) / (Rs * Igain))
+#define currentToDigital(i) ()
+
+#define digitalToTemp(d) ((((float)d * (float)Vref) / (float)AdcN)) / ((float)Rt * 1E-6)
+
+
 bool stringEquals(const char * str1, const char * str2);
 
 uint16_t stringToInt(const char * str);

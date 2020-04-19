@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=Controllers/MCP_Controller.c Controllers/SUPPLIES_Controller.c Controllers/UART_Controller.c Controllers/GLCD_Controller.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c Drivers/SPI1_Driver.c Drivers/SPI_Driver.c Drivers/SYSTEM_Driver.c Drivers/UART_Driver.c configuration.c main.c Utils.c
+SOURCEFILES_QUOTED_IF_SPACED=Controllers/SUPPLIES_Controller.c Controllers/UART_Controller.c Controllers/GLCD_Controller.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c Drivers/SYSTEM_Driver.c Drivers/UART_Driver.c configuration.c main.c Utils.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Controllers/MCP_Controller.o ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o ${OBJECTDIR}/Controllers/UART_Controller.o ${OBJECTDIR}/Controllers/GLCD_Controller.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/Drivers/SPI1_Driver.o ${OBJECTDIR}/Drivers/SPI_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/Utils.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/Controllers/MCP_Controller.o.d ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o.d ${OBJECTDIR}/Controllers/UART_Controller.o.d ${OBJECTDIR}/Controllers/GLCD_Controller.o.d ${OBJECTDIR}/Drivers/ENC_Driver.o.d ${OBJECTDIR}/Drivers/I2C_Driver.o.d ${OBJECTDIR}/Drivers/SPI1_Driver.o.d ${OBJECTDIR}/Drivers/SPI_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/Drivers/UART_Driver.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/Utils.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Controllers/SUPPLIES_Controller.o ${OBJECTDIR}/Controllers/UART_Controller.o ${OBJECTDIR}/Controllers/GLCD_Controller.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/Utils.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/Controllers/SUPPLIES_Controller.o.d ${OBJECTDIR}/Controllers/UART_Controller.o.d ${OBJECTDIR}/Controllers/GLCD_Controller.o.d ${OBJECTDIR}/Drivers/ENC_Driver.o.d ${OBJECTDIR}/Drivers/I2C_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/Drivers/UART_Driver.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/Utils.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/Controllers/MCP_Controller.o ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o ${OBJECTDIR}/Controllers/UART_Controller.o ${OBJECTDIR}/Controllers/GLCD_Controller.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/Drivers/SPI1_Driver.o ${OBJECTDIR}/Drivers/SPI_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/Utils.o
+OBJECTFILES=${OBJECTDIR}/Controllers/SUPPLIES_Controller.o ${OBJECTDIR}/Controllers/UART_Controller.o ${OBJECTDIR}/Controllers/GLCD_Controller.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/Utils.o
 
 # Source Files
-SOURCEFILES=Controllers/MCP_Controller.c Controllers/SUPPLIES_Controller.c Controllers/UART_Controller.c Controllers/GLCD_Controller.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c Drivers/SPI1_Driver.c Drivers/SPI_Driver.c Drivers/SYSTEM_Driver.c Drivers/UART_Driver.c configuration.c main.c Utils.c
+SOURCEFILES=Controllers/SUPPLIES_Controller.c Controllers/UART_Controller.c Controllers/GLCD_Controller.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c Drivers/SYSTEM_Driver.c Drivers/UART_Driver.c configuration.c main.c Utils.c
 
 
 CFLAGS=
@@ -94,13 +94,6 @@ MP_LINKER_FILE_OPTION=,--script=p33EP32GP502.gld
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/Controllers/MCP_Controller.o: Controllers/MCP_Controller.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Controllers" 
-	@${RM} ${OBJECTDIR}/Controllers/MCP_Controller.o.d 
-	@${RM} ${OBJECTDIR}/Controllers/MCP_Controller.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  Controllers/MCP_Controller.c  -o ${OBJECTDIR}/Controllers/MCP_Controller.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Controllers/MCP_Controller.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/Controllers/MCP_Controller.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
 ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o: Controllers/SUPPLIES_Controller.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Controllers" 
 	@${RM} ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o.d 
@@ -135,20 +128,6 @@ ${OBJECTDIR}/Drivers/I2C_Driver.o: Drivers/I2C_Driver.c  nbproject/Makefile-${CN
 	@${RM} ${OBJECTDIR}/Drivers/I2C_Driver.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/I2C_Driver.c  -o ${OBJECTDIR}/Drivers/I2C_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/I2C_Driver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/Drivers/I2C_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/Drivers/SPI1_Driver.o: Drivers/SPI1_Driver.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Drivers" 
-	@${RM} ${OBJECTDIR}/Drivers/SPI1_Driver.o.d 
-	@${RM} ${OBJECTDIR}/Drivers/SPI1_Driver.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/SPI1_Driver.c  -o ${OBJECTDIR}/Drivers/SPI1_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/SPI1_Driver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/Drivers/SPI1_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/Drivers/SPI_Driver.o: Drivers/SPI_Driver.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Drivers" 
-	@${RM} ${OBJECTDIR}/Drivers/SPI_Driver.o.d 
-	@${RM} ${OBJECTDIR}/Drivers/SPI_Driver.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/SPI_Driver.c  -o ${OBJECTDIR}/Drivers/SPI_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/SPI_Driver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/Drivers/SPI_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/Drivers/SYSTEM_Driver.o: Drivers/SYSTEM_Driver.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Drivers" 
@@ -186,13 +165,6 @@ ${OBJECTDIR}/Utils.o: Utils.c  nbproject/Makefile-${CND_CONF}.mk
 	@${FIXDEPS} "${OBJECTDIR}/Utils.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 else
-${OBJECTDIR}/Controllers/MCP_Controller.o: Controllers/MCP_Controller.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Controllers" 
-	@${RM} ${OBJECTDIR}/Controllers/MCP_Controller.o.d 
-	@${RM} ${OBJECTDIR}/Controllers/MCP_Controller.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  Controllers/MCP_Controller.c  -o ${OBJECTDIR}/Controllers/MCP_Controller.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Controllers/MCP_Controller.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/Controllers/MCP_Controller.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
 ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o: Controllers/SUPPLIES_Controller.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Controllers" 
 	@${RM} ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o.d 
@@ -227,20 +199,6 @@ ${OBJECTDIR}/Drivers/I2C_Driver.o: Drivers/I2C_Driver.c  nbproject/Makefile-${CN
 	@${RM} ${OBJECTDIR}/Drivers/I2C_Driver.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/I2C_Driver.c  -o ${OBJECTDIR}/Drivers/I2C_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/I2C_Driver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/Drivers/I2C_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/Drivers/SPI1_Driver.o: Drivers/SPI1_Driver.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Drivers" 
-	@${RM} ${OBJECTDIR}/Drivers/SPI1_Driver.o.d 
-	@${RM} ${OBJECTDIR}/Drivers/SPI1_Driver.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/SPI1_Driver.c  -o ${OBJECTDIR}/Drivers/SPI1_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/SPI1_Driver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/Drivers/SPI1_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/Drivers/SPI_Driver.o: Drivers/SPI_Driver.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Drivers" 
-	@${RM} ${OBJECTDIR}/Drivers/SPI_Driver.o.d 
-	@${RM} ${OBJECTDIR}/Drivers/SPI_Driver.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/SPI_Driver.c  -o ${OBJECTDIR}/Drivers/SPI_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/SPI_Driver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/Drivers/SPI_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/Drivers/SYSTEM_Driver.o: Drivers/SYSTEM_Driver.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Drivers" 

@@ -1,56 +1,38 @@
 #ifndef ENC_DRIVER_H
 #define	ENC_DRIVER_H
 
-// ----------------------------------------------------------------------------
+#include <xc.h>
+#include <stdint.h>
 
-#define ENC_NORMAL        (1 << 1)   // use Peter Danneger's decoder
-#define ENC_FLAKY         (1 << 2)   // use Table-based decoder
+#include "../Settings.h"
 
-// ----------------------------------------------------------------------------
-
-#ifndef ENC_DECODER
-#  define ENC_DECODER     ENC_NORMAL /* ENC_NORMAL OR ENC_FLAKY */
-#endif
-
-#if ENC_DECODER == ENC_FLAKY
-#  ifndef ENC_HALFSTEP
-#    define ENC_HALFSTEP  1        // use table for half step per default
-#  endif
-#endif
-
-// ----------------------------------------------------------------------------
+#define ROTARY1 0
+#define ROTARY2 1
+#define ROTARY3 2
 
 typedef enum {
-    Open = 0,
-    Closed,
-    Pressed,
-    Held,
-    Released,
-    Clicked,
-    DoubleClicked
-} Button_e;
+    Released = 0,
+    Pressed = 1
+} ButtonState_t;
+
+typedef struct {
+    ButtonState_t button;   // Button pressed or not
+    int16_t turns;          // Turns, left or right
+} Rotary_t;
+
 
 /**
- * 
+ * Initialize rotary encoder
+ * Uses interrupts on rotary port
  */
 void encDriverInit();
 
 /**
- * 
+ * Get the value of the rotary encoder
+ * @param rotary Which rotary
+ * @param data Copy data into this
  */
-void encDriverService();
-
-/**
- * 
- * @return 
- */
-int16_t encDriverGetValue();
-
-/**
- * 
- * @return 
- */
-Button_e encDriverGetButton();
+void encGetRotaryData(uint16_t rotary, Rotary_t * data);
 
 
 
