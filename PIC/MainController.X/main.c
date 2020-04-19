@@ -14,6 +14,8 @@
 
 #include "Controllers/SUPPLIES_Controller.h"
 #include "Controllers/GLCD_Controller.h"
+#include "Controllers/FSM_Controller.h"
+
 
 /*******************************************************************************
  *          TODO
@@ -31,7 +33,8 @@
  *  encDriverService();
 
  * */
-
+    
+// Setup timer
 /*******************************************************************************
  *          DEFINES
  ******************************************************************************/       
@@ -100,9 +103,11 @@ int main(void) {
 
     initialize();
     DelayMs(100);
-    
+   
+    // TODO: Move to init phase of FSM 
     glcdInit();
     encDriverInit();
+    fsmInit();
 
 //    DelayMs(100);
 //    LED1 = 1;
@@ -117,15 +122,20 @@ int main(void) {
     Rotary_t rotary;    
 
     while(1) {
-        
-        DelayMs(1000);
-        encGetRotaryData(ROTARY1, &rotary);
-        if (rotary.button == Pressed) {
-            printf("btn pressed\n");
-        }
-        if (rotary.turns != 0) {
-            printf("%d turns\n", rotary.turns);
-        }
+
+
+        if (fsmShouldExecute()) {
+            fsmExecute();
+            LED1 = !LED1;
+        }       
+        /* DelayMs(1000); */
+        /* encGetRotaryData(ROTARY1, &rotary); */
+        /* if (rotary.button == Pressed) { */
+            /* printf("btn pressed\n"); */
+        /* } */
+        /* if (rotary.turns != 0) { */
+            /* printf("%d turns\n", rotary.turns); */
+        /* } */
     }
     return 0;
 

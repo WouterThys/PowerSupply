@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=Controllers/SUPPLIES_Controller.c Controllers/UART_Controller.c Controllers/GLCD_Controller.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c Drivers/SYSTEM_Driver.c Drivers/UART_Driver.c configuration.c main.c Utils.c
+SOURCEFILES_QUOTED_IF_SPACED=Controllers/SUPPLIES_Controller.c Controllers/UART_Controller.c Controllers/GLCD_Controller.c Controllers/FSM_Controller.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c Drivers/SYSTEM_Driver.c Drivers/UART_Driver.c configuration.c main.c Utils.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Controllers/SUPPLIES_Controller.o ${OBJECTDIR}/Controllers/UART_Controller.o ${OBJECTDIR}/Controllers/GLCD_Controller.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/Utils.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/Controllers/SUPPLIES_Controller.o.d ${OBJECTDIR}/Controllers/UART_Controller.o.d ${OBJECTDIR}/Controllers/GLCD_Controller.o.d ${OBJECTDIR}/Drivers/ENC_Driver.o.d ${OBJECTDIR}/Drivers/I2C_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/Drivers/UART_Driver.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/Utils.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Controllers/SUPPLIES_Controller.o ${OBJECTDIR}/Controllers/UART_Controller.o ${OBJECTDIR}/Controllers/GLCD_Controller.o ${OBJECTDIR}/Controllers/FSM_Controller.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/Utils.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/Controllers/SUPPLIES_Controller.o.d ${OBJECTDIR}/Controllers/UART_Controller.o.d ${OBJECTDIR}/Controllers/GLCD_Controller.o.d ${OBJECTDIR}/Controllers/FSM_Controller.o.d ${OBJECTDIR}/Drivers/ENC_Driver.o.d ${OBJECTDIR}/Drivers/I2C_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/Drivers/UART_Driver.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/Utils.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/Controllers/SUPPLIES_Controller.o ${OBJECTDIR}/Controllers/UART_Controller.o ${OBJECTDIR}/Controllers/GLCD_Controller.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/Utils.o
+OBJECTFILES=${OBJECTDIR}/Controllers/SUPPLIES_Controller.o ${OBJECTDIR}/Controllers/UART_Controller.o ${OBJECTDIR}/Controllers/GLCD_Controller.o ${OBJECTDIR}/Controllers/FSM_Controller.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/Utils.o
 
 # Source Files
-SOURCEFILES=Controllers/SUPPLIES_Controller.c Controllers/UART_Controller.c Controllers/GLCD_Controller.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c Drivers/SYSTEM_Driver.c Drivers/UART_Driver.c configuration.c main.c Utils.c
+SOURCEFILES=Controllers/SUPPLIES_Controller.c Controllers/UART_Controller.c Controllers/GLCD_Controller.c Controllers/FSM_Controller.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c Drivers/SYSTEM_Driver.c Drivers/UART_Driver.c configuration.c main.c Utils.c
 
 
 CFLAGS=
@@ -114,6 +114,13 @@ ${OBJECTDIR}/Controllers/GLCD_Controller.o: Controllers/GLCD_Controller.c  nbpro
 	@${RM} ${OBJECTDIR}/Controllers/GLCD_Controller.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  Controllers/GLCD_Controller.c  -o ${OBJECTDIR}/Controllers/GLCD_Controller.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Controllers/GLCD_Controller.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/Controllers/GLCD_Controller.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/Controllers/FSM_Controller.o: Controllers/FSM_Controller.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Controllers" 
+	@${RM} ${OBJECTDIR}/Controllers/FSM_Controller.o.d 
+	@${RM} ${OBJECTDIR}/Controllers/FSM_Controller.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  Controllers/FSM_Controller.c  -o ${OBJECTDIR}/Controllers/FSM_Controller.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Controllers/FSM_Controller.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/Controllers/FSM_Controller.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/Drivers/ENC_Driver.o: Drivers/ENC_Driver.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Drivers" 
@@ -185,6 +192,13 @@ ${OBJECTDIR}/Controllers/GLCD_Controller.o: Controllers/GLCD_Controller.c  nbpro
 	@${RM} ${OBJECTDIR}/Controllers/GLCD_Controller.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  Controllers/GLCD_Controller.c  -o ${OBJECTDIR}/Controllers/GLCD_Controller.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Controllers/GLCD_Controller.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/Controllers/GLCD_Controller.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/Controllers/FSM_Controller.o: Controllers/FSM_Controller.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Controllers" 
+	@${RM} ${OBJECTDIR}/Controllers/FSM_Controller.o.d 
+	@${RM} ${OBJECTDIR}/Controllers/FSM_Controller.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  Controllers/FSM_Controller.c  -o ${OBJECTDIR}/Controllers/FSM_Controller.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Controllers/FSM_Controller.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/Controllers/FSM_Controller.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/Drivers/ENC_Driver.o: Drivers/ENC_Driver.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Drivers" 

@@ -8,6 +8,7 @@
         <itemPath>Controllers/SUPPLIES_Controller.h</itemPath>
         <itemPath>Controllers/UART_Controller.h</itemPath>
         <itemPath>Controllers/GLCD_Controller.h</itemPath>
+        <itemPath>Controllers/FSM_Controller.h</itemPath>
       </logicalFolder>
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/ENC_Driver.h</itemPath>
@@ -16,7 +17,7 @@
         <itemPath>Drivers/UART_Driver.h</itemPath>
       </logicalFolder>
       <itemPath>Settings.h</itemPath>
-      <itemPath>utils.h</itemPath>
+      <itemPath>Utils.h</itemPath>
       <itemPath>../Common/CommonData.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -30,6 +31,7 @@
         <itemPath>Controllers/SUPPLIES_Controller.c</itemPath>
         <itemPath>Controllers/UART_Controller.c</itemPath>
         <itemPath>Controllers/GLCD_Controller.c</itemPath>
+        <itemPath>Controllers/FSM_Controller.c</itemPath>
       </logicalFolder>
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/ENC_Driver.c</itemPath>
@@ -39,7 +41,7 @@
       </logicalFolder>
       <itemPath>configuration.c</itemPath>
       <itemPath>main.c</itemPath>
-      <itemPath>utils.c</itemPath>
+      <itemPath>Utils.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

@@ -43,9 +43,12 @@
 #define IP_I2C       5
 #define IP_CN        3
 #define IP_MENU_TMR  2
-#define IP_MAIN_TMR  1
+#define IP_TMR_4     1
     
-
+/**
+ * FSM TIMER CONFIG
+ */
+#define T4_PERIOD    200 /* In milliseconds (should be between 14us and 900ms)*/
 
 /******************************************************************************/
 /*                  PORT MAPPINGS                                             */
