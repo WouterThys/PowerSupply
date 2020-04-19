@@ -7,7 +7,6 @@
       <logicalFolder name="Controllers" displayName="Controllers" projectFiles="true">
         <itemPath>Controllers/MCP_Controller.h</itemPath>
         <itemPath>Controllers/MCP_Module.h</itemPath>
-        <itemPath>Controllers/MENU_Controller.h</itemPath>
         <itemPath>Controllers/SUPPLIES_Controller.h</itemPath>
         <itemPath>Controllers/UART_Controller.h</itemPath>
         <itemPath>Controllers/GLCD_Controller.h</itemPath>
@@ -15,7 +14,6 @@
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/ENC_Driver.h</itemPath>
         <itemPath>Drivers/I2C_Driver.h</itemPath>
-        <itemPath>Drivers/LCD_Driver.h</itemPath>
         <itemPath>Drivers/SPI1_Driver.h</itemPath>
         <itemPath>Drivers/SPI_Driver.h</itemPath>
         <itemPath>Drivers/SYSTEM_Driver.h</itemPath>
@@ -34,7 +32,6 @@
                    projectFiles="true">
       <logicalFolder name="Controllers" displayName="Controllers" projectFiles="true">
         <itemPath>Controllers/MCP_Controller.c</itemPath>
-        <itemPath>Controllers/MENU_Controller.c</itemPath>
         <itemPath>Controllers/SUPPLIES_Controller.c</itemPath>
         <itemPath>Controllers/UART_Controller.c</itemPath>
         <itemPath>Controllers/GLCD_Controller.c</itemPath>
@@ -42,7 +39,6 @@
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/ENC_Driver.c</itemPath>
         <itemPath>Drivers/I2C_Driver.c</itemPath>
-        <itemPath>Drivers/LCD_Driver.c</itemPath>
         <itemPath>Drivers/SPI1_Driver.c</itemPath>
         <itemPath>Drivers/SPI_Driver.c</itemPath>
         <itemPath>Drivers/SYSTEM_Driver.c</itemPath>

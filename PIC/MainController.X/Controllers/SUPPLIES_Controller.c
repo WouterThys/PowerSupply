@@ -3,7 +3,7 @@
 #include <stdint.h>        /* Includes uint16_t definition                    */
 #include <stdbool.h>       /* Includes true/false definition                  */
 
-#include "../utils.h"
+#include "../Utils.h"
 #include "../Settings.h"
 #include "../Drivers/I2C_Driver.h"
 #include "../Drivers/SYSTEM_Driver.h"

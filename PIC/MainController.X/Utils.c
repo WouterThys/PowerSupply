@@ -4,7 +4,7 @@
 #include <stdbool.h>       /* Includes true/false definition                  */
 #include <string.h>
 
-#include "utils.h"
+#include "Utils.h"
 
 
 bool stringEquals(const char * str1, const char * str2) {

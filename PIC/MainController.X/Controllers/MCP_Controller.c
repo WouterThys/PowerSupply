@@ -6,7 +6,7 @@
 #include "../Drivers/SYSTEM_Driver.h"
 #include "../Drivers/SPI1_Driver.h"
 #include "../Settings.h"
-#include "MCP_Module.h"
+#include "MCP_Registers.h"
 #include "MCP_Controller.h"
 
 /*******************************************************************************

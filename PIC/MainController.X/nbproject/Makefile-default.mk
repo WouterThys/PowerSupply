@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=Controllers/MCP_Controller.c Controllers/MENU_Controller.c Controllers/SUPPLIES_Controller.c Controllers/UART_Controller.c Controllers/GLCD_Controller.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c Drivers/LCD_Driver.c Drivers/SPI1_Driver.c Drivers/SPI_Driver.c Drivers/SYSTEM_Driver.c Drivers/UART_Driver.c configuration.c main.c utils.c
+SOURCEFILES_QUOTED_IF_SPACED=Controllers/MCP_Controller.c Controllers/SUPPLIES_Controller.c Controllers/UART_Controller.c Controllers/GLCD_Controller.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c Drivers/SPI1_Driver.c Drivers/SPI_Driver.c Drivers/SYSTEM_Driver.c Drivers/UART_Driver.c configuration.c main.c Utils.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Controllers/MCP_Controller.o ${OBJECTDIR}/Controllers/MENU_Controller.o ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o ${OBJECTDIR}/Controllers/UART_Controller.o ${OBJECTDIR}/Controllers/GLCD_Controller.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/Drivers/LCD_Driver.o ${OBJECTDIR}/Drivers/SPI1_Driver.o ${OBJECTDIR}/Drivers/SPI_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/utils.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/Controllers/MCP_Controller.o.d ${OBJECTDIR}/Controllers/MENU_Controller.o.d ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o.d ${OBJECTDIR}/Controllers/UART_Controller.o.d ${OBJECTDIR}/Controllers/GLCD_Controller.o.d ${OBJECTDIR}/Drivers/ENC_Driver.o.d ${OBJECTDIR}/Drivers/I2C_Driver.o.d ${OBJECTDIR}/Drivers/LCD_Driver.o.d ${OBJECTDIR}/Drivers/SPI1_Driver.o.d ${OBJECTDIR}/Drivers/SPI_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/Drivers/UART_Driver.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/utils.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Controllers/MCP_Controller.o ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o ${OBJECTDIR}/Controllers/UART_Controller.o ${OBJECTDIR}/Controllers/GLCD_Controller.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/Drivers/SPI1_Driver.o ${OBJECTDIR}/Drivers/SPI_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/Utils.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/Controllers/MCP_Controller.o.d ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o.d ${OBJECTDIR}/Controllers/UART_Controller.o.d ${OBJECTDIR}/Controllers/GLCD_Controller.o.d ${OBJECTDIR}/Drivers/ENC_Driver.o.d ${OBJECTDIR}/Drivers/I2C_Driver.o.d ${OBJECTDIR}/Drivers/SPI1_Driver.o.d ${OBJECTDIR}/Drivers/SPI_Driver.o.d ${OBJECTDIR}/Drivers/SYSTEM_Driver.o.d ${OBJECTDIR}/Drivers/UART_Driver.o.d ${OBJECTDIR}/configuration.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/Utils.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/Controllers/MCP_Controller.o ${OBJECTDIR}/Controllers/MENU_Controller.o ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o ${OBJECTDIR}/Controllers/UART_Controller.o ${OBJECTDIR}/Controllers/GLCD_Controller.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/Drivers/LCD_Driver.o ${OBJECTDIR}/Drivers/SPI1_Driver.o ${OBJECTDIR}/Drivers/SPI_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/utils.o
+OBJECTFILES=${OBJECTDIR}/Controllers/MCP_Controller.o ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o ${OBJECTDIR}/Controllers/UART_Controller.o ${OBJECTDIR}/Controllers/GLCD_Controller.o ${OBJECTDIR}/Drivers/ENC_Driver.o ${OBJECTDIR}/Drivers/I2C_Driver.o ${OBJECTDIR}/Drivers/SPI1_Driver.o ${OBJECTDIR}/Drivers/SPI_Driver.o ${OBJECTDIR}/Drivers/SYSTEM_Driver.o ${OBJECTDIR}/Drivers/UART_Driver.o ${OBJECTDIR}/configuration.o ${OBJECTDIR}/main.o ${OBJECTDIR}/Utils.o
 
 # Source Files
-SOURCEFILES=Controllers/MCP_Controller.c Controllers/MENU_Controller.c Controllers/SUPPLIES_Controller.c Controllers/UART_Controller.c Controllers/GLCD_Controller.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c Drivers/LCD_Driver.c Drivers/SPI1_Driver.c Drivers/SPI_Driver.c Drivers/SYSTEM_Driver.c Drivers/UART_Driver.c configuration.c main.c utils.c
+SOURCEFILES=Controllers/MCP_Controller.c Controllers/SUPPLIES_Controller.c Controllers/UART_Controller.c Controllers/GLCD_Controller.c Drivers/ENC_Driver.c Drivers/I2C_Driver.c Drivers/SPI1_Driver.c Drivers/SPI_Driver.c Drivers/SYSTEM_Driver.c Drivers/UART_Driver.c configuration.c main.c Utils.c
 
 
 CFLAGS=
@@ -100,13 +100,6 @@ ${OBJECTDIR}/Controllers/MCP_Controller.o: Controllers/MCP_Controller.c  nbproje
 	@${RM} ${OBJECTDIR}/Controllers/MCP_Controller.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  Controllers/MCP_Controller.c  -o ${OBJECTDIR}/Controllers/MCP_Controller.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Controllers/MCP_Controller.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/Controllers/MCP_Controller.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/Controllers/MENU_Controller.o: Controllers/MENU_Controller.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Controllers" 
-	@${RM} ${OBJECTDIR}/Controllers/MENU_Controller.o.d 
-	@${RM} ${OBJECTDIR}/Controllers/MENU_Controller.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  Controllers/MENU_Controller.c  -o ${OBJECTDIR}/Controllers/MENU_Controller.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Controllers/MENU_Controller.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/Controllers/MENU_Controller.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o: Controllers/SUPPLIES_Controller.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Controllers" 
@@ -142,13 +135,6 @@ ${OBJECTDIR}/Drivers/I2C_Driver.o: Drivers/I2C_Driver.c  nbproject/Makefile-${CN
 	@${RM} ${OBJECTDIR}/Drivers/I2C_Driver.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/I2C_Driver.c  -o ${OBJECTDIR}/Drivers/I2C_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/I2C_Driver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/Drivers/I2C_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/Drivers/LCD_Driver.o: Drivers/LCD_Driver.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Drivers" 
-	@${RM} ${OBJECTDIR}/Drivers/LCD_Driver.o.d 
-	@${RM} ${OBJECTDIR}/Drivers/LCD_Driver.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/LCD_Driver.c  -o ${OBJECTDIR}/Drivers/LCD_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/LCD_Driver.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/Drivers/LCD_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/Drivers/SPI1_Driver.o: Drivers/SPI1_Driver.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Drivers" 
@@ -192,12 +178,12 @@ ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE)  main.c  -o ${OBJECTDIR}/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/utils.o: utils.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/Utils.o: Utils.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/utils.o.d 
-	@${RM} ${OBJECTDIR}/utils.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  utils.c  -o ${OBJECTDIR}/utils.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/utils.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/utils.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	@${RM} ${OBJECTDIR}/Utils.o.d 
+	@${RM} ${OBJECTDIR}/Utils.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  Utils.c  -o ${OBJECTDIR}/Utils.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Utils.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/Utils.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 else
 ${OBJECTDIR}/Controllers/MCP_Controller.o: Controllers/MCP_Controller.c  nbproject/Makefile-${CND_CONF}.mk
@@ -206,13 +192,6 @@ ${OBJECTDIR}/Controllers/MCP_Controller.o: Controllers/MCP_Controller.c  nbproje
 	@${RM} ${OBJECTDIR}/Controllers/MCP_Controller.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  Controllers/MCP_Controller.c  -o ${OBJECTDIR}/Controllers/MCP_Controller.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Controllers/MCP_Controller.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/Controllers/MCP_Controller.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/Controllers/MENU_Controller.o: Controllers/MENU_Controller.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Controllers" 
-	@${RM} ${OBJECTDIR}/Controllers/MENU_Controller.o.d 
-	@${RM} ${OBJECTDIR}/Controllers/MENU_Controller.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  Controllers/MENU_Controller.c  -o ${OBJECTDIR}/Controllers/MENU_Controller.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Controllers/MENU_Controller.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/Controllers/MENU_Controller.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/Controllers/SUPPLIES_Controller.o: Controllers/SUPPLIES_Controller.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Controllers" 
@@ -248,13 +227,6 @@ ${OBJECTDIR}/Drivers/I2C_Driver.o: Drivers/I2C_Driver.c  nbproject/Makefile-${CN
 	@${RM} ${OBJECTDIR}/Drivers/I2C_Driver.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/I2C_Driver.c  -o ${OBJECTDIR}/Drivers/I2C_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/I2C_Driver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/Drivers/I2C_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/Drivers/LCD_Driver.o: Drivers/LCD_Driver.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Drivers" 
-	@${RM} ${OBJECTDIR}/Drivers/LCD_Driver.o.d 
-	@${RM} ${OBJECTDIR}/Drivers/LCD_Driver.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  Drivers/LCD_Driver.c  -o ${OBJECTDIR}/Drivers/LCD_Driver.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Drivers/LCD_Driver.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/Drivers/LCD_Driver.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/Drivers/SPI1_Driver.o: Drivers/SPI1_Driver.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Drivers" 
@@ -298,12 +270,12 @@ ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE)  main.c  -o ${OBJECTDIR}/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/utils.o: utils.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/Utils.o: Utils.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/utils.o.d 
-	@${RM} ${OBJECTDIR}/utils.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  utils.c  -o ${OBJECTDIR}/utils.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/utils.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/utils.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	@${RM} ${OBJECTDIR}/Utils.o.d 
+	@${RM} ${OBJECTDIR}/Utils.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  Utils.c  -o ${OBJECTDIR}/Utils.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/Utils.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/Utils.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
 

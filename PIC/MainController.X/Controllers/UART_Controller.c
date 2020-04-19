@@ -5,7 +5,7 @@
 
 #include "../Settings.h"
 #include "../Drivers/SYSTEM_Driver.h"
-#include "../utils.h"
+#include "../Utils.h"
 #include "UART_Controller.h"
 
 /*******************************************************************************
