@@ -3,12 +3,7 @@
 
 #include <xc.h>
 #include <stdint.h>
-
 #include "../Settings.h"
-
-#define ROTARY1 0
-#define ROTARY2 1
-#define ROTARY3 2
 
 typedef enum {
     Released = 0,
@@ -20,6 +15,9 @@ typedef struct {
     int16_t turns;          // Turns, left or right
 } Rotary_t;
 
+#define ROTARY1 0
+#define ROTARY2 1
+#define ROTARY3 2
 
 /**
  * Initialize rotary encoder

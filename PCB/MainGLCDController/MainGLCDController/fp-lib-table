@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name Pandas)(type KiCad)(uri /home/wouter/Documents/Geeken/Libraries/KiCad/PandaLogos.pretty)(options "")(descr ""))
+)

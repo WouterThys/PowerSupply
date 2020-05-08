@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name MainGLCDController-rescue)(type Legacy)(uri ${KIPRJMOD}/MainGLCDController-rescue.lib)(options "")(descr ""))
+)

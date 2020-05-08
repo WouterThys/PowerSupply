@@ -13,7 +13,7 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include <math.h>
 
-#define DEBUG       1           /* General debug enable                       */
+#define DEBUG       0           /* General debug enable                       */
 #define DEBUG_I2C  (0 & DEBUG)  /* I²C debug enable                           */
 #define DEBUG_FSM  (0 & DEBUG)  /* FSM debug enable                           */
 #define DEBUG_LCD  (1 & DEBUG)  /* LCD debug enable                           */
@@ -55,20 +55,20 @@
 /******************************************************************************/  
 /*  RA0 /AN0    -> LED1    
  *  RA1 /AN1    -> LED2
- *  RA2         -> 
- *  RA3         -> 
- *  RA4 /RP20   -> TX
+ *  RA2         -> ROT3-A 
+ *  RA3         -> ROT3-B 
+ *  RA4 /RP20   -> ROT3-D
  * 
- *  RB0 /RPI32  -> 
- *  RB1 /RPI33  ->
+ *  RB0 /RPI32  -> MCP_INTB
+ *  RB1 /RPI33  -> MCP_INTA
  *  RB2 /RPI34  ->
  *  RB3 /RP35   ->
- *  RB4 /RP36   -> RX
+ *  RB4 /RP36   -> MCP_CS
  *  RB5 /RP37   -> I2C-SDA
  *  RB6 /RP38   -> I2C-SCL
- *  RB7 /RP39   -> ROT3-D
- *  RB8 /RP40   -> ROT3-B
- *  RB9 /RP41   -> ROT3-A
+ *  RB7 /RP39   -> SCK
+ *  RB8 /RP40   -> SDO  
+ *  RB9 /RP41   -> SDI
  *  RB10/RP42   -> ROT2-D
  *  RB11/RP43   -> ROT2-B
  *  RB12/RPI44  -> ROT2-A
@@ -144,15 +144,15 @@
 #define ROT2_D_Dir      TRISBbits.TRISB10
 #define ROT2_D_Int      CNENBbits.CNIEB10
 
-#define ROT3_A_Pin      PORTBbits.RB9
-#define ROT3_A_Dir      TRISBbits.TRISB9
-#define ROT3_A_Int      CNENBbits.CNIEB9 
-#define ROT3_B_Pin      PORTBbits.RB8
-#define ROT3_B_Dir      TRISBbits.TRISB8
-#define ROT3_B_Int      CNENBbits.CNIEB8 
-#define ROT3_D_Pin      PORTBbits.RB7
-#define ROT3_D_Dir      TRISBbits.TRISB7
-#define ROT3_D_Int      CNENBbits.CNIEB7
+#define ROT3_A_Pin      PORTAbits.RA2
+#define ROT3_A_Dir      TRISAbits.TRISA2
+#define ROT3_A_Int      CNENAbits.CNIEA2 
+#define ROT3_B_Pin      PORTAbits.RA3
+#define ROT3_B_Dir      TRISAbits.TRISA3
+#define ROT3_B_Int      CNENAbits.CNIEA3 
+#define ROT3_D_Pin      PORTAbits.RA4
+#define ROT3_D_Dir      TRISAbits.TRISA4
+#define ROT3_D_Int      CNENAbits.CNIEA4
 
 
 #endif	/* XC_HEADER_TEMPLATE_H */

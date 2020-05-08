@@ -119,7 +119,6 @@ int main(void) {
 //    LED1 = 0;
 
     printf("Start\n");
-    Rotary_t rotary;    
 
     while(1) {
 
