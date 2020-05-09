@@ -95,7 +95,7 @@
  */      
 // Orange = RX
 // Geel = TX
-#define UART1_BAUD      57600 /* 57600 */
+#define UART1_BAUD      19200 /* 57600 */
 #define UART1_ID        2   
 
 #define UART1_RX_Dir    TRISBbits.TRISB4    /* RX Pin on RP36-RB4             */

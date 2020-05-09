@@ -7,6 +7,7 @@
 #include <math.h>
 
 #include "settings.h"
+#include "Drivers/UART_Driver.h"
 #include "Controllers/DATA_Controller.h"
 #include "Controllers/MENU_Controller.h"
 
@@ -30,6 +31,7 @@ static uint8_t dataReadFlag;
 static void initialize();
 static void onDataPacketRead(GLCD_DataPacket_t * data);
 static void delaySeconds(uint8_t seconds);
+static void uartDataRead(uint8_t data);
 
 static void initialize() {
     // Disable interrupts
@@ -56,8 +58,9 @@ static void initialize() {
 int main(void) {
 
     initialize();
-    dataInit(onDataPacketRead);
-    menuInit();
+    //dataInit(onDataPacketRead);
+    //menuInit();
+    UART_Init(UART_BAUD, UART_INVERT, uartDataRead);
     
     // Enable interrupts
     GIEH = 1;
@@ -68,8 +71,10 @@ int main(void) {
     data_packet.i_set = i_set_arr;
     data_packet.v_rd = v_rd_arr;
     data_packet.i_rd = i_rd_arr;
-
-    printf("Start!\n");
+    
+    // Test GLCD
+    UART_PutChar(0xFE);
+    UART_PutChar(0x58);
 
     while (1) {
 
@@ -131,6 +136,10 @@ int main(void) {
 
     }
     return 0;
+}
+
+static void uartDataRead(uint8_t data) {
+    
 }
 
 static void onDataPacketRead(GLCD_DataPacket_t *data) {

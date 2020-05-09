@@ -11,6 +11,7 @@
 #include "Drivers/SYSTEM_Driver.h"
 #include "Drivers/I2C_Driver.h"
 #include "Drivers/ENC_Driver.h"
+#include "Drivers/UART_Driver.h"
 
 #include "Controllers/SUPPLIES_Controller.h"
 #include "Controllers/GLCD_Controller.h"
@@ -106,8 +107,8 @@ int main(void) {
    
     // TODO: Move to init phase of FSM 
     glcdInit();
-    encDriverInit();
-    fsmInit();
+    //encDriverInit();
+    //fsmInit();
 
 //    DelayMs(100);
 //    LED1 = 1;
@@ -118,23 +119,20 @@ int main(void) {
 //    glcdWriteMenu(1); 
 //    LED1 = 0;
 
-    printf("Start\n");
+    //printf("Start\n");
+    
+   
+    
+    uartDriverWriteByte(0xFE);
+    uartDriverWriteByte(0x58);
 
     while(1) {
 
 
         if (fsmShouldExecute()) {
-            fsmExecute();
+            //fsmExecute();
             LED1 = !LED1;
         }       
-        /* DelayMs(1000); */
-        /* encGetRotaryData(ROTARY1, &rotary); */
-        /* if (rotary.button == Pressed) { */
-            /* printf("btn pressed\n"); */
-        /* } */
-        /* if (rotary.turns != 0) { */
-            /* printf("%d turns\n", rotary.turns); */
-        /* } */
     }
     return 0;
 
