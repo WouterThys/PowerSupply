@@ -7,7 +7,6 @@
 #include <math.h>
 
 #include "settings.h"
-#include "Drivers/UART_Driver.h"
 #include "Controllers/DATA_Controller.h"
 #include "Controllers/MENU_Controller.h"
 
@@ -58,9 +57,8 @@ static void initialize() {
 int main(void) {
 
     initialize();
-    //dataInit(onDataPacketRead);
-    //menuInit();
-    UART_Init(UART_BAUD, UART_INVERT, uartDataRead);
+    dataInit(onDataPacketRead);
+    menuInit();
     
     // Enable interrupts
     GIEH = 1;
@@ -72,10 +70,6 @@ int main(void) {
     data_packet.v_rd = v_rd_arr;
     data_packet.i_rd = i_rd_arr;
     
-    // Test GLCD
-    UART_PutChar(0xFE);
-    UART_PutChar(0x58);
-
     while (1) {
 
         if (dataReadFlag) {

@@ -12,6 +12,7 @@
         <itemPath>Drivers/GLCD_bitmaps.h</itemPath>
         <itemPath>Drivers/GLCD_ks0108.h</itemPath>
         <itemPath>Drivers/UART_Driver.h</itemPath>
+        <itemPath>Drivers/GLK19264A_Driver.h</itemPath>
       </logicalFolder>
       <itemPath>settings.h</itemPath>
     </logicalFolder>
@@ -29,6 +30,7 @@
       <logicalFolder name="Drivers" displayName="Drivers" projectFiles="true">
         <itemPath>Drivers/GLCD_ks0108.c</itemPath>
         <itemPath>Drivers/UART_Driver.c</itemPath>
+        <itemPath>Drivers/GLK19264A_Driver.c</itemPath>
       </logicalFolder>
       <itemPath>configuration.c</itemPath>
       <itemPath>main.c</itemPath>

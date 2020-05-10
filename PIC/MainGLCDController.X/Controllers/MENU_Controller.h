@@ -13,6 +13,7 @@
 
 #include "../Drivers/GLCD_ks0108.h"
 #include "../Drivers/GLCD_bitmaps.h"
+#include "../Drivers/GLK19264A_Driver.h"
 
 /******************************************************************************/
 /* Defines                                                                    */

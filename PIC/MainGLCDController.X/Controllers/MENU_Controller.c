@@ -100,28 +100,34 @@ static Menu_t menus[3];
 
 void menuInit() {
 
-    // Initialize GLCD
-    GLCD_Init(NON_INVERTED);
-    GLCD_SelectFont(font);
-    GLCD_ClearScreen(BLACK);
+    GLK_Init();
+    GLK_ClearScreen();
+    
+    GLK_Write("PANDA");
 
-    menus[0] = menu1;
-    menus[1] = menu2;
-    menus[2] = menu3;
 
-    drawMenu(&menu1);
-    drawMenu(&menu2);
-    drawMenu(&menu3);
+/*     // Initialize GLCD */
+    /* GLCD_Init(NON_INVERTED); */
+    /* GLCD_SelectFont(font); */
+    /* GLCD_ClearScreen(BLACK); */
 
-    // Draw lines
-    GLCD_DrawHoriLine(0, 10, 191);
-    GLCD_DrawHoriLine(0, 36, 191);
-    GLCD_DrawHoriLine(0, 37, 191);
-    GLCD_DrawVertLine(64, 0, 63);
-    GLCD_DrawVertLine(128, 0, 63);
-    GLCD_DrawVertLine(0, 38, 26);
-    GLCD_DrawVertLine(65, 38, 26);
-    GLCD_DrawVertLine(129, 38, 26);
+    /* menus[0] = menu1; */
+    /* menus[1] = menu2; */
+    /* menus[2] = menu3; */
+
+    /* drawMenu(&menu1); */
+    /* drawMenu(&menu2); */
+    /* drawMenu(&menu3); */
+
+    /* // Draw lines */
+    /* GLCD_DrawHoriLine(0, 10, 191); */
+    /* GLCD_DrawHoriLine(0, 36, 191); */
+    /* GLCD_DrawHoriLine(0, 37, 191); */
+    /* GLCD_DrawVertLine(64, 0, 63); */
+    /* GLCD_DrawVertLine(128, 0, 63); */
+    /* GLCD_DrawVertLine(0, 38, 26); */
+    /* GLCD_DrawVertLine(65, 38, 26); */
+    /* GLCD_DrawVertLine(129, 38, 26); */
 
 }
 

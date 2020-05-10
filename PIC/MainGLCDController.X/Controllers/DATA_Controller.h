@@ -23,5 +23,11 @@ void dataInit(dataCallback callback);
  */
 void dataRead(uint8_t data);
 
+/**
+ * 
+ * @return 
+ */
+int foo();
+
 #endif	/* DATA_CONTROLLER_H */
 
