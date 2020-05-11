@@ -5,6 +5,7 @@
  *              COMMANDS 
  *******************************************************************************/
 
+// TEXT
 static const uint8_t CLEAR_SCREEN[2]        = {0xFE, 0x58};
 static const uint8_t GO_HOME[2]             = {0xFE, 0x48};
 static const uint8_t SET_CURSOR_POS[2]      = {0xFE, 0x47};
@@ -19,6 +20,9 @@ static const uint8_t UPDATE_LABEL[2]        = {0xFE, 0x2E};
 static const uint8_t AUTO_SCROLL_ON[2]      = {0xFE, 0x51};
 static const uint8_t AUTO_SCROLL_OFF[2]     = {0xFE, 0x52};
 
+// MISC
+static const uint8_t READ_VERSION_NUMBER[2] = {0xFE, 0x36};
+static const uint8_t READ_MODULE_NUMBER[2]  = {0xFE, 0x37};
 
 /********************************************************************************
  *              PROTOTYPES 
@@ -32,7 +36,7 @@ static void write(const uint8_t * command, const uint8_t length);
  *******************************************************************************/
 
 static void uartDataRead(uint8_t data) {
-
+    data++;
 }
 
 static void write(const uint8_t * command, const uint8_t length) {
@@ -47,10 +51,10 @@ static void write(const uint8_t * command, const uint8_t length) {
  *******************************************************************************/
 
 void GLK_Init() {
-
-
+    
     // Initialize UART
     UART_Init(UART_BAUD, UART_INVERT, uartDataRead);   
+    
 }
 
 void GLK_Write(const char * text) {
@@ -66,7 +70,7 @@ void GLK_Write(const char * text) {
 }
 
 void GLK_ClearScreen() {
-    write(&CLEAR_SCREEN[0], 2);
+    write(CLEAR_SCREEN, 2);
 }
 
 void GLK_GoHome() {
@@ -140,7 +144,7 @@ void GLK_ClearTextWindow(uint8_t id) {
 
 
 void GLK_InitializeLabel(uint8_t id, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t vert, uint8_t hor, uint16_t font, uint8_t background, uint8_t char_space) {
-    uint8_t data[14];
+    uint8_t data[13];
     data[0] = INIT_LABEL[0];
     data[1] = INIT_LABEL[1];
     data[2] = id;
@@ -149,16 +153,16 @@ void GLK_InitializeLabel(uint8_t id, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t
     data[5] = x2;
     data[6] = y2;
     data[7] = vert;
-    data[9] = hor;
-    data[10] = font & 0x00FF;
-    data[11] = (font >> 8) & 0x00FF;
-    data[12] = background;
-    data[13] = char_space;
-    write(data, 14);
+    data[8] = hor;
+    data[9] = font & 0x00FF;
+    data[10] = (font >> 8) & 0x00FF;
+    data[11] = background;
+    data[12] = char_space;
+    write(data, 13);
 }
 
 void GLK_InitializeScrollingLabel(uint8_t id, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t vert, uint8_t dir, uint16_t font, uint8_t background, uint8_t char_space, uint16_t delay) {
-    uint8_t data[16];
+    uint8_t data[15];
     data[0] = INIT_SCROLLING_LABEL[0];
     data[1] = INIT_SCROLLING_LABEL[1];
     data[2] = id;
@@ -167,27 +171,27 @@ void GLK_InitializeScrollingLabel(uint8_t id, uint8_t x1, uint8_t y1, uint8_t x2
     data[5] = x2;
     data[6] = y2;
     data[7] = vert;
-    data[9] = dir;
-    data[10] = font & 0x00FF;
-    data[11] = (font >> 8) & 0x00FF;
-    data[12] = background;
-    data[13] = char_space;
-    data[14] = delay & 0x00FF;
-    data[15] = (delay >> 8) & 0x00FF;
-    write(data, 16);
+    data[8] = dir;
+    data[9] = font & 0x00FF;
+    data[10] = (font >> 8) & 0x00FF;
+    data[11] = background;
+    data[12] = char_space;
+    data[13] = delay & 0x00FF;
+    data[14] = (delay >> 8) & 0x00FF;
+    write(data, 15);
 }
 
 void GLK_UpdateLabel(uint8_t id, const char * data) {
 
     UART_PutChar(UPDATE_LABEL[0]);
     UART_PutChar(UPDATE_LABEL[1]);
-    char c = data[0];
-    uint8_t i = 0;
+    UART_PutChar(id);
+    
+    char c = 1;
     while (c != 0) {
+        c = *(data++);
         UART_PutChar(c);
-        i++;
-        c = data[i];
-    } 
+    }
 }
 
 void GLK_AutoScrollOn(void) {
@@ -200,7 +204,21 @@ void GLK_AutoScrollOff(void) {
 }
 
 
+void GLK_ReadVersionNumber(uint8_t * response) {
+    write(READ_VERSION_NUMBER, 2);
+    
+    while(PIR1bits.RCIF == 0);
+    *response = RCREG;
+    PIR1bits.RCIF = 0;
+}
 
+void GLK_ReadModuleType(uint8_t * response) {
+    write(READ_MODULE_NUMBER, 2);
+    
+    while(PIR1bits.RCIF == 0);
+    *response = RCREG;
+    PIR1bits.RCIF = 0;
+}
 
 
 

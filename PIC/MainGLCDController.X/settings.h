@@ -25,8 +25,8 @@
 #define LED1_Dir        TRISAbits.TRISA0
 #define LED2            PORTAbits.RA1
 #define LED2_Dir        TRISAbits.TRISA1
-#define LED3            PORTCbits.RC4
-#define LED3_Dir        TRISCbits.TRISC4
+#define LED3            PORTAbits.RA2
+#define LED3_Dir        TRISAbits.TRISA2
     
 
 /**

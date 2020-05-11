@@ -7,13 +7,17 @@
 #include "UART_Driver.h"
 
 /********************************************************************************
- *              DEFINES
+ *              MY FUNCTIONS
  *******************************************************************************/
 
 void GLK_Init(void);
 
 void GLK_Write(const char * text);
 
+
+/********************************************************************************
+ *              TEXT
+ *******************************************************************************/
 /**
  * Clear screen: Clear the contents of the screen.
  */
@@ -27,8 +31,8 @@ void GLK_GoHome(void);
 /*
  * Set Cursor Position: Sets the cursor to a specific cursor position where 
  * the next transmitted character is printed.
- * @param c: column, value between 1 and number of character colums.
- * @param r: row, Value between 1 and numer of character rows.
+ * @param c: column, value between 1 and number of character columns.
+ * @param r: row, Value between 1 and number of character rows.
  */
 void GLK_SetCursorPosition(uint8_t c, uint8_t r);
 
@@ -77,15 +81,15 @@ void GLK_SetTextWindow(uint8_t id);
 void GLK_ClearTextWindow(uint8_t id);
 
 /*
- * Initialize Label: Designates a protion of the screen that can be easily updated with on eline of text,
+ * Initialize Label: Designates a portion of the screen that can be easily updated with one line of text,
  * often used to display variables.
  * @param id: Unique label identification number, value between 0 and 15.
  * @param x1: Leftmost coordinate.
  * @param y1: Topmost coordinate.
  * @param x2: Rightmost coordinate.
- * @param y2: Bottommost corrdinate.
+ * @param y2: Bottommost coordinate.
  * @param vert: Vertical justification of the text; o for top, 1 for middle, or 2 for bottom.
- * @param hor: Horizontal justification of the label text; 0 for left, 1 for centre, or 2 for right.
+ * @param hor: Horizontal justification of the label text; 0 for left, 1 for center, or 2 for right.
  * @param font: Unique font ID to use for this label, value between 0 and 1023.
  * @param background: State of the pixels in the label region that is not occupied by text; 0 for off or 1 for on.
  * @param char_space: Spacing between characters to use for this label.
@@ -101,7 +105,7 @@ void GLK_InitializeLabel(uint8_t id, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t
  * @param x2: Rightmost coordinate.
  * @param y2: Bottommost coordinate.
  * @param vert: Vertical justification of the label text; 0 for top, 1 for middle, or 2 for bottom.
- * @param dir: Direction of the scrolling behaviour; 0 for left, 1 for right, or 2 for bounce.
+ * @param dir: Direction of the scrolling behavior; 0 for left, 1 for right, or 2 for bounce.
  * @param font: Unique font ID to use for this label, value between 0 and 1023.
  * @param background: State of the pixels in the label region that is not occupied by text; 0 for off or 1 for on.
  * @param char_space: Spacing between characters to use for this label.
@@ -129,5 +133,21 @@ void GLK_AutoScrollOn(void);
  */
 void GLK_AutoScrollOff(void);
 
+
+/********************************************************************************
+ *              MISC
+ *******************************************************************************/
+
+/**
+ * Read Version Number: Causes display to respond with its firmware version number.
+ * @param response: Convert to hexadecimal to view major and minor revision number.
+ */
+void GLK_ReadVersionNumber(uint8_t * response);
+
+/**
+ * Read Module Type: Causes display to respond with its module number.
+ * @param response: Module number, see Sample Module Type Responses for a partial list.
+ */
+void GLK_ReadModuleType(uint8_t * response);
 
 #endif

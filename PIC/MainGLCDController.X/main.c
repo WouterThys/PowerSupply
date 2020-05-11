@@ -7,6 +7,7 @@
 #include <math.h>
 
 #include "settings.h"
+#include "Drivers/UART_Driver.h"
 #include "Controllers/DATA_Controller.h"
 #include "Controllers/MENU_Controller.h"
 
@@ -57,7 +58,9 @@ static void initialize() {
 int main(void) {
 
     initialize();
-    dataInit(onDataPacketRead);
+    __delay_ms(100);
+    
+    //dataInit(onDataPacketRead);
     menuInit();
     
     // Enable interrupts
@@ -71,62 +74,69 @@ int main(void) {
     data_packet.i_rd = i_rd_arr;
     
     while (1) {
+        
+        LED1 = 1;
+        __delay_ms(100);
+        __delay_ms(100);
+        LED1 = 0;
+        __delay_ms(100);
+        __delay_ms(100);
 
-        if (dataReadFlag) {
-            LED1 = 1;
-            dataReadFlag = 0;
-    
-            uint8_t menu = data_packet.command.menu;
-            if (DEBUG) printf("cmd:%d\n", data_packet.command.cmd_bits);
-
-            // Select or deselect menu
-            menuSelect(menu, data_packet.command.selected);
-
-            // Point and select
-            switch (data_packet.command.pointSelect) {
-                default:
-                case POINT_TO_V:
-                    menuSetCurrentState(menu, STATE_NONE);
-                    menuSetVoltageState(menu, STATE_POINT);
-                    break;
-                case POINT_TO_I:
-                    menuSetVoltageState(menu, STATE_NONE);
-                    menuSetCurrentState(menu, STATE_POINT);
-                    break;
-                case SELECT_V:
-                    menuSetCurrentState(menu, STATE_NONE);
-                    menuSetVoltageState(menu, STATE_SELECT);
-                    break;
-                case SELECT_I:
-                    menuSetVoltageState(menu, STATE_NONE);
-                    menuSetCurrentState(menu, STATE_SELECT);
-                    break;
-            }
-
-            // Set values
-            switch (data_packet.command.command) {
-                default:
-                case CMD_NONE:
-                    break;
-                case CMD_SET_V_SET:
-                    menuSetVoltageSet(menu, data_packet.v_set);
-                    break;
-                 case CMD_SET_I_SET:
-                    menuSetCurrentSet(menu, data_packet.i_set);
-                    break;
-                case CMD_SET_V_READ:
-                    menuSetVoltageRead(menu, data_packet.v_rd);
-                    break;
-                case CMD_SET_I_READ:
-                    menuSetCurrentRead(menu, data_packet.i_rd);
-                    break;
-                case CMD_SET_A_READ:
-                    menuSetVoltageRead(menu, data_packet.v_rd);
-                    menuSetCurrentRead(menu, data_packet.i_rd);
-                    break;
-            }
-            LED1 = 0;
-        }
+//        if (dataReadFlag) {
+//            
+//            dataReadFlag = 0;
+//    
+//            uint8_t menu = data_packet.command.menu;
+//            if (DEBUG) printf("cmd:%d\n", data_packet.command.cmd_bits);
+//
+//            // Select or deselect menu
+//            menuSelect(menu, data_packet.command.selected);
+//
+//            // Point and select
+//            switch (data_packet.command.pointSelect) {
+//                default:
+//                case POINT_TO_V:
+//                    menuSetCurrentState(menu, STATE_NONE);
+//                    menuSetVoltageState(menu, STATE_POINT);
+//                    break;
+//                case POINT_TO_I:
+//                    menuSetVoltageState(menu, STATE_NONE);
+//                    menuSetCurrentState(menu, STATE_POINT);
+//                    break;
+//                case SELECT_V:
+//                    menuSetCurrentState(menu, STATE_NONE);
+//                    menuSetVoltageState(menu, STATE_SELECT);
+//                    break;
+//                case SELECT_I:
+//                    menuSetVoltageState(menu, STATE_NONE);
+//                    menuSetCurrentState(menu, STATE_SELECT);
+//                    break;
+//            }
+//
+//            // Set values
+//            switch (data_packet.command.command) {
+//                default:
+//                case CMD_NONE:
+//                    break;
+//                case CMD_SET_V_SET:
+//                    menuSetVoltageSet(menu, data_packet.v_set);
+//                    break;
+//                 case CMD_SET_I_SET:
+//                    menuSetCurrentSet(menu, data_packet.i_set);
+//                    break;
+//                case CMD_SET_V_READ:
+//                    menuSetVoltageRead(menu, data_packet.v_rd);
+//                    break;
+//                case CMD_SET_I_READ:
+//                    menuSetCurrentRead(menu, data_packet.i_rd);
+//                    break;
+//                case CMD_SET_A_READ:
+//                    menuSetVoltageRead(menu, data_packet.v_rd);
+//                    menuSetCurrentRead(menu, data_packet.i_rd);
+//                    break;
+//            }
+//            
+//        }
 
     }
     return 0;

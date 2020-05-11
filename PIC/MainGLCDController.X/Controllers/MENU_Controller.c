@@ -47,6 +47,33 @@ typedef struct Menu {
     Value_t values[4];  // Values inside the menu
 } Menu_t;
 
+typedef struct Label {
+    uint8_t id;
+    uint8_t x1;
+    uint8_t y1;
+    uint8_t x2;
+    uint8_t y2;
+    uint8_t vert;
+    uint8_t hor;
+    uint16_t font;
+    uint8_t background;
+    uint8_t char_space;
+} Label_t;
+
+typedef struct ScrollingLabel {
+    uint8_t id;
+    uint8_t x1;
+    uint8_t y1;
+    uint8_t x2;
+    uint8_t y2;
+    uint8_t vert;
+    uint8_t dir;
+    uint16_t font;
+    uint8_t background;
+    uint8_t char_space;
+    uint16_t delay;
+} ScrollingLabel_t;
+
 static void drawMenu(Menu_t * menu);
 static void drawTitle(Title_t * title);
 static void drawValue(Value_t * value);
@@ -98,13 +125,53 @@ static Menu_t menu3 = {
 
 static Menu_t menus[3];
 
+static ScrollingLabel_t lbl_voltage;
+
 void menuInit() {
 
     GLK_Init();
     GLK_ClearScreen();
     
-    GLK_Write("PANDA");
+    // Setup screen 
+    lbl_voltage.id = 1;
+    lbl_voltage.x1 = 0;
+    lbl_voltage.y1 = 0;
+    lbl_voltage.x2 = 64;
+    lbl_voltage.y2 = 10;
+    lbl_voltage.vert = 1; // middle
+    lbl_voltage.dir = 2; // bounce
+    lbl_voltage.font = 1;
+    lbl_voltage.background = 0;
+    lbl_voltage.char_space = 0;
+    lbl_voltage.delay = 500; // ms
+    
+    GLK_InitializeScrollingLabel(
+            lbl_voltage.id,
+            lbl_voltage.x1,
+            lbl_voltage.y1,
+            lbl_voltage.x2,
+            lbl_voltage.y2,
+            lbl_voltage.vert,
+            lbl_voltage.dir,
+            lbl_voltage.font,
+            lbl_voltage.background,
+            lbl_voltage.char_space,
+            lbl_voltage.delay);
 
+    GLK_UpdateLabel(1, "pandas");
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 /*     // Initialize GLCD */
     /* GLCD_Init(NON_INVERTED); */
@@ -182,58 +249,58 @@ static void drawMenu(Menu_t * menu) {
 }
 
 static void drawTitle(Title_t * title) {
-    GLCD_WriteText(title->nPos.x, title->nPos.y, title->name);
-    GLCD_GotoXY(title->sPos.x, title->sPos.y);
-    GLCD_PutChar(title->status);
+//    GLCD_WriteText(title->nPos.x, title->nPos.y, title->name);
+//    GLCD_GotoXY(title->sPos.x, title->sPos.y);
+//    GLCD_PutChar(title->status);
 }
 
 static void drawValue(Value_t * value) {
-    GLCD_WriteText(value->nPos.x, value->nPos.y, value->name);
+//    GLCD_WriteText(value->nPos.x, value->nPos.y, value->name);
 }
 
 static void updateTitleStatus(Title_t * title, char status) {
-    title->status = status;
-    GLCD_GotoXY(title->sPos.x, title->sPos.y);
-    GLCD_PutChar(title->status);
+//    title->status = status;
+//    GLCD_GotoXY(title->sPos.x, title->sPos.y);
+//    GLCD_PutChar(title->status);
 }
 
 static void updateTitleSelection(Title_t * title, bool selected) {
-    if (title->selected != selected) {
-        GLCD_InvertRect(title->sRect.x, title->sRect.y, title->sRect.w, title->sRect.h);
-        title->selected = selected;
-    }
+//    if (title->selected != selected) {
+//        GLCD_InvertRect(title->sRect.x, title->sRect.y, title->sRect.w, title->sRect.h);
+//        title->selected = selected;
+//    }
 }
 
 static void updateValueValue(Value_t * value, const char * data) {
-    // Copy values into buffer
-    strcpy(value->value, data);
-    value->value[VALUE_DATA_LENGTH - 1] = 0; // Ensure termination
-    GLCD_WriteText(value->vPos.x, value->vPos.y, value->value); 
+//    // Copy values into buffer
+//    strcpy(value->value, data);
+//    value->value[VALUE_DATA_LENGTH - 1] = 0; // Ensure termination
+//    GLCD_WriteText(value->vPos.x, value->vPos.y, value->value); 
 }
 
 static void updateValueState(Value_t * value, uint8_t state) {
-    switch(state) {
-        case STATE_NONE:
-            GLCD_ClearDot(value->nPos.x - 2, value->nPos.y + 4);
-            if (value->state == STATE_SELECT) {
-                GLCD_InvertRect(value->sRect.x, value->sRect.y, value->sRect.w, value->sRect.h);
-            }
-            break;
-        case STATE_POINT:
-            GLCD_DrawDot(value->nPos.x - 2, value->nPos.y + 4);
-            if (value->state == STATE_SELECT) {
-                GLCD_InvertRect(value->sRect.x, value->sRect.y, value->sRect.w, value->sRect.h);
-            }
-            break;
-        case STATE_SELECT:
-            GLCD_DrawDot(value->nPos.x - 2, value->nPos.y + 4);
-            if (value->state < STATE_SELECT) {
-                GLCD_InvertRect(value->sRect.x, value->sRect.y, value->sRect.w, value->sRect.h);
-            }
-            break;
-
-    }
-    value->state = state;
+//    switch(state) {
+//        case STATE_NONE:
+//            GLCD_ClearDot(value->nPos.x - 2, value->nPos.y + 4);
+//            if (value->state == STATE_SELECT) {
+//                GLCD_InvertRect(value->sRect.x, value->sRect.y, value->sRect.w, value->sRect.h);
+//            }
+//            break;
+//        case STATE_POINT:
+//            GLCD_DrawDot(value->nPos.x - 2, value->nPos.y + 4);
+//            if (value->state == STATE_SELECT) {
+//                GLCD_InvertRect(value->sRect.x, value->sRect.y, value->sRect.w, value->sRect.h);
+//            }
+//            break;
+//        case STATE_SELECT:
+//            GLCD_DrawDot(value->nPos.x - 2, value->nPos.y + 4);
+//            if (value->state < STATE_SELECT) {
+//                GLCD_InvertRect(value->sRect.x, value->sRect.y, value->sRect.w, value->sRect.h);
+//            }
+//            break;
+//
+//    }
+//    value->state = state;
 }
 
 
