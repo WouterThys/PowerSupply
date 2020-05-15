@@ -20,6 +20,14 @@ static const uint8_t UPDATE_LABEL[2]        = {0xFE, 0x2E};
 static const uint8_t AUTO_SCROLL_ON[2]      = {0xFE, 0x51};
 static const uint8_t AUTO_SCROLL_OFF[2]     = {0xFE, 0x52};
 
+// DAWING
+static const uint8_t SET_DRAWING_COLOR[2]   = {0xFE, 0x63};
+static const uint8_t DRAW_PIXEL[2]          = {0xFE, 0x70};
+static const uint8_t DRAW_LINE[2]           = {0xFE, 0x6C};
+static const uint8_t CONTINUE_LINE[2]       = {0xFE, 0x65};
+static const uint8_t DRAW_RECTANGLE[2]      = {0xFE, 0x72};
+static const uint8_t DRAW_FILLED_RECT[2]    = {0xFE, 0x78};
+
 // MISC
 static const uint8_t READ_VERSION_NUMBER[2] = {0xFE, 0x36};
 static const uint8_t READ_MODULE_NUMBER[2]  = {0xFE, 0x37};
@@ -204,6 +212,78 @@ void GLK_AutoScrollOff(void) {
 }
 
 
+
+/********************************************************************************
+ *              DRAWING
+ *******************************************************************************/
+void GLK_SetDrawingColor(uint8_t color) {
+    uint8_t data[3];
+    data[0] = SET_DRAWING_COLOR[0];
+    data[1] = SET_DRAWING_COLOR[1];
+    data[2] = color;
+    write(data, 3);
+}
+
+
+void GLK_DrawPixel(uint8_t x, uint8_t y) {
+    uint8_t data[4];
+    data[0] = DRAW_PIXEL[0];
+    data[1] = DRAW_PIXEL[1];
+    data[2] = x;
+    data[3] = y;
+    write(data, 4);
+}
+
+
+void GLK_DrawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
+    uint8_t data[6];
+    data[0] = DRAW_LINE[0];
+    data[1] = DRAW_LINE[1];
+    data[2] = x1;
+    data[3] = y1;
+    data[4] = x2;
+    data[3] = y2;
+    write(data, 6);
+}
+
+
+void GLK_ContinueLine(uint8_t x, uint8_t y) {
+    uint8_t data[4];
+    data[0] = CONTINUE_LINE[0];
+    data[1] = CONTINUE_LINE[1];
+    data[2] = x;
+    data[3] = y;
+    write(data, 4);
+}
+
+void GLK_DrawRectangle(uint8_t color, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
+    uint8_t data[7];
+    data[0] = DRAW_RECTANGLE[0];
+    data[1] = DRAW_RECTANGLE[1];
+    data[2] = color;
+    data[3] = x1;
+    data[4] = y1;
+    data[5] = x2;
+    data[6] = y2;
+    write(data, 7);
+}
+
+
+void GLK_DrawFilledRectangle(uint8_t color, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
+    uint8_t data[7];
+    data[0] = DRAW_FILLED_RECT[0];
+    data[1] = DRAW_FILLED_RECT[1];
+    data[2] = color;
+    data[3] = x1;
+    data[4] = y1;
+    data[5] = x2;
+    data[6] = y2;
+    write(data, 7);
+}
+
+/********************************************************************************
+ *              MISC
+ *******************************************************************************/
 void GLK_ReadVersionNumber(uint8_t * response) {
     write(READ_VERSION_NUMBER, 2);
     
@@ -219,17 +299,6 @@ void GLK_ReadModuleType(uint8_t * response) {
     *response = RCREG;
     PIR1bits.RCIF = 0;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

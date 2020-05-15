@@ -7,6 +7,28 @@
 #include "UART_Driver.h"
 
 /********************************************************************************
+ *              ENUMS
+ *******************************************************************************/
+typedef enum VerticalJustification {
+    Top = 0,
+    Middle = 1,
+    Bottom = 2
+} VerticalJustification_t;
+
+typedef enum HorizontalJustification {
+    Left = 0,
+    Center = 1,
+    Right = 2
+} HorizontalJustification_t; 
+
+typedef enum BarGraphType {
+    VerticalBottom  = 0,
+    HorizontalLeft  = 1,
+    VerticalTop     = 2,
+    HorizontalRight = 3
+} BarGraphType_t;     
+
+/********************************************************************************
  *              MY FUNCTIONS
  *******************************************************************************/
 
@@ -132,6 +154,157 @@ void GLK_AutoScrollOn(void);
  * Display default Auto Scroll on.
  */
 void GLK_AutoScrollOff(void);
+
+
+/********************************************************************************
+ *              DRAWING
+ *******************************************************************************/
+
+/*
+ * Set Drawing Color: Set the color to be used for all future drawing commands
+ * that do not implicitly specify color.
+ * @param color: 0 for background or any other value for text color.
+ */
+void GLK_SetDrawingColor(uint8_t color);
+
+/*
+ * Draw Pixel: Draw a single pixel at the specified coordinate using the current
+ * drawing color.
+ * @param x: Horizontal position of pixel to be drawn.
+ * @param y: Vertical position of pixel to be drawn.
+ */
+void GLK_DrawPixel(uint8_t x, uint8_t y);
+
+/*
+ * Draw Line: Draw a line connecting two termini. Lines may be rendered differently
+ * when drawn right to left versus left to right.
+ * @param x1: Horizontal coordinate of first terminus.
+ * @param y1: Vertical coordinate of first terminus.
+ * @param x2: Horizontal coordinate of second terminus.
+ * @param y2: Vertical coordinate of second terminus.
+ */
+void GLK_DrawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
+
+/*
+ * Continue Line: Draw a line from the last point drawn to the coordinate specified
+ * using the current drawing color.
+ * @param x: Left coordinate of terminus.
+ * @param y: Top coordinate of terminus.
+ */
+void GLK_ContinueLine(uint8_t x, uint8_t y);
+
+/*
+ * Draw Rectangle: Draw a rectangular frame one pixel wide using the color specified.
+ * Current drawing color is ignored.
+ * @param color: 0 for background or any other value for text color.
+ * @param x1: Lefmost coordinate.
+ * @param y1: Topmost coordinate.
+ * @param x2: Rightmost coordinate.
+ * @param y2: Bottommost coordinate.
+ */
+void GLK_DrawRectangle(uint8_t color, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
+
+/*
+ * Draw filled Rectangle: Draw a filled rectangle using the color specified.
+ * Current drawing color is ignored.
+ * @param color: 0 for background or any other value for text color.
+ * @param x1: Lefmost coordinate.
+ * @param y1: Topmost coordinate.
+ * @param x2: Rightmost coordinate.
+ * @param y2: Bottommost coordinate.
+ */
+void GLK_DrawFilledRectangle(uint8_t color, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
+
+/*
+ * Draw Rounded Rectangle: Draw a rounded rectangular frame one pixel wide
+ * using the current drawing color.
+ * @param x1: Leftmost coordinate of the rectangle.
+ * @param y1: Topmost coordinate of the rectangle.
+ * @param x2: Rightmost coordinate of the rectangle.
+ * @param y2: Bottommost coordinate of the rectangle.
+ * @param radius: Radius of curvature of the rectangle corners.
+ */
+void GLK_DrawRoundedRectangle(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t radius);
+
+/*
+ * Draw Filled Rounded Rectangle: Draw a filled rounded rectangular frame one pixel wide
+ * using the current drawing color.
+ * @param x1: Leftmost coordinate of the rectangle.
+ * @param y1: Topmost coordinate of the rectangle.
+ * @param x2: Rightmost coordinate of the rectangle.
+ * @param y2: Bottommost coordinate of the rectangle.
+ * @param radius: Radius of curvature of the rectangle corners.
+ */
+
+void GLK_DrawFilledRoundedRectangle(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t radius);
+
+/*
+ * Draw Circle: Draw a circular frame one pixel wide using the current drawing color.
+ * @param x: Horizontal coordinate of the circle center.
+ * @param y: Vertical coordinate of the circle center.
+ * @param radius: Distance between the circle perimeter and center.
+ */
+void GLK_DrawCircle(uint8_t x, uint8_t y, uint8_t radius);
+
+/*
+ * Draw Filled Circle: Draw a filled circular frame one pixel wide using the current drawing color.
+ * @param x: Horizontal coordinate of the circle center.
+ * @param y: Vertical coordinate of the circle center.
+ * @param radius: Distance between the circle perimeter and center.
+ */
+void GLK_DrawFilledCircle(uint8_t x, uint8_t y, uint8_t radius);
+
+/*
+ * Draw Ellipse: Draw an elliptical frame one pixel wide using the current drawing color.
+ * @param x: Horizontal coordinate of the circle center, zero indexed from left.
+ * @param y: Vertical coordinate of the circle center, zero indexed from top.
+ * @param x_radius: Distance between the furthest horizontal point on the ellipse perimneter and center.
+ * @param y_radius: Distance between the furthest vertical point on the ellipse perimneter and center.
+ */
+void GLK_DrawEllipse(uint8_t x, uint8_t y, uint8_t x_radius, uint8_t y_radius);
+
+/*
+ * Draw Filled Ellipse: Draw an filled elliptical frame one pixel wide using the current drawing color.
+ * @param x: Horizontal coordinate of the circle center, zero indexed from left.
+ * @param y: Vertical coordinate of the circle center, zero indexed from top.
+ * @param x_radius: Distance between the furthest horizontal point on the ellipse perimneter and center.
+ * @param y_radius: Distance between the furthest vertical point on the ellipse perimneter and center.
+ */
+
+void GLK_DrawFilledEllipse(uint8_t x, uint8_t y, uint8_t x_radius, uint8_t y_radius);
+
+/*
+ * Scroll Screen: Define and scroll the contents of a portion of the screen.
+ * @param x1: Leftmost coordinate of the scroll window, zero indexed from left.
+ * @param y1: Topmost coordinate of the scroll window,zero indexed from top.
+ * @param x2: Rightmost coordinate of the scroll window, zero indexed from left.
+ * @param y2: Bottommost coordinate of the scroll window, zero indexed from top.
+ * @param move_x: Number of pixels to scroll horizontally.
+ * @param move_y: Number of pixels to scroll vertically.
+ */
+void GLK_ScrollScreen(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, int16_t move_x, int16_t move_y);
+
+/* 
+ * Initialize Bar Graph: Initialize a bar graph in memory for later implementation. Graphs can be 
+ * located anywhere on the screen, but overlapping may cause distortion. Graph should be filled using 
+ * the Draw Bar command.
+ * @param id: Unique bar identification number, between 0 and 255.
+ * @param type: Graph style, see Bar Graph Type.
+ * @param x1: Leftmost coordinate. 
+ * @param y1: Topmost coordinate.
+ * @param x2: Rightmost coordinate.
+ * @param y2: Bottommost coordinate.
+ */
+void GLK_InitializeBarGraph(uint8_t id, BarGraphType_t type, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
+
+void GLK_Initialize9SliceBarGraph(uint8_t id, BarGraphType_t type, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint16_t fore_slice, uint16_t back_slice);
+
+void GLK_DrawBarGraph(uint8_t id, uint8_t value);
+
+void GLK_InitializeStripChart(uint8_t id, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, int16_t min, int16_t max, uint8_t step, uint16_t file_id);
+
+void GLK_UpdateStripChart(uint8_t id, int16_t value);
+
 
 
 /********************************************************************************

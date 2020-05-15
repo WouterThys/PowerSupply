@@ -25,9 +25,16 @@ funclist
 nbproject/Makefile-*
 disassembly/
 *.map
+/PIC/VariableSupply.X/nbproject/private/
+/PIC/VariableSupply.X/nbproject/
+/PIC/VariableSupply.X/nbproject/Package-*.bash
 /PIC/MainGLCDController.X/nbproject/private/
+/PIC/MainGLCDController.X/nbproject/
+/PIC/MainGLCDController.X/nbproject/Package-*.bash
+/PIC/MainController.X/nbproject/Package-*.bash
 /PIC/GLCDTest.X/nbproject/private/
 /PIC/MainController.X/nbproject/private/
+/PIC/MainController.X/nbproject/
 /PCB/ConstantSupply/fp-info-cache
 /PCB/ControlBoard/fp-info-cache
 /PCB/MainController/fp-info-cache

@@ -78,10 +78,23 @@ int main(void) {
         LED1 = 1;
         __delay_ms(100);
         __delay_ms(100);
-        LED1 = 0;
+        LED2 = 1;
+        __delay_ms(100);
+        __delay_ms(100);
+        LED3 = 1;
         __delay_ms(100);
         __delay_ms(100);
 
+        LED1 = 0;
+        __delay_ms(100);
+        __delay_ms(100);
+        LED2 = 0;
+        __delay_ms(100);
+        __delay_ms(100);
+        LED3 = 0;
+        __delay_ms(100);
+        __delay_ms(100);
+        
 //        if (dataReadFlag) {
 //            
 //            dataReadFlag = 0;
