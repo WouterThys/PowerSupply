@@ -28,6 +28,19 @@ typedef enum BarGraphType {
     HorizontalRight = 3
 } BarGraphType_t;     
 
+typedef enum GLKLed {
+    LTop    = 0,
+    LMiddle = 1,
+    LBottom = 2
+} GLKLed_t;
+
+typedef enum LEDState {
+    Off     = 0,
+    Green   = 1,
+    Red     = 2,
+    Yellow  = 3
+} LEDState_t;
+
 /********************************************************************************
  *              MY FUNCTIONS
  *******************************************************************************/
@@ -305,11 +318,180 @@ void GLK_InitializeStripChart(uint8_t id, uint8_t x1, uint8_t y1, uint8_t x2, ui
 
 void GLK_UpdateStripChart(uint8_t id, int16_t value);
 
+/********************************************************************************
+ *              GPIO
+ *******************************************************************************/
+
+/*
+ * General Purpose Output On: Turns the specified GPO on, sourcing current from 
+ * an output of five volts.
+ * @param number: GPO to be turned on.
+ */
+void GLK_GeneralPurposeOutputOn(uint8_t number);
+
+/*
+ * General Purpose Output Off: Turns the specified GPO off, singking current to 
+ * an output of zero volts.
+ * @param number: GPO to be turned off.
+ */
+void GLK_GeneralPurposeOutputOff(uint8_t number);
+
+/*
+ * Set Start Up GPO State: Sets and saves the start up state of the specified GPO
+ * in non volatile memory. Changes will be seen on start up.
+ * @param number: GPO to be controlled.
+ * @param state: 1 for on or 0 for off.
+ */
+void GLK_SetStartUpGPOState(uint8_t number, uint8_t state);
+
+
+
+/********************************************************************************
+ *              LED Indicators
+ *******************************************************************************/
+
+/*
+ * Set LED Indicators: Immediately sets the state of the specified LED indicator
+ * to a specific color. Temporary unless remember is on. LED indicators are 
+ * numbered from 0 to 2 from top to bottom.
+ * @param number: LED indicator to be controlled.
+ * @param color: LED color state as below.
+ */
+void GLK_SetLEDIndicators(GLKLed_t number, LEDState_t color);
+
+/********************************************************************************
+ *              Piezo Buzzer
+ *******************************************************************************/
+
+/*
+ * Activate Piezo Buzzer: Activates a buzz of specific frequency from the onboard
+ * piezo buzzer for a specified length of time.
+ * @param frequency: frequency to buzz in Hertz.
+ * @param time: Duration of the beep in milliseconds.
+ */
+void GLK_ActivatePiezoBuzzer(uint16_t frequency, uint16_t time);
+
+/*
+ * Set Default Buzzer Beep: Set the frequency and duration of the default beep
+ * transmitted when the bell character is transmitted.
+ * @param frequency: frequency to buzz in Hertz, default 440Hz.
+ * @param duration: Duration of the beep in milliseconds, default 100ms.
+ */
+void GLK_SetDefaultBuzzerBeep(uint16_t frequency, uint16_t duration);
+
+/* 
+ * Set Keypad Buzzer Beep: Set the frequency and duration of the default beep 
+ * transmitted when a key is pressed.
+ * @param frequency: Frequency of the beep in Hertz, default 0 or off.
+ * @param duration: Duration of the beep in milliseconds, default 0 or off.
+ */
+void GLK_SetKeypadBuzzerBeep(uint16_t frequency, uint16_t duration);
+
+/********************************************************************************
+ *              KEYPAD
+ *******************************************************************************/
+
+/* Auto Transmit Key Pressed On: Key presses are automatically sent to the host
+ * when received by the display. Use this mode for I2C transmissions.
+ */
+void GLK_AutoTransmitKeyPressedOn();
+
+/*
+ * Auto Transmit Key Pressed Off: Key presses are held in the 10 key buffer to be
+ * polled by the host using the Poll Key PRess command. Default is Auto Transmit on.
+ */
+void GLK_AutoTransmitKeyPressedOff();
+
+/*
+ * Poll Key Press: Reads the last unread key press from the 10 key display buffer. 
+ * If another key is stored in the buffer the MSB will be 1, the MSB will be 0 when
+ * the last key press is read. If there are no stored key presses a value of 0 will
+ * be returned. Auto transmit key presses must be turned off for this command to be 
+ * successful, do not use with I2C.
+ * @return Value of key pressed (MSB determines additional keys to be read)
+ */
+void GLK_PollKeyPress(uint8_t * response);
+
+/*
+ * Clear Key Buffer: Clears all key presses from the key buffer.
+ */
+void GLK_ClearKeyBuffer();
+
+/*
+ * Set Debounce Time: Sets the time between a key press and a key read by the display.
+ * Most switches will bounce when pressed; the debounce time allows the switch to 
+ * settle for an accurate read. Default is 8 representing approcimately 52ms.
+ * @param time: Debounce increment (debounce time = time * 6.554ms)
+ */
+void GLK_SetDebounceTime(uint8_t time);
+
+/*
+ * Set Auto Repeat Mode: Sets key press repeat mode to typematic or hold. In typematic 
+ * mode if a key press is held, by default the key value is transmitted immediately, 
+ * then 5 times a second after a 1 second delay. In hold mode, the keyu down value is
+ * transmitted once the when pressed, and then the key up value is send when the key is
+ * released. Default is typematic.
+ * @param mode: 1 for hold mode or 0 for typematic.
+ */
+void GLK_SetAutoRepeatMode(uint8_t mode);
+
+/*
+ * Auto Repeat Mode Off: Turns auto repeat mode off. Default is on (typematic).
+ */
+void GLK_AutoRepeatModeOff();
+
+/*
+ * Assign Keypad Codes: Assings the keyu down and key up values send to the host 
+ * when a key press is detected. A key up and key down value must be sent for every key,
+ * a value of 255 will leave the unaltered. Defaults are shown below.
+ * @param key_down: Key down values.
+ * @param key_up: Key up values.
+ */
+void GLK_AssingKeypadCodes(uint8_t key_down[9], uint8_t key_up[9]);
+
+/*
+ * Keypad Backlight Off: Turns the keypad backlight off.
+ */
+void GLK_KeypadBacklightOff();
+
+/*
+ * Set Keypad Brightness: Immediately sets the keypad brightness. On time is set using 
+ * the Backlight On Command. Default is 255.
+ * @param brightness: Brightness level from 0 (Dim) to 255 (Bright).
+ */
+void GLK_SetKeypadBrightness(uint8_t brightness);
+
+/*
+ * Set Auto Backlight: Set the way the display and keypad backlights respond 
+ * when a key is pressed. The options in the tables below allow a keypress
+ * to turn on the display and/or keypad backlights after they have timed
+ * out or been turned off.
+ * @param setting: What portions of the unit light on a keypress, if any, 
+ * and if that press is returned.
+ */
+void GLK_SetAutoBacklight(uint8_t setting);
+
+/*
+ * Set Typematic Delay: Sets the delay between the first key press and first 
+ * typematic report when a key is held in typematic mode.
+ * @param delay: Time key must be held to trigger typematic reports, specified
+ * in 100 ms, default is 10 (1s).
+ */
+void GLK_SetTypematicDelay(uint8_t delay);
+
+/*
+ * Set Typematic Interval: Sets the interval between reported key presses when 
+ * a key is held in typematic mode.
+ * @param interval: Time between key reports, specified in 100 ms increments,
+ * default is 2 (200ms).
+ */
+void GLK_SetTypematicInterval(uint8_t interval);
 
 
 /********************************************************************************
  *              MISC
  *******************************************************************************/
+
 
 /**
  * Read Version Number: Causes display to respond with its firmware version number.
