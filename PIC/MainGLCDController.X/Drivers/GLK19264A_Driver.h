@@ -41,13 +41,28 @@ typedef enum LEDState {
     Yellow  = 3
 } LEDState_t;
 
+typedef enum GLKButton {
+    ButtonTop = 'B',
+    ButtonRight = 'C',
+    ButtonBottom = 'H',
+    ButtonLeft = 'D',
+    ButtonCenter = 'E',
+    Button1 = 'A',
+    Button2 = 'G'
+} GLKButton_t;
+
+/********************************************************************************
+ *              FUCTIONS
+ *******************************************************************************/
+typedef void (*buttonCallback)(GLKButton_t button);
+
 /********************************************************************************
  *              MY FUNCTIONS
  *******************************************************************************/
 
-void GLK_Init(void);
+void GLK_Init(buttonCallback callback);
 
-void GLK_Write(const char * text);
+void GLK_WriteText(uint8_t x, uint8_t y, const char * text);
 
 
 /********************************************************************************

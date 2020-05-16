@@ -27,6 +27,15 @@ static const uint8_t DRAW_LINE[2]           = {0xFE, 0x6C};
 static const uint8_t CONTINUE_LINE[2]       = {0xFE, 0x65};
 static const uint8_t DRAW_RECTANGLE[2]      = {0xFE, 0x72};
 static const uint8_t DRAW_FILLED_RECT[2]    = {0xFE, 0x78};
+static const uint8_t DRAW_ROUNDED_RECT[2]   = {0xFE, 0x80};
+
+// GPIO
+static const uint8_t GPO_ON[2]              = {0xFE, 0x57};
+static const uint8_t GPO_OFF[2]             = {0xFE, 0x56};
+static const uint8_t SET_START_UP_STATE[2]  = {0xFE, 0xC3};
+
+// LED Indicators
+static const uint8_t SET_LED_INDICATORS[2]  = {0xFE, 0x5A};
 
 // MISC
 static const uint8_t READ_VERSION_NUMBER[2] = {0xFE, 0x36};
@@ -37,14 +46,15 @@ static const uint8_t READ_MODULE_NUMBER[2]  = {0xFE, 0x37};
  *******************************************************************************/
 static void uartDataRead(uint8_t data);
 static void write(const uint8_t * command, const uint8_t length);
-
+static buttonCallback btnCallback;
 
 /********************************************************************************
  *              INTERNAL FUNCTIONS 
  *******************************************************************************/
 
 static void uartDataRead(uint8_t data) {
-    data++;
+    btnCallback((GLKButton_t)data);
+    
 }
 
 static void write(const uint8_t * command, const uint8_t length) {
@@ -58,15 +68,20 @@ static void write(const uint8_t * command, const uint8_t length) {
  *              DRIVER FUNCTIONS
  *******************************************************************************/
 
-void GLK_Init() {
-    
+void GLK_Init(buttonCallback callback) {
+    // Callback
+    btnCallback = callback;
+
     // Initialize UART
     UART_Init(UART_BAUD, UART_INVERT, uartDataRead);   
     
 }
 
-void GLK_Write(const char * text) {
+void GLK_WriteText(uint8_t x, uint8_t y, const char * text) {
 
+    // Go to positions
+    GLK_SetCursorCoordinate(x, y);
+    
     char c = text[0];
     uint8_t i = 0;
 
@@ -242,7 +257,7 @@ void GLK_DrawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
     data[2] = x1;
     data[3] = y1;
     data[4] = x2;
-    data[3] = y2;
+    data[5] = y2;
     write(data, 6);
 }
 
@@ -268,7 +283,6 @@ void GLK_DrawRectangle(uint8_t color, uint8_t x1, uint8_t y1, uint8_t x2, uint8_
     write(data, 7);
 }
 
-
 void GLK_DrawFilledRectangle(uint8_t color, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
     uint8_t data[7];
     data[0] = DRAW_FILLED_RECT[0];
@@ -280,6 +294,60 @@ void GLK_DrawFilledRectangle(uint8_t color, uint8_t x1, uint8_t y1, uint8_t x2, 
     data[6] = y2;
     write(data, 7);
 }
+
+void GLK_DrawRoundedRectangle(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t radius) {
+    uint8_t data[7];
+    data[0] = DRAW_ROUNDED_RECT[0];
+    data[1] = DRAW_ROUNDED_RECT[1];
+    data[2] = x1;
+    data[3] = y1;
+    data[4] = x2;
+    data[5] = y2;
+    data[6] = radius;
+    write(data, 7);
+}
+
+
+/********************************************************************************
+ *              GPIO
+ *******************************************************************************/
+void GLK_GeneralPurposeOutputOn(uint8_t number) {
+    uint8_t data[3];
+    data[0] = GPO_ON[0];
+    data[1] = GPO_ON[1];
+    data[2] = number;
+    write(data, 3);
+}
+
+void GLK_GeneralPurposeOutputOff(uint8_t number) {
+    uint8_t data[3];
+    data[0] = GPO_OFF[0];
+    data[1] = GPO_OFF[1];
+    data[2] = number;
+    write(data, 3);
+}
+
+void GLK_SetStartUpGPOState(uint8_t number, uint8_t state) {
+    uint8_t data[4];
+    data[0] = SET_START_UP_STATE[0];
+    data[1] = SET_START_UP_STATE[1];
+    data[2] = number;
+    data[3] = state;
+    write(data, 4);
+}
+
+/********************************************************************************
+ *              LED Indicators
+ *******************************************************************************/
+void GLK_SetLEDIndicators(GLKLed_t number, LEDState_t color) {
+    uint8_t data[4];
+    data[0] = SET_LED_INDICATORS[0];
+    data[1] = SET_LED_INDICATORS[1];
+    data[2] = number;
+    data[3] = color;
+    write(data, 4);
+}
+
 
 /********************************************************************************
  *              MISC

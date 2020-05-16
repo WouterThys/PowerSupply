@@ -10,297 +10,167 @@
 #define V_READ_VALUE        2
 #define I_READ_VALUE        3
 
-// Helpers
-typedef struct Pos {
-    const uint8_t x;          // X location on screen
-    const uint8_t y;          // Y location on screen
-} Pos_t;
+/********************************************************************************
+ *              DEFINITIONS
+ *******************************************************************************/
+#define ID_TITLE_LBL_1      0
+#define ID_TITLE_LBL_2      1
+#define ID_TITLE_LBL_3      2
+#define ID_V_SET_LBL_1      3
+#define ID_V_SET_LBL_2      4
+#define ID_V_SET_LBL_3      5
+#define ID_I_SET_LBL_1      6
+#define ID_I_SET_LBL_2      7
+#define ID_I_SET_LBL_3      8
+#define ID_V_RD_LBL_1       9
+#define ID_V_RD_LBL_2       10
+#define ID_V_RD_LBL_3       11
+#define ID_I_RD_LBL_1       12
+#define ID_I_RD_LBL_2       13
+#define ID_I_RD_LBL_3       14
 
-typedef struct Rect {
-    const uint8_t x;          // X start position
-    const uint8_t y;          // Y start position
-    const uint8_t w;          // Width
-    const uint8_t h;          // Height
-} Rect_t;
+/********************************************************************************
+ *              PROTOTYPES
+ *******************************************************************************/
+void onButtonPressed(GLKButton_t button);
 
-typedef struct Value {
-    const char name[3];       // Display name
-    const Pos_t nPos;         // Name position
-    char value[8];            // Display value
-    const Pos_t vPos;         // Value position
-    uint8_t state;            // State
-    const Rect_t sRect;       // Selection rectangle
-    bool selected;            // Selected
-} Value_t;
+/********************************************************************************
+ *              VARIABLES
+ *******************************************************************************/
 
-typedef struct Title {
-    const char name[6];       // Display name
-    const Pos_t nPos;         // Name position
-    char status;              // Status character
-    const Pos_t sPos;         // Status position
-    const Rect_t sRect;       // Selection rectangle
-    bool selected;            // Selected
-} Title_t;
-
-typedef struct Menu {
-    Title_t title;      // Menu title
-    Value_t values[4];  // Values inside the menu
-} Menu_t;
-
-typedef struct Label {
-    uint8_t id;
-    uint8_t x1;
-    uint8_t y1;
-    uint8_t x2;
-    uint8_t y2;
-    uint8_t vert;
-    uint8_t hor;
-    uint16_t font;
-    uint8_t background;
-    uint8_t char_space;
-} Label_t;
-
-typedef struct ScrollingLabel {
-    uint8_t id;
-    uint8_t x1;
-    uint8_t y1;
-    uint8_t x2;
-    uint8_t y2;
-    uint8_t vert;
-    uint8_t dir;
-    uint16_t font;
-    uint8_t background;
-    uint8_t char_space;
-    uint16_t delay;
-} ScrollingLabel_t;
-
-static void drawMenu(Menu_t * menu);
-static void drawTitle(Title_t * title);
-static void drawValue(Value_t * value);
-
-static void updateTitleStatus(Title_t * title, char status);
-static void updateTitleSelection(Title_t * title, bool selected);
-static void updateValueValue(Value_t * value, const char * data);
-static void updateValueState(Value_t * value, uint8_t state);
-
-
-static Menu_t menu1 = {
-    // Title
-    { "Sup 1", { 16, 1 }, 'I', { 56, 1 }, { 0, 0, 63, 10 }, false },
-
-    // Values
-    {
-        { "V:", { 4, 16 }, { 0 }, { 24, 16 }, STATE_NONE, { 1, 15, 12, 8 }, false  },
-        { "I:", { 4, 26 }, { 0 }, { 24, 26 }, STATE_NONE, { 1, 25, 12, 8 }, false  },
-        { "V=", { 5, 40 }, { 0 }, { 24, 40 }, STATE_NONE, { 1, 39, 12, 8 }, false  },
-        { "I=", { 5, 50 }, { 0 }, { 24, 50 }, STATE_NONE, { 1, 49, 12, 8 }, false  },
-    }
-};
-
-static Menu_t menu2 = {
-    // Title
-    { "Sup 2", { 80, 1 }, 'I', { 120, 1 }, { 64, 0, 63, 10 }, false },
-
-    // Values
-    {
-        { "V:", { 68, 16 }, { 0 }, { 88, 16 }, STATE_NONE, { 65, 15, 12, 8 }, false  },
-        { "I:", { 68, 26 }, { 0 }, { 88, 26 }, STATE_NONE, { 65, 25, 12, 8 }, false  },
-        { "V=", { 69, 40 }, { 0 }, { 88, 40 }, STATE_NONE, { 65, 39, 12, 8 }, false  },
-        { "I=", { 69, 50 }, { 0 }, { 88, 50 }, STATE_NONE, { 65, 49, 12, 8 }, false  },
-    }
-};
-
-static Menu_t menu3 = {
-    // Title
-    { "Sup 3", { 144, 1 }, 'I', { 184, 1 }, { 128, 0, 63, 10 }, false },
-
-    // Values
-    {
-        { "V:", { 132, 16 }, { 0 }, { 152, 16 }, STATE_NONE, { 129, 15, 12, 8 }, false  },
-        { "I:", { 132, 26 }, { 0 }, { 152, 26 }, STATE_NONE, { 129, 25, 12, 8 }, false  },
-        { "V=", { 133, 40 }, { 0 }, { 152, 40 }, STATE_NONE, { 129, 39, 12, 8 }, false  },
-        { "I=", { 133, 50 }, { 0 }, { 152, 50 }, STATE_NONE, { 129, 49, 12, 8 }, false  },
-    }
-};
-
-static Menu_t menus[3];
-
-static ScrollingLabel_t lbl_voltage;
-
+/********************************************************************************
+ *              FUCTIONS
+ *******************************************************************************/
 void menuInit() {
 
-    GLK_Init();
+    GLK_Init(&onButtonPressed);
+
+    // Clear screen
     GLK_ClearScreen();
+   
+    // Dim Leds
+    GLK_SetLEDIndicators(LTop, Off); 
+    GLK_SetLEDIndicators(LMiddle, Off); 
+    GLK_SetLEDIndicators(LBottom, Off); 
     
-    // Setup screen 
-    lbl_voltage.id = 1;
-    lbl_voltage.x1 = 0;
-    lbl_voltage.y1 = 0;
-    lbl_voltage.x2 = 64;
-    lbl_voltage.y2 = 10;
-    lbl_voltage.vert = 1; // middle
-    lbl_voltage.dir = 2; // bounce
-    lbl_voltage.font = 1;
-    lbl_voltage.background = 0;
-    lbl_voltage.char_space = 0;
-    lbl_voltage.delay = 500; // ms
-    
-    GLK_InitializeScrollingLabel(
-            lbl_voltage.id,
-            lbl_voltage.x1,
-            lbl_voltage.y1,
-            lbl_voltage.x2,
-            lbl_voltage.y2,
-            lbl_voltage.vert,
-            lbl_voltage.dir,
-            lbl_voltage.font,
-            lbl_voltage.background,
-            lbl_voltage.char_space,
-            lbl_voltage.delay);
+    // Draw contour lines
+    GLK_DrawRectangle(1, 0, 0, 191, 63);
+    GLK_DrawLine(1, 10, 191, 10);
+    GLK_DrawLine(1, 36, 191, 36);
+    GLK_DrawLine(63, 1, 63, 62);
+    GLK_DrawLine(127, 1, 127, 62);
+    GLK_DrawRoundedRectangle(1, 37, 62, 62, 3);
+    GLK_DrawRoundedRectangle(64, 37, 126, 62, 3);
+    GLK_DrawRoundedRectangle(128, 37, 190, 62, 3);
 
-    GLK_UpdateLabel(1, "pandas");
+    // Setup labels
+    GLK_InitializeLabel(ID_TITLE_LBL_1, 53,  1,   62,  9,   1, 0, 1, 0, 0); 
+    GLK_InitializeLabel(ID_TITLE_LBL_2, 117, 1,   126, 9,   1, 0, 1, 0, 0); 
+    GLK_InitializeLabel(ID_TITLE_LBL_3, 181, 1,   190, 9,   1, 0, 1, 0, 0); 
 
+    GLK_InitializeLabel(ID_V_SET_LBL_1, 16,  11,  62,  22,  1, 0, 1, 0, 0); 
+    GLK_InitializeLabel(ID_V_SET_LBL_2, 79,  11,  126, 22,  1, 0, 1, 0, 0); 
+    GLK_InitializeLabel(ID_V_SET_LBL_3, 143, 11,  190, 22,  1, 0, 1, 0, 0); 
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    GLK_InitializeLabel(ID_I_SET_LBL_1, 16,  23,  62,  34,  1, 0, 1, 0, 0); 
+    GLK_InitializeLabel(ID_I_SET_LBL_2, 79,  23,  126, 34,  1, 0, 1, 0, 0); 
+    GLK_InitializeLabel(ID_I_SET_LBL_3, 143, 23,  190, 34,  1, 0, 1, 0, 0); 
 
-/*     // Initialize GLCD */
-    /* GLCD_Init(NON_INVERTED); */
-    /* GLCD_SelectFont(font); */
-    /* GLCD_ClearScreen(BLACK); */
+    GLK_InitializeLabel(ID_V_RD_LBL_1,  16,  38,  60,  48,  1, 0, 1, 0, 0); 
+    GLK_InitializeLabel(ID_V_RD_LBL_2,  79,  38,  124, 48,  1, 0, 1, 0, 0); 
+    GLK_InitializeLabel(ID_V_RD_LBL_3,  143, 38,  188, 48,  1, 0, 1, 0, 0); 
 
-    /* menus[0] = menu1; */
-    /* menus[1] = menu2; */
-    /* menus[2] = menu3; */
+    GLK_InitializeLabel(ID_I_RD_LBL_1,  16,  49,  60,  61,  1, 0, 1, 0, 0); 
+    GLK_InitializeLabel(ID_I_RD_LBL_2,  79,  49,  124, 61,  1, 0, 1, 0, 0); 
+    GLK_InitializeLabel(ID_I_RD_LBL_3,  143, 49,  188, 61,  1, 0, 1, 0, 0); 
 
-    /* drawMenu(&menu1); */
-    /* drawMenu(&menu2); */
-    /* drawMenu(&menu3); */
+    // Setup static text
+    GLK_WriteText(5, 2, "SUP 1");
+    GLK_WriteText(68, 2, "SUP 2");
+    GLK_WriteText(132, 2, "SUP 3");
 
-    /* // Draw lines */
-    /* GLCD_DrawHoriLine(0, 10, 191); */
-    /* GLCD_DrawHoriLine(0, 36, 191); */
-    /* GLCD_DrawHoriLine(0, 37, 191); */
-    /* GLCD_DrawVertLine(64, 0, 63); */
-    /* GLCD_DrawVertLine(128, 0, 63); */
-    /* GLCD_DrawVertLine(0, 38, 26); */
-    /* GLCD_DrawVertLine(65, 38, 26); */
-    /* GLCD_DrawVertLine(129, 38, 26); */
+    GLK_WriteText(2, 14, "V:");
+    GLK_WriteText(65, 14, "V:");
+    GLK_WriteText(129, 14, "V:");
 
+    GLK_WriteText(2, 26, "I:");
+    GLK_WriteText(65, 26, "I:");
+    GLK_WriteText(129, 26, "I:");
+
+    GLK_WriteText(5, 40, "V=");
+    GLK_WriteText(68, 40, "V=");
+    GLK_WriteText(132, 40, "V=");
+
+    GLK_WriteText(5, 52, "I=");
+    GLK_WriteText(68, 52, "I=");
+    GLK_WriteText(132, 52, "I=");
+
+
+    // Test
+    GLK_UpdateLabel(ID_TITLE_LBL_1, "A");
+    GLK_UpdateLabel(ID_TITLE_LBL_2, "B");
+    GLK_UpdateLabel(ID_TITLE_LBL_3, "C");
+    GLK_UpdateLabel(ID_V_SET_LBL_1, "  5,00V");
+    GLK_UpdateLabel(ID_V_SET_LBL_2, " 12,00V");
+    GLK_UpdateLabel(ID_V_SET_LBL_3, "  3,00V");
+    GLK_UpdateLabel(ID_I_SET_LBL_1, " 0,10mA");
+    GLK_UpdateLabel(ID_I_SET_LBL_2, " 0,20mA");
+    GLK_UpdateLabel(ID_I_SET_LBL_3, " 0,30mA");
+    GLK_UpdateLabel(ID_V_RD_LBL_1, "  5,00V");
+    GLK_UpdateLabel(ID_V_RD_LBL_2, " 12,00V");
+    GLK_UpdateLabel(ID_V_RD_LBL_3, "  3,00V");
+    GLK_UpdateLabel(ID_I_RD_LBL_1, "  5,00V");
+    GLK_UpdateLabel(ID_I_RD_LBL_2, " 12,00V");
+    GLK_UpdateLabel(ID_I_RD_LBL_3, "  3,00V");
 }
 
 void menuSelect(const uint8_t menu, bool selected) {
-    if (menus[menu].title.selected != selected) {
-        updateTitleSelection(&menus[menu].title, selected);
-    }
+    /* if (menus[menu].title.selected != selected) { */
+        /* updateTitleSelection(&menus[menu].title, selected); */
+    /* } */
 }
 
 void menuSetVoltageState(const uint8_t menu, const uint8_t state) {
-    if (menus[menu].values[V_SET_VALUE].state != state) {
-        updateValueState(&menus[menu].values[V_SET_VALUE], state);
-    }
+    /* if (menus[menu].values[V_SET_VALUE].state != state) { */
+        /* updateValueState(&menus[menu].values[V_SET_VALUE], state); */
+    /* } */
 }
 
 void menuSetCurrentState(const uint8_t menu, const uint8_t state) {
-    if (menus[menu].values[I_SET_VALUE].state != state) {
-        updateValueState(&menus[menu].values[I_SET_VALUE], state);
-    }
+    /* if (menus[menu].values[I_SET_VALUE].state != state) { */
+     /* updateValueState(&menus[menu].values[I_SET_VALUE], state); */
+    /* } */
 }
 
 void menuSetVoltageSet(const uint8_t menu, const char * v) {
-    if (strcmp(menus[menu].values[V_SET_VALUE].value, v) != 0) {
-        updateValueValue(&menus[menu].values[V_SET_VALUE], v);
-    }
+    /* if (strcmp(menus[menu].values[V_SET_VALUE].value, v) != 0) { */
+        /* updateValueValue(&menus[menu].values[V_SET_VALUE], v); */
+    /* } */
 }
 
 void menuSetCurrentSet(const uint8_t menu, const char * i) {
-     if (strcmp(menus[menu].values[I_SET_VALUE].value, i) != 0) {
-        updateValueValue(&menus[menu].values[I_SET_VALUE], i);
-    }
+     /* if (strcmp(menus[menu].values[I_SET_VALUE].value, i) != 0) { */
+        /* updateValueValue(&menus[menu].values[I_SET_VALUE], i); */
+    /* } */
 }
 
 void menuSetVoltageRead(const uint8_t menu, const char * v) {
-     if (strcmp(menus[menu].values[V_READ_VALUE].value, v) != 0) {
-        updateValueValue(&menus[menu].values[V_READ_VALUE], v);
-    }
+     /* if (strcmp(menus[menu].values[V_READ_VALUE].value, v) != 0) { */
+        /* updateValueValue(&menus[menu].values[V_READ_VALUE], v); */
+    /* } */
 }
 
 void menuSetCurrentRead(const uint8_t menu, const char * i) {
-     if (strcmp(menus[menu].values[I_READ_VALUE].value, i) != 0) {
-        updateValueValue(&menus[menu].values[I_READ_VALUE], i);
-    }
+     /* if (strcmp(menus[menu].values[I_READ_VALUE].value, i) != 0) { */
+        /* updateValueValue(&menus[menu].values[I_READ_VALUE], i); */
+    /* } */
 }
 
-static void drawMenu(Menu_t * menu) {
-    drawTitle(&menu->title);
-    drawValue(&menu->values[V_SET_VALUE]);
-    drawValue(&menu->values[I_SET_VALUE]);
-    drawValue(&menu->values[V_READ_VALUE]);
-    drawValue(&menu->values[I_READ_VALUE]);
-}
 
-static void drawTitle(Title_t * title) {
-//    GLCD_WriteText(title->nPos.x, title->nPos.y, title->name);
-//    GLCD_GotoXY(title->sPos.x, title->sPos.y);
-//    GLCD_PutChar(title->status);
-}
+/********************************************************************************
+ *              PRIVATE FUCTIONS
+ *******************************************************************************/
+static void onButtonPressed(GLKButton_t button) {
 
-static void drawValue(Value_t * value) {
-//    GLCD_WriteText(value->nPos.x, value->nPos.y, value->name);
 }
-
-static void updateTitleStatus(Title_t * title, char status) {
-//    title->status = status;
-//    GLCD_GotoXY(title->sPos.x, title->sPos.y);
-//    GLCD_PutChar(title->status);
-}
-
-static void updateTitleSelection(Title_t * title, bool selected) {
-//    if (title->selected != selected) {
-//        GLCD_InvertRect(title->sRect.x, title->sRect.y, title->sRect.w, title->sRect.h);
-//        title->selected = selected;
-//    }
-}
-
-static void updateValueValue(Value_t * value, const char * data) {
-//    // Copy values into buffer
-//    strcpy(value->value, data);
-//    value->value[VALUE_DATA_LENGTH - 1] = 0; // Ensure termination
-//    GLCD_WriteText(value->vPos.x, value->vPos.y, value->value); 
-}
-
-static void updateValueState(Value_t * value, uint8_t state) {
-//    switch(state) {
-//        case STATE_NONE:
-//            GLCD_ClearDot(value->nPos.x - 2, value->nPos.y + 4);
-//            if (value->state == STATE_SELECT) {
-//                GLCD_InvertRect(value->sRect.x, value->sRect.y, value->sRect.w, value->sRect.h);
-//            }
-//            break;
-//        case STATE_POINT:
-//            GLCD_DrawDot(value->nPos.x - 2, value->nPos.y + 4);
-//            if (value->state == STATE_SELECT) {
-//                GLCD_InvertRect(value->sRect.x, value->sRect.y, value->sRect.w, value->sRect.h);
-//            }
-//            break;
-//        case STATE_SELECT:
-//            GLCD_DrawDot(value->nPos.x - 2, value->nPos.y + 4);
-//            if (value->state < STATE_SELECT) {
-//                GLCD_InvertRect(value->sRect.x, value->sRect.y, value->sRect.w, value->sRect.h);
-//            }
-//            break;
-//
-//    }
-//    value->state = state;
-}
-
 
