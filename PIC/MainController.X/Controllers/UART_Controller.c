@@ -16,8 +16,8 @@
 /*******************************************************************************
  *          LOCAL FUNCTION DEFINES
  ******************************************************************************/
-static bool checkState(UartData_t data);
-static void onReadDone(UartData_t data);
+static bool checkState(uint8_t data);
+static void onReadDone(uint8_t data);
 
 /* Event function pointers */
 static bool (*putCommand)(Command_t data);

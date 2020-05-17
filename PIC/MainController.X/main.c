@@ -14,7 +14,7 @@
 #include "Drivers/UART_Driver.h"
 
 #include "Controllers/SUPPLIES_Controller.h"
-#include "Controllers/GLCD_Controller.h"
+#include "Controllers/MENU_Controller.h"
 #include "Controllers/FSM_Controller.h"
 
 
@@ -106,32 +106,17 @@ int main(void) {
     DelayMs(100);
    
     // TODO: Move to init phase of FSM 
-    glcdInit();
+    menuInit();
     //encDriverInit();
     //fsmInit();
 
-//    DelayMs(100);
-//    LED1 = 1;
-//    glcdSelectMenu(1, true);
-//    glcdSetVoltageState(1, SELECT_V);
-//    glcdSetVoltageRead(1, "8,24 V");
-//    glcdSetCurrentRead(1, "POG2 A");
-//    glcdWriteMenu(1); 
-//    LED1 = 0;
-
     //printf("Start\n");
-    
-   
-    
-    uartDriverWriteByte(0xFE);
-    uartDriverWriteByte(0x58);
 
     while(1) {
 
-
         if (fsmShouldExecute()) {
             //fsmExecute();
-            LED1 = !LED1;
+            //LED1 = !LED1;
         }       
     }
     return 0;

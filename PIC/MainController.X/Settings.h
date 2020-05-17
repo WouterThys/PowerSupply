@@ -98,11 +98,11 @@
 #define UART1_BAUD      19200 /* 57600 */
 #define UART1_ID        2   
 
-#define UART1_RX_Dir    TRISBbits.TRISB4    /* RX Pin on RP36-RB4             */
-#define UART1_TX_Dir    TRISAbits.TRISA4    /* TX Pin on RP20-RA4             */
+#define UART1_RX_Dir    TRISBbits.TRISB9    /* RX Pin on RP41-RB9            */
+#define UART1_TX_Dir    TRISBbits.TRISB8    /* TX Pin on RP40-RB8            */
 
-#define UART1_RX_Map    0b0100100           /* RX on RP36                     */
-#define UART1_TX_Map    RPOR0bits.RP20R     /* TX on RP20                     */
+#define UART1_RX_Map    0b0101001           /* RX on RP41                    */
+#define UART1_TX_Map    RPOR3bits.RP40R     /* TX on RP40                    */
 
 
 

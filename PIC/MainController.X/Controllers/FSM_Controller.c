@@ -188,30 +188,30 @@ static void state_SelectI(MenuStateMachine_t *sm, Rotary_t * rotary) {
 
 static void handle_PointToV(MenuStateMachine_t *sm, Rotary_t * rotary) {
     if(DEBUG) printf("point to v\n");
-    glcdSelectMenu(0, true);
-    glcdSetVoltageState(0, POINT_TO_V);
-    glcdWriteMenu(0);
+//    glcdSelectMenu(0, true);
+//    glcdSetVoltageState(0, POINT_TO_V);
+//    glcdWriteMenu(0);
 }
 
 static void handle_SelectV(MenuStateMachine_t *sm, Rotary_t * rotary) {
     if(DEBUG) printf("select V\n");
-    glcdSelectMenu(0, true);
-    glcdSetVoltageState(0, SELECT_V);
-    glcdWriteMenu(0);
+//    glcdSelectMenu(0, true);
+//    glcdSetVoltageState(0, SELECT_V);
+//    glcdWriteMenu(0);
 }
 
 static void handle_PointToI(MenuStateMachine_t *sm, Rotary_t * rotary) {
     if(DEBUG) printf("point to i\n");
-    glcdSelectMenu(0, true);
-    glcdSetCurrentState(0, POINT_TO_I);
-    glcdWriteMenu(0);
+//    glcdSelectMenu(0, true);
+//    glcdSetCurrentState(0, POINT_TO_I);
+//    glcdWriteMenu(0);
 }
 
 static void handle_SelectI(MenuStateMachine_t *sm, Rotary_t * rotary) {
     if(DEBUG) printf("select V\n");
-    glcdSelectMenu(0, true);
-    glcdSetCurrentState(0, SELECT_I);
-    glcdWriteMenu(0);
+//    glcdSelectMenu(0, true);
+//    glcdSetCurrentState(0, SELECT_I);
+//    glcdWriteMenu(0);
 }
 
 /*******************************************************************************
