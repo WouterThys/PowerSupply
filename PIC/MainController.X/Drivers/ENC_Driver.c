@@ -137,9 +137,10 @@ void encDriverInit() {
     
 }
 
-void encGetRotaryData(uint16_t rotary, Rotary_t * data) {
+void encGetRotaryData(Rotary_t * data) {
+    if (data == NULL) return;
     
-    switch(rotary) {
+    switch(data->id) {
         case ROTARY1:
             copyAndClear(rotary_state_1.rotary, data);
             break;

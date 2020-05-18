@@ -1,4 +1,4 @@
-Device DSPIC33EP32GP502
+Device DSPIC33EP128GP502
 set system.disableerrormsg true
 Hwtool pickit3 -p
 Program "./dist/default/production/MainController.X.production.hex"

@@ -29,21 +29,62 @@
 #define ID_I_RD_LBL_2       13
 #define ID_I_RD_LBL_3       14
 
+#define SELECT_MENU_1_X     5
+#define SELECT_MENU_1_Y     5
+#define SELECT_MENU_2_X     68
+#define SELECT_MENU_2_Y     5
+#define SELECT_MENU_3_X     132
+#define SELECT_MENU_3_Y     5
+
 /********************************************************************************
  *              PROTOTYPES
  *******************************************************************************/
-static void onButtonPressed(GLKButton_t button);
 
 /********************************************************************************
  *              VARIABLES
  *******************************************************************************/
+static int8_t selected_menu = -1;
+static uint8_t menu_select_locs[3][2] = {
+    { 5, 5 },
+    { 68, 5 },
+    { 132, 5 }
+};
+static uint8_t menu_select_v_locs[3][2] = {
+    { 2, 17 },
+    { 65, 17 },
+    { 129, 17 }
+};
+static uint8_t menu_select_i_locs[3][2] = {
+    { 2, 29 },
+    { 65, 29 },
+    { 129, 29 }
+};
+static uint8_t menu_voltage_ids[3] = {
+    ID_V_SET_LBL_1,
+    ID_V_SET_LBL_2,
+    ID_V_SET_LBL_3,
+};
+static uint8_t menu_current_ids[3] = {
+    ID_I_SET_LBL_1,
+    ID_I_SET_LBL_2,
+    ID_I_SET_LBL_3,
+};
+static uint8_t menu_voltage_rd_ids[3] = {
+    ID_V_RD_LBL_1,
+    ID_V_RD_LBL_2,
+    ID_V_RD_LBL_3,
+};
+static uint8_t menu_current_rd_ids[3] = {
+    ID_I_RD_LBL_1,
+    ID_I_RD_LBL_2,
+    ID_I_RD_LBL_3,
+};
 
-/********************************************************************************
- *              FUCTIONS
+/******************************************************************************** *              FUCTIONS
  *******************************************************************************/
-void menuInit() {
+void menuInit(buttonCallback callback) {
 
-    GLK_Init(&onButtonPressed);
+    GLK_Init(callback);
 
     // Clear screen
     GLK_ClearScreen();
@@ -85,17 +126,17 @@ void menuInit() {
     GLK_InitializeLabel(ID_I_RD_LBL_3,  143, 49,  188, 61,  1, 0, 1, 0, 0); 
 
     // Setup static text
-    GLK_WriteText(5, 2, "SUP 1");
-    GLK_WriteText(68, 2, "SUP 2");
-    GLK_WriteText(132, 2, "SUP 3");
+    GLK_WriteText(12, 2, "SUP 1");
+    GLK_WriteText(75, 2, "SUP 2");
+    GLK_WriteText(140, 2, "SUP 3");
 
-    GLK_WriteText(2, 14, "V:");
-    GLK_WriteText(65, 14, "V:");
-    GLK_WriteText(129, 14, "V:");
+    GLK_WriteText(4, 14, "V:");
+    GLK_WriteText(67, 14, "V:");
+    GLK_WriteText(131, 14, "V:");
 
-    GLK_WriteText(2, 26, "I:");
-    GLK_WriteText(65, 26, "I:");
-    GLK_WriteText(129, 26, "I:");
+    GLK_WriteText(4, 26, "I:");
+    GLK_WriteText(67, 26, "I:");
+    GLK_WriteText(131, 26, "I:");
 
     GLK_WriteText(5, 40, "V=");
     GLK_WriteText(68, 40, "V=");
@@ -105,72 +146,62 @@ void menuInit() {
     GLK_WriteText(68, 52, "I=");
     GLK_WriteText(132, 52, "I=");
 
-
-    // Test
-    GLK_UpdateLabel(ID_TITLE_LBL_1, "A");
-    GLK_UpdateLabel(ID_TITLE_LBL_2, "B");
-    GLK_UpdateLabel(ID_TITLE_LBL_3, "C");
-    GLK_UpdateLabel(ID_V_SET_LBL_1, "  5,00V");
-    GLK_UpdateLabel(ID_V_SET_LBL_2, " 12,00V");
-    GLK_UpdateLabel(ID_V_SET_LBL_3, "  3,00V");
-    GLK_UpdateLabel(ID_I_SET_LBL_1, " 0,10mA");
-    GLK_UpdateLabel(ID_I_SET_LBL_2, " 0,20mA");
-    GLK_UpdateLabel(ID_I_SET_LBL_3, " 0,30mA");
-    GLK_UpdateLabel(ID_V_RD_LBL_1, "  5,00V");
-    GLK_UpdateLabel(ID_V_RD_LBL_2, " 12,00V");
-    GLK_UpdateLabel(ID_V_RD_LBL_3, "  3,00V");
-    GLK_UpdateLabel(ID_I_RD_LBL_1, "  5,00V");
-    GLK_UpdateLabel(ID_I_RD_LBL_2, " 12,00V");
-    GLK_UpdateLabel(ID_I_RD_LBL_3, "  3,00V");
+    menuSelect(1);
 }
 
-void menuSelect(const uint8_t menu, bool selected) {
-    /* if (menus[menu].title.selected != selected) { */
-        /* updateTitleSelection(&menus[menu].title, selected); */
-    /* } */
+void menuSelect(const int8_t menu) {
+    if (menu != selected_menu) {
+        // Unselect previous menu
+        if (selected_menu >= 0) {
+            GLK_SetDrawingColor(0);
+            GLK_DrawFilledCircle(
+                    menu_select_locs[selected_menu][0],
+                    menu_select_locs[selected_menu][1],
+                    3);
+        }
+
+        // Select new menu
+        selected_menu = menu;
+        GLK_SetDrawingColor(1);
+        GLK_DrawFilledCircle(
+                menu_select_locs[selected_menu][0],
+                menu_select_locs[selected_menu][1],
+                3);
+    }
 }
 
 void menuSetVoltageState(const uint8_t menu, const uint8_t state) {
-    /* if (menus[menu].values[V_SET_VALUE].state != state) { */
-        /* updateValueState(&menus[menu].values[V_SET_VALUE], state); */
-    /* } */
+    menuSelect(menu);
+    GLK_SetDrawingColor(state);
+    GLK_DrawFilledCircle(
+        menu_select_v_locs[menu][0],
+        menu_select_v_locs[menu][1],
+        1);
 }
 
 void menuSetCurrentState(const uint8_t menu, const uint8_t state) {
-    /* if (menus[menu].values[I_SET_VALUE].state != state) { */
-     /* updateValueState(&menus[menu].values[I_SET_VALUE], state); */
-    /* } */
+    menuSelect(menu);
+    GLK_SetDrawingColor(state);
+    GLK_DrawFilledCircle(
+        menu_select_i_locs[menu][0],
+        menu_select_i_locs[menu][1],
+        1);
 }
 
 void menuSetVoltageSet(const uint8_t menu, const char * v) {
-    /* if (strcmp(menus[menu].values[V_SET_VALUE].value, v) != 0) { */
-        /* updateValueValue(&menus[menu].values[V_SET_VALUE], v); */
-    /* } */
+    GLK_UpdateLabel(menu_voltage_ids[menu], v);
 }
 
 void menuSetCurrentSet(const uint8_t menu, const char * i) {
-     /* if (strcmp(menus[menu].values[I_SET_VALUE].value, i) != 0) { */
-        /* updateValueValue(&menus[menu].values[I_SET_VALUE], i); */
-    /* } */
+    GLK_UpdateLabel(menu_current_ids[menu], i);
 }
 
 void menuSetVoltageRead(const uint8_t menu, const char * v) {
-     /* if (strcmp(menus[menu].values[V_READ_VALUE].value, v) != 0) { */
-        /* updateValueValue(&menus[menu].values[V_READ_VALUE], v); */
-    /* } */
+    GLK_UpdateLabel(menu_voltage_rd_ids[menu], v);
 }
 
 void menuSetCurrentRead(const uint8_t menu, const char * i) {
-     /* if (strcmp(menus[menu].values[I_READ_VALUE].value, i) != 0) { */
-        /* updateValueValue(&menus[menu].values[I_READ_VALUE], i); */
-    /* } */
+    GLK_UpdateLabel(menu_current_rd_ids[menu], i);
 }
 
-
-/********************************************************************************
- *              PRIVATE FUCTIONS
- *******************************************************************************/
-static void onButtonPressed(GLKButton_t button) {
-
-}
 

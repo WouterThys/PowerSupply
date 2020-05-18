@@ -25,7 +25,7 @@ typedef struct {
  * @param status
  * @param onError
  */
-void suppliesInit(SupplyStatus_t * status, void (*onError)(Error_t error));
+void splInit(SupplyStatus_t * status, void (*onError)(Error_t error));
 
 /**
  * Set voltage of supply board, and write too I2C

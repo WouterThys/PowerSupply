@@ -30,7 +30,6 @@
 
 #define STATE_NONE   0
 #define STATE_POINT  1
-#define STATE_SELECT 2
     
     
 /******************************************************************************/
@@ -40,13 +39,13 @@
 /**
  * Draw initial menu
  */
-void menuInit();
+void menuInit(buttonCallback callback);
 
 /**
  * Select current menu
  * @param menu
  */
-void menuSelect(const uint8_t menu, bool selected);
+void menuSelect(const int8_t menu);
 
 /**
  * Set the state

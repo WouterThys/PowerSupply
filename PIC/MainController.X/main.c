@@ -13,8 +13,6 @@
 #include "Drivers/ENC_Driver.h"
 #include "Drivers/UART_Driver.h"
 
-#include "Controllers/SUPPLIES_Controller.h"
-#include "Controllers/MENU_Controller.h"
 #include "Controllers/FSM_Controller.h"
 
 
@@ -105,17 +103,14 @@ int main(void) {
     initialize();
     DelayMs(100);
    
-    // TODO: Move to init phase of FSM 
-    menuInit();
-    //encDriverInit();
-    //fsmInit();
+    fsmInit();
 
     //printf("Start\n");
 
     while(1) {
 
         if (fsmShouldExecute()) {
-            //fsmExecute();
+            fsmExecute();
             //LED1 = !LED1;
         }       
     }

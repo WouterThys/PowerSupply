@@ -62,7 +62,7 @@ bool i2cCheckState(i2cPackage_t data) {
 /*******************************************************************************
  *          DRIVER FUNCTIONS
  ******************************************************************************/
-void suppliesInit(SupplyStatus_t * s, void (*onError)(Error_t error)) {
+void splInit(SupplyStatus_t * s, void (*onError)(Error_t error)) {
     
     // Event
     onSupplyError = onError;
@@ -86,7 +86,7 @@ void suppliesInit(SupplyStatus_t * s, void (*onError)(Error_t error)) {
     i2cDriverInit();
     i2cDriverEnable(true);
     
-    printf("I2C ready \n");
+    if (DEBUG_I2C) printf("I2C ready \n");
 }
 
 //void splSetStatus(SupplyStatus_t s) {

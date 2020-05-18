@@ -2,6 +2,7 @@
 #define	ENC_DRIVER_H
 
 #include <xc.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include "../Settings.h"
 
@@ -11,6 +12,7 @@ typedef enum {
 } ButtonState_t;
 
 typedef struct {
+    uint16_t id;            // Id of the rotary encoder
     ButtonState_t button;   // Button pressed or not
     int16_t turns;          // Turns, left or right
 } Rotary_t;
@@ -27,10 +29,9 @@ void encDriverInit();
 
 /**
  * Get the value of the rotary encoder
- * @param rotary Which rotary
  * @param data Copy data into this
  */
-void encGetRotaryData(uint16_t rotary, Rotary_t * data);
+void encGetRotaryData(Rotary_t * data);
 
 
 

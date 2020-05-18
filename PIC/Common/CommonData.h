@@ -8,6 +8,22 @@
 /*      COMMON DEFINES                                                        */
 /******************************************************************************/
 
+#define SUPPLY_1            0
+#define SUPPLY_2            1
+#define SUPPLY_3            2
+
+#define Rs          0.1     /* Sense resistance                               */
+#define Rt          21500   /* Temperature resitance                          */
+#define Igain       20      /* Current sense amplifier gain                   */
+#define Vgain       5       /* Voltage amplification from DAC to LT3080       */
+#define Vdivider    1/5     /* Voltage divider for sensing output voltage     */
+#define AdcN        pow(2, 12)
+#define DacN        pow(2, 12)
+#define Vref        2.048
+
+#define DEFAULT_V   400
+#define DEFAULT_I   400
+
 #define I2C_COM_SET_V       0
 #define I2C_COM_SET_I       1
 #define I2C_COM_MSR_V       2

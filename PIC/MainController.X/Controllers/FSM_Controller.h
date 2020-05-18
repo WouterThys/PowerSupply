@@ -17,7 +17,8 @@
 #include "../Settings.h"
 #include "../Drivers/SYSTEM_Driver.h"
 #include "../Drivers/ENC_Driver.h"
-#include "../Controllers/GLCD_Controller.h"
+#include "../Drivers/GLK19264A_Driver.h"
+#include "../Controllers/MENU_Controller.h"
 #include "../Controllers/SUPPLIES_Controller.h"
 
 /**

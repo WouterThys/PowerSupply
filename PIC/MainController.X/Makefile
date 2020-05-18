@@ -107,6 +107,9 @@ help: .help-post
 flash: build
 		/opt/microchip/mplabx/v4.05/mplab_ide/bin/mdb.sh $(PROGRAMMER)
 
+wflash: build
+		C:\Program Files (x86)\Microchip\MPLABX\v4.05\mplab_ide\bin\mdb.bat $(PROGRAMMER)
+
 # include project implementation makefile
 include nbproject/Makefile-impl.mk
 
