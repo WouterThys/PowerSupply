@@ -89,18 +89,6 @@ void splInit(SupplyStatus_t * s, void (*onError)(Error_t error)) {
     if (DEBUG_I2C) printf("I2C ready \n");
 }
 
-//void splSetStatus(SupplyStatus_t s) {
-//    // DONT SET LOCAL STATUS NOW, BUT WAIT WHEN READ BACK FROM SLAVE!!!
-//    
-//    // Send
-//    i2cPackage.length = 1;
-//    i2cPackage.command = I2C_COM_STATUS;
-//    i2cPackage.data = &s.value;
-//    
-//    i2cDriverWrite(&i2cPackage);
-//    i2cCheckState(i2cPackage);
-//}
-
 void splSetVoltage(uint16_t voltage) {
 
     *setVoltage = voltage;
