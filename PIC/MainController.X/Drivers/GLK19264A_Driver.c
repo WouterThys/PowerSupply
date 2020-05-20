@@ -4,6 +4,8 @@
 /********************************************************************************
  *              COMMANDS 
  *******************************************************************************/
+// COMMUNICATION
+static const uint8_t CHANGE_BAUD_RATE[2]    = {0xFE, 0x39};
 
 // TEXT
 static const uint8_t CLEAR_SCREEN[2]        = {0xFE, 0x58};
@@ -70,8 +72,7 @@ static buttonCallback btnCallback;
  *******************************************************************************/
 
 static void uartDataRead(uint8_t data) {
-    btnCallback((GLKButton_t) (data & 0x7F));
-    GLK_ClearKeyBuffer();
+    btnCallback((data & 0x7F));
 }
 
 static void write(const uint8_t * command, const uint8_t length) {
@@ -108,6 +109,23 @@ void GLK_WriteText(uint8_t x, uint8_t y, const char * text) {
         c = text[i];
     }
 }
+
+
+/********************************************************************************
+ *              COMMUNICATION
+ *******************************************************************************/
+
+void GLK_ChangeBaudRate(GLKBaud_t speed) {
+    uint8_t data[3];
+    data[0] = CHANGE_BAUD_RATE[0];
+    data[1] = CHANGE_BAUD_RATE[1];
+    data[2] = (uint8_t) speed;
+    write(data, 3);
+}
+
+/********************************************************************************
+ *              TEXT
+ *******************************************************************************/
 
 void GLK_ClearScreen() {
     write(CLEAR_SCREEN, 2);

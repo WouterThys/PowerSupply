@@ -62,6 +62,7 @@ void sysInitPorts(void) {
     TRISB = 0x0000;
     ANSELB = 0x0000;
     PORTB = 0x0000;
+    
 }
 
 void sysInitInterrupts(void) {

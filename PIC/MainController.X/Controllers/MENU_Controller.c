@@ -133,6 +133,9 @@ void menuInit(buttonCallback callback) {
     GLK_WriteText(4, 14, "V:");
     GLK_WriteText(67, 14, "V:");
     GLK_WriteText(131, 14, "V:");
+//    GLK_WriteText(57, 14, "V");
+//    GLK_WriteText(121, 14, "V");
+//    GLK_WriteText(184, 14, "V");
 
     GLK_WriteText(4, 26, "I:");
     GLK_WriteText(67, 26, "I:");
@@ -188,20 +191,70 @@ void menuSetCurrentState(const uint8_t menu, const uint8_t state) {
         1);
 }
 
-void menuSetVoltageSet(const uint8_t menu, const char * v) {
-    GLK_UpdateLabel(menu_voltage_ids[menu], v);
+void menuSetVoltageSet(const uint8_t menu, uint16_t value) {
+    // Result value:    d1   d2        d3   d4   x   
+    char result[8] = { ' ', '5', '.', '0', '0', ' ', 'V', 0};
+    
+    uint16_t d1 = value / 10000; value %= 10000;
+    uint16_t d2 = value / 1000; value %= 1000;
+    uint16_t d3 = value / 100; value %= 100;
+    uint16_t d4 = value / 10; 
+    
+    result[0] = d1 > 0 ? (d1 + 48) : ' '; 
+    result[1] = d2 + 48;
+    result[3] = d3 + 48;
+    result[4] = d4 + 48;
+    
+    GLK_UpdateLabel(menu_voltage_ids[menu], result);
 }
 
-void menuSetCurrentSet(const uint8_t menu, const char * i) {
-    GLK_UpdateLabel(menu_current_ids[menu], i);
+void menuSetCurrentSet(const uint8_t menu, uint16_t value) {
+    // Result value:    d1   d2        d3   d4   x   
+    char result[8] = { ' ', '5', '.', '0', '0', ' ', 'A', 0};
+    
+    uint16_t d1 = value / 10000; value %= 10000;
+    uint16_t d2 = value / 1000; value %= 1000;
+    uint16_t d3 = value / 100; value %= 100;
+    uint16_t d4 = value / 10; 
+    
+    result[0] = d1 > 0 ? (d1 + 48) : ' '; 
+    result[1] = d2 + 48;
+    result[3] = d3 + 48;
+    result[4] = d4 + 48;
+    
+    GLK_UpdateLabel(menu_current_ids[menu], result);
 }
 
-void menuSetVoltageRead(const uint8_t menu, const char * v) {
-    GLK_UpdateLabel(menu_voltage_rd_ids[menu], v);
+void menuSetVoltageRead(const uint8_t menu, uint16_t value) {
+    // Result value:    d1   d2        d3   d4   x   
+    char result[8] = { ' ', '5', '.', '0', '0', ' ', 'V', 0};
+    
+    uint16_t d1 = value / 10000; value %= 10000;
+    uint16_t d2 = value / 1000; value %= 1000;
+    uint16_t d3 = value / 100; value %= 100;
+    uint16_t d4 = value / 10; 
+    
+    result[0] = d1 > 0 ? (d1 + 48) : ' '; 
+    result[1] = d2 + 48;
+    result[3] = d3 + 48;
+    result[4] = d4 + 48;
+    
+    GLK_UpdateLabel(menu_voltage_rd_ids[menu], result);
 }
 
-void menuSetCurrentRead(const uint8_t menu, const char * i) {
-    GLK_UpdateLabel(menu_current_rd_ids[menu], i);
+void menuSetCurrentRead(const uint8_t menu, uint16_t value) {
+        // Result value:    d1   d2        d3   d4   x   
+    char result[8] = { ' ', '5', '.', '0', '0', ' ', 'A', 0};
+    
+    uint16_t d1 = value / 10000; value %= 10000;
+    uint16_t d2 = value / 1000; value %= 1000;
+    uint16_t d3 = value / 100; value %= 100;
+    uint16_t d4 = value / 10; 
+    
+    result[0] = d1 > 0 ? (d1 + 48) : ' '; 
+    result[1] = d2 + 48;
+    result[3] = d3 + 48;
+    result[4] = d4 + 48;
+    
+    GLK_UpdateLabel(menu_current_rd_ids[menu], result);
 }
-
-

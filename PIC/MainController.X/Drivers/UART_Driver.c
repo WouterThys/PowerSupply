@@ -55,7 +55,7 @@ void initializeRegisters(uint16_t baud) {
     // U1STA register settings
     U1STAbits.UTXISEL0 = 0; // Interrupt is generated when any character is transferred to the Transmit Shift Register and the
     U1STAbits.UTXISEL1 = 0; // transmit buffer is empty (which implies at least one location is empty in the transmit buffer) 
-    U1STAbits.UTXINV = 1; // UxTX Idle state is ?0?*********************************
+    U1STAbits.UTXINV = 0; // UxTX Idle state is ?0?*********************************
     U1STAbits.UTXEN = 0; // UARTx transmitter is disabled; any pending transmission is aborted and the buffer is reset, UxTX pin is controlled by the port
     U1STAbits.URXISEL = 0b00; // Interrupt flag bit is set when a character is received
     U1STAbits.ADDEN = 0; // Address Detect mode is disabled
@@ -71,6 +71,7 @@ void initializeRegisters(uint16_t baud) {
     U1TXREG = 0x0000;
     
     _U1RXIF = 0; // Clear flag
+    _U1TXIF = 0;
     _U1RXIP = IP_U1RX; // Priority
     _U1RXIE = 1; // Enable interrupts
     
@@ -105,12 +106,8 @@ void uartDriverEnable(bool enable) {
 
 void uartDriverWriteByte(uint8_t data) {
     U1TXREG = data;
-    while(U1STAbits.TRMT == 0);
-    if (DEBUG) {
-        DelayUs(1000);
-    } else {
-        DelayUs(1);
-    }
+    while(U1STAbits.UTXBF == 1);
+    DelayUs(1);
 }
 
 void uartDriverWriteString(const char * str, uint8_t length) {
@@ -181,6 +178,6 @@ void __attribute__ ( (interrupt, no_auto_psv) ) _U1RXInterrupt(void) {
             return;
         } 
        
-        readDone(data);
+        readDone(data);     
     }
 }

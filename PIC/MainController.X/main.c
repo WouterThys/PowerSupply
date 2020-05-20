@@ -101,18 +101,19 @@ void printI2CError(int16_t errorCode) {
 int main(void) {
 
     initialize();
+    UART1_TX_Pin = 1;
+    DelayMs(100);
+    DelayMs(100);
+    DelayMs(100);
     DelayMs(100);
    
     fsmInit();
-
-    //printf("Start\n");
 
     while(1) {
 
         if (fsmShouldExecute()) {
             fsmExecute();
-            //LED1 = !LED1;
-        }       
+        }
     }
     return 0;
 

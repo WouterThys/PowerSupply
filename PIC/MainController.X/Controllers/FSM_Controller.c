@@ -1,52 +1,68 @@
 #include "FSM_Controller.h"
 
 /*******************************************************************************
- *          DEFINES
+ *          FSM
  ******************************************************************************/
-// Menu state machine updates GLCD display
-typedef struct MenuStateMachine MenuStateMachine_t;
-typedef void (*FindNextMenuState)(MenuStateMachine_t *sm, Rotary_t *rotary, GLKButton_t * button);
-typedef void (*HandleMenuState)(MenuStateMachine_t *sm, Rotary_t *rotary, GLKButton_t * button);
 
-struct MenuStateMachine {
-    uint8_t menu_id;
-    FindNextMenuState state;
-    HandleMenuState handle;
+typedef struct MenuState {
+    uint16_t supply_id; // Supply id for this menu
+    bool updateSelection; // Indicate if update is needed
+    bool selected; // Is menu selected
+    bool voltage; // Set voltage = true, set current = false
+} MenuState_t;
+
+// State machine goes through pulling data from supply boards etc
+typedef struct StateMachine StateMachine_t;
+
+// State transition function prototype
+typedef void (*state_transition)(StateMachine_t *sm);
+
+// State handle function prototype
+typedef void (*state_handler)(StateMachine_t *sm);
+
+// Actual FSM data
+
+struct StateMachine {
+    // ID
+    uint16_t supply_id; // Id of supply 
+
+    // State update
+    state_transition transition; // Transition to next state 
+    state_handler handler; // Handler for the state
+
+    // Data
+    Rotary_t * rotary; // Rotary input for this supply
+    MenuState_t * menu_state; // State of the menu for this supply
+    SupplyStatus_t * supply_status; // Status for this supply
+    SupplyData_t * supply_data; // Data of this supply
 };
 
-// Main state machine goes through pulling data from supply boards etc
-typedef struct MainStateMachine MainStateMachine_t;
-typedef void (*FindNextMainState)(MainStateMachine_t *sm);
-typedef void (*HandleMainState)(MainStateMachine_t *sm);
+// State transitions
+static void transitionReadSupply(StateMachine_t * sm);
+static void transitionRotary(StateMachine_t * sm);
+static void transitionWriteSupply(StateMachine_t * sm);
+static void transitionUpdateGLCD(StateMachine_t * sm);
 
-struct MainStateMachine {
-    uint16_t supply_id;
-    FindNextMainState state;
-    HandleMainState handle;
-    Rotary_t * rotary;
-    SupplyStatus_t * supply_status;
-    SupplyData_t * supply_data;
-    MenuStateMachine_t * menu_fsm;
-};
-
+// State handlers
+static void handleReadSupply(StateMachine_t * sm);
+static void handleRotary(StateMachine_t * sm);
+static void handleWriteSupply(StateMachine_t * sm);
+static void handleUpdateGLCD(StateMachine_t * sm);
 
 /*******************************************************************************
  *          VARIABLES
  ******************************************************************************/
 static volatile bool fsm_flag;
-static GLKButton_t glcd_button;
+static volatile uint8_t button;
 
-static uint8_t current_fsm = 0;
-static int8_t current_menu = 0;
-static MainStateMachine_t main_fsm[3];
-static MenuStateMachine_t menu_fsm[3];
+static volatile uint16_t current_fsm;
+static volatile int16_t current_supply;
 
-// Extra data
+static StateMachine_t fsms[3];
 static Rotary_t rotaries[3];
-
-// Supply data
+static MenuState_t menus[3];
 static SupplyStatus_t supply_status[3];
-static SupplyData_t supply_data[3]; 
+static SupplyData_t supply_data[3];
 
 /*******************************************************************************
  *          LOCAL FUNCTIONS
@@ -54,27 +70,13 @@ static SupplyData_t supply_data[3];
 static void initTimer();
 static void initRotary(uint8_t id, Rotary_t * rotary);
 static void initSupplyData(SupplyData_t * data, uint16_t defaultV, uint16_t defaultI);
-static void initFSM(uint8_t id, MainStateMachine_t *mainFsm, MenuStateMachine_t *menuFsm);
+static void initMenu(uint8_t id, MenuState_t * menu);
+static void initFSM(uint8_t id, StateMachine_t *sm);
+static void handleButton();
 
-static void readInputs(MainStateMachine_t *sm);
-static void onButtonPressed(GLKButton_t button);
+// Callback
+static void onButtonPressed(uint8_t btn);
 static void onSupplyError(Error_t error);
-
-static void state_ReadSupply(MainStateMachine_t *sm);
-static void state_WriteSupply(MainStateMachine_t *sm);
-static void state_UpdateMenu(MainStateMachine_t *sm);
-static void state_WriteDebug(MainStateMachine_t *sm);
-
-static void handle_ReadSupply(MainStateMachine_t *sm);
-static void handle_WriteSupply(MainStateMachine_t *sm);
-static void handle_UpdateMenu(MainStateMachine_t *sm);
-static void handle_WriteDebug(MainStateMachine_t *sm);
-
-static void state_SelectV(MenuStateMachine_t *sm, Rotary_t * rotary, GLKButton_t  * button);
-static void state_SelectI(MenuStateMachine_t *sm, Rotary_t * rotary, GLKButton_t  * button);
-
-static void handle_SelectV(MenuStateMachine_t *sm, Rotary_t * rotary, GLKButton_t  * button);
-static void handle_SelectI(MenuStateMachine_t *sm, Rotary_t * rotary, GLKButton_t  * button);
 
 static void initTimer() {
 
@@ -120,183 +122,175 @@ static void initSupplyData(SupplyData_t * data, uint16_t defaultV, uint16_t defa
     data->msrTemperature.value = 0;
 }
 
-static void initFSM(uint8_t id, MainStateMachine_t *mainFsm, MenuStateMachine_t *menuFsm) {
-    menuFsm->menu_id = id;
-    menuFsm->state = state_SelectV;
-    menuFsm->handle = NULL;
-    mainFsm->state = state_ReadSupply;
-    mainFsm->handle = NULL;
-    mainFsm->rotary = &(rotaries[id]);
-    mainFsm->supply_status = &(supply_status[id]);
-    mainFsm->supply_data = &(supply_data[id]);
-    mainFsm->menu_fsm = &(menu_fsm[id]);
+static void initFSM(uint8_t id, StateMachine_t *sm) {
+    sm->supply_id = id;
+    sm->transition = transitionReadSupply;
+    sm->handler = NULL;
+    sm->menu_state = &(menus[id]);
+    sm->rotary = &(rotaries[id]);
+    sm->supply_status = &(supply_status[id]);
+    sm->supply_data = &(supply_data[id]);
 }
 
-static void readInputs(MainStateMachine_t *sm) {
-    
-    // Update current menu with GLCD button press
-    if (glcd_button == ButtonLeft) {
-        current_menu--;
-        if (current_menu < SUPPLY_1) {
-            current_menu = SUPPLY_3;
+static void initMenu(uint8_t id, MenuState_t * menu) {
+    menu->supply_id = id;
+    menu->updateSelection = false;
+    menu->selected = false;
+    menu->voltage = true;
+}
+
+static void handleButton() {
+
+    if (button != 0) {
+
+        menus[current_supply].selected = false;
+        menus[current_supply].updateSelection = false;
+
+        switch (button) {
+            default:
+                break;
+
+            case BTN_LEFT:
+                current_supply--;
+                if (current_supply < SUPPLY_1) {
+                    current_supply = SUPPLY_3;
+                }
+                menus[current_supply].selected = true;
+                menus[current_supply].updateSelection = true;
+                break;
+
+            case BTN_RIGHT:
+                current_supply++;
+                if (current_supply > SUPPLY_3) {
+                    current_supply = SUPPLY_1;
+                }
+                menus[current_supply].selected = true;
+                menus[current_supply].updateSelection = true;
+                break;
+
+            case BTN_TOP:
+            case BTN_BOTTOM:
+                if (menus[current_supply].voltage) {
+                    menus[current_supply].voltage = false;
+                } else {
+                    menus[current_supply].voltage = true;
+                }
+                menus[current_supply].updateSelection = true;
+                break;
         }
-        glcd_button = 0;
-    } 
-    
-    if (glcd_button == ButtonRight) {
-        current_menu++;
-        if (current_menu > SUPPLY_3) {
-            current_menu = SUPPLY_1;
-        }
-        glcd_button = 0;
+        button = 0;
     }
-    
-    // Get rotary data
-    encGetRotaryData(sm->rotary);
 }
 
-static void onButtonPressed(GLKButton_t button) {
-    glcd_button = button;
+static void onButtonPressed(uint8_t btn) {
+    button = btn;
 }
 
 static void onSupplyError(Error_t error) {
-    
+
 }
 
-
-static void state_ReadSupply(MainStateMachine_t *sm) {
-    sm->state = state_WriteSupply;
-    sm->handle = handle_WriteSupply;
+static void transitionReadSupply(StateMachine_t * sm) {
+    sm->transition = transitionRotary;
+    sm->handler = handleReadSupply;
 }
 
-static void state_WriteSupply(MainStateMachine_t *sm) {
-    sm->state = state_UpdateMenu;
-    sm->handle = handle_UpdateMenu;
+static void transitionRotary(StateMachine_t * sm) {
+    sm->transition = transitionWriteSupply;
+    sm->handler = handleRotary;
 }
 
-static void state_UpdateMenu(MainStateMachine_t *sm) {
-    sm->state = state_WriteDebug;
-    sm->handle = handle_WriteDebug;
+static void transitionWriteSupply(StateMachine_t * sm) {
+    sm->transition = transitionUpdateGLCD;
+    sm->handler = handleWriteSupply;
 }
 
-static void state_WriteDebug(MainStateMachine_t *sm) {
-    sm->state = state_ReadSupply;
-    sm->handle = handle_ReadSupply;
+static void transitionUpdateGLCD(StateMachine_t * sm) {
+    sm->transition = transitionReadSupply;
+    sm->handler = handleUpdateGLCD;
 }
 
-static void handle_ReadSupply(MainStateMachine_t *sm) {
-    if (DEBUG) printf("main %d\n", 0);
+// State handlers
+
+static void handleReadSupply(StateMachine_t * sm) {
+
 }
 
-static void handle_WriteSupply(MainStateMachine_t *sm) {
-    if (DEBUG) printf("main %d\n", 1);
-    
-    // Rotary updates voltage setting
-    if (sm->supply_id == current_menu) {
-        int16_t turns = sm->rotary->turns;
-        if (turns != 0) {
-
-            if (rotary->turns > 0) {
-
-            } else {
-
+static void handleRotary(StateMachine_t * sm) {
+    encGetRotaryData(sm->rotary);
+    int16_t turns = sm->rotary->turns;
+    if (turns != 0) {
+        if (sm->menu_state->voltage) {
+            int16_t change = turns * VOLTAGE_STEP;
+            int16_t value = sm->supply_data->setVoltage.value;
+            value += change;
+            if (value < VOLTAGE_MIN) {
+                value = VOLTAGE_MIN;
             }
-        }
-    }
-}
+            if (value > VOLTAGE_MAX) {
+                value = VOLTAGE_MAX;
+            }
+            sm->supply_data->setVoltage.value = (uint16_t) value;
+            sm->supply_data->setVoltage.changed = true;
 
-static void handle_UpdateMenu(MainStateMachine_t *sm) {
-    if (DEBUG) printf("main %d\n", 2);
-    
-    // Find next state and handle menu FSM
-    (sm->menu_fsm->state)(sm->menu_fsm, sm->rotary, &glcd_button);
-    if (*sm->menu_fsm->handle != NULL) {
-        (sm->menu_fsm->handle)(sm->menu_fsm, sm->rotary, &glcd_button);
-    }
-}
-
-static void handle_WriteDebug(MainStateMachine_t *sm) {
-    if (DEBUG) printf("main %d\n", 3);
-
-    // Set next menu
-    switch (current_fsm) {
-        case SUPPLY_1: current_fsm = SUPPLY_2;
-            break;
-        case SUPPLY_2: current_fsm = SUPPLY_3;
-            break;
-        case SUPPLY_3: current_fsm = SUPPLY_1;
-            break;
-    }
-}
-
-static void state_SelectV(MenuStateMachine_t *sm, Rotary_t * rotary, GLKButton_t * button) {
-    // Next state
-    if (current_fsm == current_menu) {
-        menuSelect(sm->menu_id);
-        if (*button == ButtonTop || *button == ButtonBottom) {
-            // Move to next state
-            sm->state = state_SelectI;
-            sm->handle = handle_SelectI;
-        } else if (rotary->turns != 0) {
-            // Execute this state again
-            sm->state = state_SelectV;
-            sm->handle = handle_SelectV;
         } else {
-            // Do nothing
-            sm->handle = NULL;
+            int16_t change = turns * CURRENT_STEP;
+            int16_t value = sm->supply_data->setCurrent.value;
+            value += change;
+            if (value < CURRENT_MIN) {
+                value = CURRENT_MIN;
+            }
+            if (value > CURRENT_MAX) {
+                value = CURRENT_MAX;
+            }
+            sm->supply_data->setCurrent.value = (uint16_t) value;
+            sm->supply_data->setCurrent.changed = true;
+
         }
-    } else {
-        sm->handle = NULL;
     }
 }
 
-static void state_SelectI(MenuStateMachine_t *sm, Rotary_t * rotary, GLKButton_t * button) {
-    // Next state
-    if (current_fsm == current_menu) {
-        menuSelect(sm->menu_id);
-        if (*button == ButtonTop || *button == ButtonBottom) {
-            // Move to next state
-            sm->state = state_SelectV;
-            sm->handle = handle_SelectV;
-        } else if (rotary->turns != 0) {
-            // Execute this state again
-            sm->state = state_SelectI;
-            sm->handle = handle_SelectI;
+static void handleWriteSupply(StateMachine_t * sm) {
+
+}
+
+static void handleUpdateGLCD(StateMachine_t * sm) {
+    // Update GLCD
+    if (sm->menu_state->updateSelection) {
+        if (sm->menu_state->voltage) {
+            menuSetVoltageState(sm->supply_id, STATE_POINT);
+            menuSetCurrentState(sm->supply_id, STATE_NONE);
         } else {
-            // Do nothing
-            sm->handle = NULL;
+            menuSetVoltageState(sm->supply_id, STATE_NONE);
+            menuSetCurrentState(sm->supply_id, STATE_POINT);
         }
-    } else {
-        sm->handle = NULL;
+        sm->menu_state->updateSelection = false;
     }
     
-}
-
-static void handle_SelectV(MenuStateMachine_t *sm, Rotary_t * rotary, GLKButton_t * button) {
-    if (DEBUG) printf("select V\n");
-
-    // Handle button press
-    if (*button != 0) {
-        menuSetVoltageState(sm->menu_id, STATE_POINT);
-        menuSetCurrentState(sm->menu_id, STATE_NONE);
+    if (sm->supply_data->setVoltage.changed) {
+        menuSetVoltageSet(sm->supply_id, sm->supply_data->setVoltage.value);
+        sm->supply_data->setVoltage.changed = false;
     }
-    
-    
 
-    // Reset values
-    *button = 0;
-}
+    if (sm->supply_data->setCurrent.changed) {
+        menuSetCurrentSet(sm->supply_id, sm->supply_data->setCurrent.value);
+        sm->supply_data->setCurrent.changed = false;
+    }
 
-static void handle_SelectI(MenuStateMachine_t *sm, Rotary_t * rotary, GLKButton_t * button) {
-    if (DEBUG) printf("select V\n");
+    if (sm->supply_data->msrVoltage.changed) {
+        menuSetVoltageRead(sm->supply_id, sm->supply_data->msrVoltage.value);
+        sm->supply_data->msrVoltage.changed = false;
+    }
 
-    menuSetCurrentState(sm->menu_id, STATE_POINT);
-    menuSetVoltageState(sm->menu_id, STATE_NONE);
-    
-    // Rotary updates current setting
-    
-    // Reset values
-    *button = 0;
+    if (sm->supply_data->msrCurrent.changed) {
+        menuSetCurrentRead(sm->supply_id, sm->supply_data->msrCurrent.value);
+        sm->supply_data->msrCurrent.changed = false;
+    }
+
+    current_fsm++;
+    if (current_fsm > 2) {
+        current_fsm = 0;
+    }
 }
 
 /*******************************************************************************
@@ -306,52 +300,63 @@ void fsmInit() {
 
     // Setup timer
     initTimer();
-    
+
     // Initialize rotary driver
     encDriverInit();
-    
+
     // Initialize supplies controller
     // TODO: multiple supplies!!!!!!!!!
     splInit(&(supply_status[0]), &onSupplyError);
-    
+
     // Initialize rotary-encoders
     initRotary(SUPPLY_1, &(rotaries[SUPPLY_1]));
     initRotary(SUPPLY_2, &(rotaries[SUPPLY_2]));
     initRotary(SUPPLY_3, &(rotaries[SUPPLY_3]));
-    
+
     // Initialize supply-data
     initSupplyData(&(supply_data[SUPPLY_1]), DEFAULT_V, DEFAULT_I);
     initSupplyData(&(supply_data[SUPPLY_2]), DEFAULT_V, DEFAULT_I);
     initSupplyData(&(supply_data[SUPPLY_3]), DEFAULT_V, DEFAULT_I);
 
+    // Initialize menu-states
+    initMenu(SUPPLY_1, &(menus[SUPPLY_1]));
+    initMenu(SUPPLY_2, &(menus[SUPPLY_2]));
+    initMenu(SUPPLY_3, &(menus[SUPPLY_3]));
+
     // Initialize FSMs
-    initFSM(SUPPLY_1, &(main_fsm[SUPPLY_1]), &(menu_fsm[SUPPLY_1]));
-    initFSM(SUPPLY_2, &(main_fsm[SUPPLY_2]), &(menu_fsm[SUPPLY_2]));
-    initFSM(SUPPLY_3, &(main_fsm[SUPPLY_3]), &(menu_fsm[SUPPLY_3]));
-    
+    initFSM(SUPPLY_1, &(fsms[SUPPLY_1]));
+    initFSM(SUPPLY_2, &(fsms[SUPPLY_2]));
+    initFSM(SUPPLY_3, &(fsms[SUPPLY_3]));
+
     // Initialize menu
     menuInit(&onButtonPressed);
     menuSetVoltageState(SUPPLY_3, STATE_POINT);
     menuSetVoltageState(SUPPLY_2, STATE_POINT);
     menuSetVoltageState(SUPPLY_1, STATE_POINT);
+
+    current_supply = SUPPLY_1;
+    current_fsm = 0;
 }
 
 void fsmExecute() {
 
-    // Read inputs
-    readInputs(&main_fsm[current_fsm]);
-    
-    // Find next state
-    (main_fsm[current_fsm].state)(&main_fsm[current_fsm]);
+    PORTBbits.RB7 = !PORTBbits.RB7;
 
-    // Handle state
-    (main_fsm[current_fsm].handle)(&main_fsm[current_fsm]);
+    // Button
+    handleButton();
+
+    // Transition
+    (fsms[current_fsm].transition)(&fsms[current_fsm]);
+
+    // Handle
+    (fsms[current_fsm].handler)(&fsms[current_fsm]);
+
+    // Clear
+    fsm_flag = false;
 }
 
 bool fsmShouldExecute() {
-    bool should = fsm_flag;
-    fsm_flag = false;
-    return should;
+    return fsm_flag;
 }
 
 /*******************************************************************************
@@ -359,7 +364,6 @@ bool fsmShouldExecute() {
  ******************************************************************************/
 
 void __attribute__((interrupt, no_auto_psv)) _T4Interrupt(void) {
-
     if (_T4IF) {
         fsm_flag = true;
         _T4IF = 0; // Clear flag

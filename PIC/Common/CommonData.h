@@ -38,10 +38,10 @@
 #define STAT_RUNNING        1
 #define STAT_CALIBRATING    2
 
-#define VOLTAGE_STEP        40                      /* Step size in [mV]      */
-#define VOLTAGE_MAX         4000                    /* Maximum in [mV]        */
-#define VOLTAGE_MIN         40                      /* Minimum in [mV]        */
-#define CURRENT_STEP        40                      /* Step size in [mA]      */
+#define VOLTAGE_STEP        100                     /* Step size in [mV]      */
+#define VOLTAGE_MAX         10000                   /* Maximum in [mV]        */
+#define VOLTAGE_MIN         100                     /* Minimum in [mV]        */
+#define CURRENT_STEP        100                     /* Step size in [mA]      */
 #define CURRENT_MAX         2000                    /* Maximum in [mA]        */
 #define CURRENT_MIN         0                       /* Minimum in [mA]        */
 

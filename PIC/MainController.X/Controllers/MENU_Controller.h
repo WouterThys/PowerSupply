@@ -61,22 +61,22 @@ void menuSetCurrentState(const uint8_t menu, const uint8_t state);
  /**
  * Set the voltage setting
  */
-void menuSetVoltageSet(const uint8_t menu, const char * v);
+void menuSetVoltageSet(const uint8_t menu, uint16_t value);
 
 /**
  * Set the current setting
  */
-void menuSetCurrentSet(const uint8_t menu, const char * i);
+void menuSetCurrentSet(const uint8_t menu, uint16_t value);
 
 /**
  * Set the voltage reading
  */
-void menuSetVoltageRead(const uint8_t menu, const char * v);
+void menuSetVoltageRead(const uint8_t menu, uint16_t value);
 
 /**
  * Set the current reading
  */
-void menuSetCurrentRead(const uint8_t menu, const char * i);
+void menuSetCurrentRead(const uint8_t menu, uint16_t value);
 
 #endif	/* MENU_CONTROLLER_H */
 

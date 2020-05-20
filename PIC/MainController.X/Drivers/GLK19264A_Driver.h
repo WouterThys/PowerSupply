@@ -6,9 +6,29 @@
 #include "../Settings.h"
 #include "UART_Driver.h"
 
+#define BTN_TOP     'B'
+#define BTN_RIGHT   'C'
+#define BTN_BOTTOM  'H'
+#define BTN_LEFT    'D'
+#define BTN_CENTER  'E'
+#define BTN_1       'A'
+#define BTN_2       'G'
+
 /********************************************************************************
  *              ENUMS
  *******************************************************************************/
+
+typedef enum GLKBaud {
+    B9600   = 207,
+    B14400  = 138,
+    B19200  = 103,
+    B28800  = 68,
+    B38400  = 51,
+    B57600  = 34,
+    B76800  = 25,
+    B115200 = 16
+} GLKBaud_t;
+
 typedef enum VerticalJustification {
     Top = 0,
     Middle = 1,
@@ -41,20 +61,10 @@ typedef enum LEDState {
     Yellow  = 3
 } LEDState_t;
 
-typedef enum GLKButton {
-    ButtonTop = 'B',
-    ButtonRight = 'C',
-    ButtonBottom = 'H',
-    ButtonLeft = 'D',
-    ButtonCenter = 'E',
-    Button1 = 'A',
-    Button2 = 'G'
-} GLKButton_t;
-
 /********************************************************************************
  *              FUCTIONS
  *******************************************************************************/
-typedef void (*buttonCallback)(GLKButton_t button);
+typedef void (*buttonCallback)(uint8_t button);
 
 /********************************************************************************
  *              MY FUNCTIONS
@@ -64,6 +74,16 @@ void GLK_Init(buttonCallback callback);
 
 void GLK_WriteText(uint8_t x, uint8_t y, const char * text);
 
+/********************************************************************************
+ *              COMMUNICATION
+ *******************************************************************************/
+
+/**
+ * Change Baud Rate: Immediately changes the baud rate. Not available in I2C.
+ * Baud rate can be temporarily forced to 19200 by a manual override.
+ * @param speed: Valid settings shown below.
+ */
+void GLK_ChangeBaudRate(GLKBaud_t speed);
 
 /********************************************************************************
  *              TEXT

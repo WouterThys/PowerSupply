@@ -23,16 +23,16 @@
  * Interrupt priorities (Highest (7) - Lowest(1))
  */
 
-#define IP_U1RX      6
-#define IP_I2C       5
-#define IP_CN        3
-#define IP_MENU_TMR  2
-#define IP_TMR_4     1
+#define IP_CN        5
+#define IP_MENU_TMR  4
+#define IP_TMR_4     3
+#define IP_I2C       2
+#define IP_U1RX      1
     
 /**
  * FSM TIMER CONFIG
  */
-#define T4_PERIOD    200 /* In milliseconds (should be between 14us and 900ms)*/
+#define T4_PERIOD    60 /* In milliseconds (should be between 14us and 900ms)*/
 
 /******************************************************************************/
 /*                  PORT MAPPINGS                                             */
@@ -79,9 +79,11 @@
  */      
 // Orange = RX
 // Geel = TX
-#define UART1_BAUD      19200 /* 57600 */
+#define UART1_BAUD      19200 
 #define UART1_ID        2   
 
+#define UART1_RX_Pin    PORTBbits.RB9       /* RX Pin on RP41-RB9            */
+#define UART1_TX_Pin    PORTBbits.RB8       /* TX Pin on RP40-RB8            */
 #define UART1_RX_Dir    TRISBbits.TRISB9    /* RX Pin on RP41-RB9            */
 #define UART1_TX_Dir    TRISBbits.TRISB8    /* TX Pin on RP40-RB8            */
 
@@ -128,15 +130,15 @@
 #define ROT2_D_Dir      TRISBbits.TRISB10
 #define ROT2_D_Int      CNENBbits.CNIEB10
 
-#define ROT3_A_Pin      PORTAbits.RA2
-#define ROT3_A_Dir      TRISAbits.TRISA2
-#define ROT3_A_Int      CNENAbits.CNIEA2 
+#define ROT3_A_Pin      PORTAbits.RA4
+#define ROT3_A_Dir      TRISAbits.TRISA4
+#define ROT3_A_Int      CNENAbits.CNIEA4 
 #define ROT3_B_Pin      PORTAbits.RA3
 #define ROT3_B_Dir      TRISAbits.TRISA3
 #define ROT3_B_Int      CNENAbits.CNIEA3 
-#define ROT3_D_Pin      PORTAbits.RA4
-#define ROT3_D_Dir      TRISAbits.TRISA4
-#define ROT3_D_Int      CNENAbits.CNIEA4
+#define ROT3_D_Pin      PORTAbits.RA2
+#define ROT3_D_Dir      TRISAbits.TRISA2
+#define ROT3_D_Int      CNENAbits.CNIEA2
 
 
 #endif	/* XC_HEADER_TEMPLATE_H */
