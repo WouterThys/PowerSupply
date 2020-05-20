@@ -7,7 +7,7 @@
 #include "Controllers/DAC_Controller.h"
 
 #define DEBUG       1
-#define DEBUG_I2C   (0 & DEBUG)
+#define DEBUG_I2C   (1 & DEBUG)
 #define DEBUG_FSM   (1 & DEBUG)
     
 /**

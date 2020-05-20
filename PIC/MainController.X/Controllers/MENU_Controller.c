@@ -210,7 +210,7 @@ void menuSetVoltageSet(const uint8_t menu, uint16_t value) {
 
 void menuSetCurrentSet(const uint8_t menu, uint16_t value) {
     // Result value:    d1   d2        d3   d4   x   
-    char result[8] = { ' ', '5', '.', '0', '0', ' ', 'A', 0};
+    char result[8] = { ' ', '5', '.', '0', '0', 'm', 'A', 0};
     
     uint16_t d1 = value / 10000; value %= 10000;
     uint16_t d2 = value / 1000; value %= 1000;
@@ -244,7 +244,7 @@ void menuSetVoltageRead(const uint8_t menu, uint16_t value) {
 
 void menuSetCurrentRead(const uint8_t menu, uint16_t value) {
         // Result value:    d1   d2        d3   d4   x   
-    char result[8] = { ' ', '5', '.', '0', '0', ' ', 'A', 0};
+    char result[8] = { ' ', '5', '.', '0', '0', 'm', 'A', 0};
     
     uint16_t d1 = value / 10000; value %= 10000;
     uint16_t d2 = value / 1000; value %= 1000;

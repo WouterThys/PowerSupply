@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "../Settings.h"
+#include "../Utils.h"
 #include "../Drivers/SYSTEM_Driver.h"
 #include "../Drivers/ENC_Driver.h"
 #include "../Drivers/GLK19264A_Driver.h"

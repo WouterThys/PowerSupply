@@ -13,10 +13,10 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 
 
-#define digitalToVoltage(d) ((((float)d * (float)Vref) / ((float)AdcN)) * Vgain)
-#define voltageToDigital(v) ((((float)v * (float)DacN) / ((float)Vref)) * (1/Vgain))
+#define digitalToVoltage(d) (((((float)d * (float)Vref) / ((float)AdcN)) * (float)Vgain) * 1000)
+#define voltageToDigital(v) (((((float)v / 1000) * (float)DacN) / ((float)Vref)) / (float)Vgain)
 
-#define digitalToCurrent(d) (((((float)d * (float)Vref) / ((float)AdcN)) * 1000) / (Rs * Igain))
+#define digitalToCurrent(d) ((((((float)d * (float)Vref) / ((float)AdcN)) * 1000) / ((float)Rs * (float)Igain)) * 1000)
 #define currentToDigital(i) ()
 
 #define digitalToTemp(d) ((((float)d * (float)Vref) / (float)AdcN)) / ((float)Rt * 1E-6)

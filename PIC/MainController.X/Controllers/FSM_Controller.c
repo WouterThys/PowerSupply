@@ -213,7 +213,8 @@ static void transitionUpdateGLCD(StateMachine_t * sm) {
 // State handlers
 
 static void handleReadSupply(StateMachine_t * sm) {
-
+    splUpdateMeasuremnets();
+    splUpdateData(sm->supply_data);
 }
 
 static void handleRotary(StateMachine_t * sm) {
@@ -251,7 +252,14 @@ static void handleRotary(StateMachine_t * sm) {
 }
 
 static void handleWriteSupply(StateMachine_t * sm) {
+    if (sm->supply_data->setVoltage.changed) {
+        splSetVoltage(voltageToDigital(sm->supply_data->setVoltage.value));
+    }
 
+//    if (sm->supply_data->setCurrent.changed) {
+//        menuSetCurrentSet(sm->supply_id, sm->supply_data->setCurrent.value);
+//        splSetCurrent(currentToDigital)
+//    }
 }
 
 static void handleUpdateGLCD(StateMachine_t * sm) {
@@ -278,12 +286,14 @@ static void handleUpdateGLCD(StateMachine_t * sm) {
     }
 
     if (sm->supply_data->msrVoltage.changed) {
-        menuSetVoltageRead(sm->supply_id, sm->supply_data->msrVoltage.value);
+        uint16_t voltage = sm->supply_data->msrVoltage.value;
+        menuSetVoltageRead(sm->supply_id, digitalToVoltage(voltage));
         sm->supply_data->msrVoltage.changed = false;
     }
 
     if (sm->supply_data->msrCurrent.changed) {
-        menuSetCurrentRead(sm->supply_id, sm->supply_data->msrCurrent.value);
+        uint16_t current = sm->supply_data->msrCurrent.value;
+        menuSetCurrentRead(sm->supply_id, digitalToCurrent(current));
         sm->supply_data->msrCurrent.changed = false;
     }
 

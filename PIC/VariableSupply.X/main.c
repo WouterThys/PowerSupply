@@ -233,6 +233,8 @@ int main(void) {
     status.statusCode = STAT_RUNNING;
     updateStatus(status);
     
+    dacSetValueA(1000);
+    
     while(1) {
        
         if (i2cDone >= 0) {
@@ -287,7 +289,6 @@ int main(void) {
             
             // TODO: do this with interrupt or timer
             status.outputEnabled = OUTPUT_ON_Pin;
-            LED1 = !LED1;
         }
     }
 }
