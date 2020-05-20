@@ -6,7 +6,7 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include "Controllers/DAC_Controller.h"
 
-#define DEBUG       1
+#define DEBUG       0
 #define DEBUG_I2C   (1 & DEBUG)
 #define DEBUG_FSM   (1 & DEBUG)
     

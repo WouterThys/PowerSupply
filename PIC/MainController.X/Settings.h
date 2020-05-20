@@ -13,16 +13,17 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include <math.h>
 
-#define DEBUG       0           /* General debug enable                       */
+#define DEBUG       1           /* General debug enable                       */
 #define DEBUG_I2C  (0 & DEBUG)  /* I²C debug enable                           */
-#define DEBUG_FSM  (0 & DEBUG)  /* FSM debug enable                           */
-#define DEBUG_LCD  (1 & DEBUG)  /* LCD debug enable                           */
+#define DEBUG_FSM  (1 & DEBUG)  /* FSM debug enable                           */
+#define DEBUG_SPL  (1 & DEBUG)  /* Supply debug enable                        */
 
 
 /**
  * Interrupt priorities (Highest (7) - Lowest(1))
  */
 
+#define IP_U2RX      6
 #define IP_CN        5
 #define IP_MENU_TMR  4
 #define IP_TMR_4     3
@@ -75,22 +76,37 @@
 #define LED3_Dir        TRISBbits.TRISB0
     
 /**
- * UART
+ * UART1
  */      
 // Orange = RX
-// Geel = TX
-#define UART1_BAUD      19200 
-#define UART1_ID        2   
+// Yellow = TX
+#define UART1_BAUD      57600 
+#define UART1_ID        3   
 
-#define UART1_RX_Pin    PORTBbits.RB9       /* RX Pin on RP41-RB9            */
-#define UART1_TX_Pin    PORTBbits.RB8       /* TX Pin on RP40-RB8            */
-#define UART1_RX_Dir    TRISBbits.TRISB9    /* RX Pin on RP41-RB9            */
-#define UART1_TX_Dir    TRISBbits.TRISB8    /* TX Pin on RP40-RB8            */
+#define UART1_RX_Pin    PORTBbits.RB2       /* RX Pin on RPI34-RB2           */
+#define UART1_TX_Pin    PORTBbits.RB3       /* TX Pin on RP35-RB3            */
+#define UART1_RX_Dir    TRISBbits.TRISB2    
+#define UART1_TX_Dir    TRISBbits.TRISB3    
 
-#define UART1_RX_Map    0b0101001           /* RX on RP41                    */
-#define UART1_TX_Map    RPOR3bits.RP40R     /* TX on RP40                    */
+#define UART1_RX_Map    0b0100010           /* RX on RPI34                   */
+#define UART1_TX_Map    RPOR0bits.RP35R     /* TX on RP35                    */
 
 
+/**
+ * UART2
+ */      
+// Orange = RX
+// Yellow = TX
+#define UART2_BAUD      19200 
+#define UART2_ID        2   
+
+#define UART2_RX_Pin    PORTBbits.RB9       /* RX Pin on RP41-RB9            */
+#define UART2_TX_Pin    PORTBbits.RB8       /* TX Pin on RP40-RB8            */
+#define UART2_RX_Dir    TRISBbits.TRISB9    /* RX Pin on RP41-RB9            */
+#define UART2_TX_Dir    TRISBbits.TRISB8    /* TX Pin on RP40-RB8            */
+
+#define UART2_RX_Map    0b0101001           /* RX on RP41                    */
+#define UART2_TX_Map    RPOR3bits.RP40R     /* TX on RP40                    */
 
 /**
  * I²C
@@ -98,7 +114,6 @@
 #define I2C_MASTER      /* Or I2C_SLAVE                                       */
 #define I2C_WORD_WIDE   /* All data is send as 16-bit                         */
 #define I2C2
-#define I2C_ADDRESS     0x55   
 
 #define I2C_SCL_Dir     TRISBbits.TRISB6        /* SCL Direction              */
 #define I2C_SDA_Dir     TRISBbits.TRISB5        /* SDA Direction              */

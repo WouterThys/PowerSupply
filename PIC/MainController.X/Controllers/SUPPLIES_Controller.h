@@ -1,9 +1,16 @@
 #ifndef SUPLIES_CONTROLLER_H
 #define	SUPLIES_CONTROLLER_H
 
-#include <xc.h> // include processor files - each processor file is guarded.  
-#include "../../Common/CommonData.h"
+#include <xc.h> // include processor files - each processor file is guarded. 
+#include <stdio.h>
+#include <stdint.h>        /* Includes uint16_t definition                    */
+#include <stdbool.h>       /* Includes true/false definition                  */
 
+#include "../Utils.h"
+#include "../Settings.h"
+#include "../Drivers/I2C_Driver.h"
+#include "../Drivers/SYSTEM_Driver.h"
+#include "../../Common/CommonData.h"
 
 typedef struct {
     uint16_t value   : 15;          /* Value                                  */
@@ -11,33 +18,33 @@ typedef struct {
 } SupplyValue_t;
 
 typedef struct {
-    SupplyValue_t setVoltage;       /* Variable voltage                       */
-    SupplyValue_t setCurrent;       /* Maximum current                        */
-    SupplyValue_t msrVoltage;       /* Measured output voltage                */
-    SupplyValue_t msrCurrent;       /* Measured output current                */
-    SupplyValue_t msrTemperature;   /* Measured temperature of the LT3081     */
+    uint16_t      supply_id : 8;    /* Id of the supply                       */
+    uint16_t      i2c_address;      /* I2C address of the supply              */   
+    SupplyValue_t set_voltage;      /* Variable voltage                       */
+    SupplyValue_t set_current;      /* Maximum current                        */
+    SupplyValue_t msr_voltage;      /* Measured output voltage                */
+    SupplyValue_t msr_current;      /* Measured output current                */
+    SupplyValue_t msr_temperature;  /* Measured temperature of the LT3081     */
 } SupplyData_t;
 
 /**
  * Initialize supply connection:
- *  - Set data packets
  *  - Initialize I2C 
- * @param status
  * @param onError
  */
-void splInit(SupplyStatus_t * status, void (*onError)(Error_t error));
+void splInit(void (*onError)(Error_t error));
 
 /**
  * Set voltage of supply board, and write too I2C
- * @param voltage
+ * @param data
  */
-void splSetVoltage(uint16_t voltage);
+void splWriteVoltage(const SupplyData_t * data);
 
 /**
  * Set current of supply board, and write too I2C
- * @param current
+ * @param data
  */
-void splSetCurrent(uint16_t current);
+void splWriteCurrent(const SupplyData_t * data);
 
 /**
  * Set status of supply board
@@ -46,15 +53,11 @@ void splSetCurrent(uint16_t current);
 void splSetStatus(SupplyStatus_t status);
 
 /**
- * Read the measured data from supply board over I2C
- */
-void splUpdateMeasuremnets();
-
-/**
  * Update data packet with data within this supply controller
+ * @param status
  * @param data
  */
-void splUpdateData(SupplyData_t * data);
+void splUpdateData(SupplyStatus_t * status, SupplyData_t * data);
 
 /**
  * Update calibration state on supply board

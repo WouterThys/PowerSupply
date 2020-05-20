@@ -17,8 +17,10 @@
 #include "../Settings.h"
 #include "../Utils.h"
 #include "../Drivers/SYSTEM_Driver.h"
+#include "../Drivers/UART1_Driver.h"
 #include "../Drivers/ENC_Driver.h"
 #include "../Drivers/GLK19264A_Driver.h"
+#include "../Controllers/DEBUG_Controller.h"
 #include "../Controllers/MENU_Controller.h"
 #include "../Controllers/SUPPLIES_Controller.h"
 

@@ -78,7 +78,7 @@ static void uartDataRead(uint8_t data) {
 static void write(const uint8_t * command, const uint8_t length) {
     uint8_t i = 0;
     for (i = 0; i < length; i++) {
-        uartDriverWriteByte(command[i]);
+        uart2DriverWrite(command[i]);
     }
 }
 
@@ -91,8 +91,8 @@ void GLK_Init(buttonCallback callback) {
     btnCallback = callback;
 
     // Initialize UART
-    uartDriverInit(UART1_BAUD, uartDataRead);   
-    uartDriverEnable(true);
+    uart2DriverInit(UART2_BAUD, uartDataRead);   
+    uart2DriverEnable(true);
 }
 
 void GLK_WriteText(uint8_t x, uint8_t y, const char * text) {
@@ -104,7 +104,7 @@ void GLK_WriteText(uint8_t x, uint8_t y, const char * text) {
     uint8_t i = 0;
 
     while (c != 0) {
-        uartDriverWriteByte(c);
+        uart2DriverWrite(c);
         i++;
         c = text[i];
     }
@@ -155,12 +155,12 @@ void GLK_SetCursorCoordinate(uint8_t x, uint8_t y) {
 
 uint8_t * GLK_GetStringExtends(const char * text) {
 
-    uartDriverWriteByte(GET_STRING_EXTENDS[0]);
-    uartDriverWriteByte(GET_STRING_EXTENDS[1]);
+    uart2DriverWrite(GET_STRING_EXTENDS[0]);
+    uart2DriverWrite(GET_STRING_EXTENDS[1]);
     char c = text[0];
     uint8_t i = 0;
     while (c != 0) {
-        uartDriverWriteByte(c);
+        uart2DriverWrite(c);
         i++;
         c = text[i];
     }   
@@ -242,14 +242,14 @@ void GLK_InitializeScrollingLabel(uint8_t id, uint8_t x1, uint8_t y1, uint8_t x2
 
 void GLK_UpdateLabel(uint8_t id, const char * data) {
 
-    uartDriverWriteByte(UPDATE_LABEL[0]);
-    uartDriverWriteByte(UPDATE_LABEL[1]);
-    uartDriverWriteByte(id);
+    uart2DriverWrite(UPDATE_LABEL[0]);
+    uart2DriverWrite(UPDATE_LABEL[1]);
+    uart2DriverWrite(id);
     
     char c = 1;
     while (c != 0) {
         c = *(data++);
-        uartDriverWriteByte(c);
+        uart2DriverWrite(c);
     }
 }
 
@@ -488,26 +488,26 @@ void GLK_SetTypematicInterval(uint8_t interval) {
  *              MISC
  *******************************************************************************/
 void GLK_ReadVersionNumber(uint8_t * response) {
-    _U1RXIE = 0; // Disable interrupts
+    _U2RXIE = 0; // Disable interrupts
     write(READ_VERSION_NUMBER, 2);
     
-    _U1RXIF = 0; // Clear flag
+    _U2RXIF = 0; // Clear flag
     
-    while(_U1RXIF == 0);
-    *response = U1RXREG;
-    _U1RXIF = 0;
-    _U1RXIE = 1; // Enable interrupts
+    while(_U2RXIF == 0);
+    *response = U2RXREG;
+    _U2RXIF = 0;
+    _U2RXIE = 1; // Enable interrupts
     
 }
 
 void GLK_ReadModuleType(uint8_t * response) {
-    _U1RXIE = 0; // Disable interrupts
+    _U2RXIE = 0; // Disable interrupts
     write(READ_MODULE_NUMBER, 2);
     
-    while(_U1RXIF == 0);
-    *response = U1RXREG;
-    _U1RXIF = 0;
-    _U1RXIE = 1; // Enable interrupts
+    while(_U2RXIF == 0);
+    *response = U2RXREG;
+    _U2RXIF = 0;
+    _U2RXIE = 1; // Enable interrupts
 }
 
 

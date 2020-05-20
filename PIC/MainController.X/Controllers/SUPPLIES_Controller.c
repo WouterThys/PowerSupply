@@ -1,13 +1,3 @@
-#include <xc.h>
-#include <stdio.h>
-#include <stdint.h>        /* Includes uint16_t definition                    */
-#include <stdbool.h>       /* Includes true/false definition                  */
-
-#include "../Utils.h"
-#include "../Settings.h"
-#include "../Drivers/I2C_Driver.h"
-#include "../Drivers/SYSTEM_Driver.h"
-
 #include "SUPPLIES_Controller.h"
 
 /*******************************************************************************
@@ -33,14 +23,7 @@ static bool i2cCheckState(i2cPackage_t data);
  *          VARIABLES
  ******************************************************************************/
 static uint16_t dataArray[7];
-static uint16_t * setVoltage;
-static uint16_t * setCurrent;
-static uint16_t * msrVoltage;
-static uint16_t * msrCurrent;
-static uint16_t * msrTemperature;
-static uint16_t * msrCurrent_;
-
-static SupplyStatus_t * status;
+static uint16_t digital; // Converted value to write to supplies
 static i2cPackage_t i2cPackage;
 
 /*******************************************************************************
@@ -51,114 +34,115 @@ static i2cPackage_t i2cPackage;
  *          I²C
  ******************************************************************************/
 bool i2cCheckState(i2cPackage_t data) {
-    if (data.status < I2C_OK) {
-        Error_t error = { true, ES_I2C, data.status };
+    if (data.status < I2C_IDLE) {
+        Error_t error = {true, ES_I2C, data.status};
         (*onSupplyError)(error);
         return false;
-    } 
+    }
     return true;
 }
 
 /*******************************************************************************
  *          DRIVER FUNCTIONS
  ******************************************************************************/
-void splInit(SupplyStatus_t * s, void (*onError)(Error_t error)) {
-    
+void splInit(void (*onError)(Error_t error)) {
+
     // Event
     onSupplyError = onError;
-    
-    // Initialize pointers to buffer
-    setVoltage = &dataArray[I2C_COM_SET_V];
-    setCurrent = &dataArray[I2C_COM_SET_I];
-    msrVoltage = &dataArray[I2C_COM_MSR_V];
-    msrCurrent = &dataArray[I2C_COM_MSR_I];
-    msrTemperature = &dataArray[I2C_COM_MSR_T];
-    msrCurrent_ = &dataArray[I2C_COM_MSR_I_];
-    status = s;
-    
+
     // Initial values
-    i2cPackage.address = I2C_ADDRESS;
+    digital = 0;
+    i2cPackage.address = 0;
     i2cPackage.command = 0;
     i2cPackage.length = 0;
-    i2cPackage.data = setVoltage;
-    
+
     // I²C
     i2cDriverInit();
     i2cDriverEnable(true);
-    
-    if (DEBUG_I2C) printf("I2C ready \n");
 }
 
-void splSetVoltage(uint16_t voltage) {
+void splWriteVoltage(const SupplyData_t * data) {
+    if (data == NULL) return;
 
-    *setVoltage = voltage;
-    
-    // Send
+    // Convert to digital value
+    digital = voltageToDigital(data->set_voltage.value);
+
+    // Prepare
+    i2cPackage.address = data->i2c_address;
     i2cPackage.length = 1;
     i2cPackage.command = I2C_COM_SET_V;
-    i2cPackage.data = setVoltage;
-    
+    i2cPackage.data = &digital;
+
+    // Write
     i2cDriverWrite(&i2cPackage);
-    //i2cCheckState(i2cPackage);
-    
+
+    // Check
+    i2cCheckState(i2cPackage);
 }
 
-void splSetCurrent(uint16_t current) {
-    
-    *setCurrent = current;
-    
-    // Send
+void splWriteCurrent(const SupplyData_t * data) {
+    if (data == NULL) return;
+
+    // Convert to digital value
+    digital = currentToDigital(data->set_current.value);
+
+    // Prepare
+    i2cPackage.address = data->i2c_address;
     i2cPackage.length = 1;
     i2cPackage.command = I2C_COM_SET_I;
-    i2cPackage.data = setCurrent;
-    
+    i2cPackage.data = &digital;
+
+    // Write
     i2cDriverWrite(&i2cPackage);
+
+    // Check
     i2cCheckState(i2cPackage);
-    
 }
 
 void splSetCalibration(CalibrationFSM_t fsm) {
-    
-    uint16_t data[2] = { fsm.saveState, fsm.calibrationCount };
-    
+
+    uint16_t data[2] = {fsm.saveState, fsm.calibrationCount};
+
     // Send
+    //i2cPackage.address = data->i2c_address;
     i2cPackage.length = 2;
     i2cPackage.command = I2C_COM_CAL_STATE;
     i2cPackage.data = &data[0];
-    
+
     i2cDriverWrite(&i2cPackage);
     i2cCheckState(i2cPackage);
 }
 
-void splUpdateMeasuremnets() {
-    
+void splUpdateData(SupplyStatus_t * status, SupplyData_t * data) {
+    if (data == NULL) return;
+
+    // Prepare
+    i2cPackage.address = data->i2c_address;
     i2cPackage.length = 5; // Voltage, current, temperature, current_ and status
     i2cPackage.command = I2C_COM_MSR_V; // First thing to measure
     i2cPackage.data = &dataArray[I2C_COM_MSR_V];
-    
+
+    // Read
     i2cDriverRead(&i2cPackage);
-    i2cCheckState(i2cPackage);
-    
-    // Update status
-    status->value = dataArray[I2C_COM_STATUS];
-}
+    if (i2cCheckState(i2cPackage)) {
 
+        // Update status
+        status->value = dataArray[I2C_COM_STATUS];
 
-void splUpdateData(SupplyData_t * data) {
-    
-    if (data->msrVoltage.value != *msrVoltage) {
-        data->msrVoltage.value = *msrVoltage;
-        data->msrVoltage.changed = true;
+        // Update values
+        if (data->msr_voltage.value != dataArray[I2C_COM_MSR_V]) {
+            data->msr_voltage.value = dataArray[I2C_COM_MSR_V];
+            data->msr_voltage.changed = true;
+        }
+
+        if (data->msr_current.value != dataArray[I2C_COM_MSR_I]) {
+            data->msr_current.value = dataArray[I2C_COM_MSR_I];
+            data->msr_current.changed = true;
+        }
+
+        if (data->msr_temperature.value != dataArray[I2C_COM_MSR_T]) {
+            data->msr_temperature.value = dataArray[I2C_COM_MSR_T];
+            data->msr_temperature.changed = true;
+        }
     }
-    
-    if (data->msrCurrent.value != *msrCurrent) {
-        data->msrCurrent.value = *msrCurrent;
-        data->msrCurrent.changed = true;
-    }
-    
-    if (data->msrTemperature.value != *msrTemperature) {
-        data->msrTemperature.value = *msrTemperature;
-        data->msrTemperature.changed = true;
-    }
-    
 }

@@ -1,17 +1,9 @@
-/* 
- * File:   
- * Author: 
- * Comments:
- * Revision history: 
- */
-
-// This is a guard condition so that contents of this file are not included
-// more than once.  
 #ifndef I2C_DRIVER_H
 #define	I2C_DRIVER_H
 
 #include <xc.h> // include processor files - each processor file is guarded. 
 #include "../Settings.h"
+#include "../Controllers/DEBUG_Controller.h"
 
 /*******************************************************************************
  * DEFAULT SETTINGS

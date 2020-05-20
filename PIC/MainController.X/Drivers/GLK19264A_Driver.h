@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "../Settings.h"
-#include "UART_Driver.h"
+#include "UART2_Driver.h"
 
 #define BTN_TOP     'B'
 #define BTN_RIGHT   'C'

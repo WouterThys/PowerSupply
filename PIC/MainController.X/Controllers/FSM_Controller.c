@@ -69,13 +69,15 @@ static SupplyData_t supply_data[3];
  ******************************************************************************/
 static void initTimer();
 static void initRotary(uint8_t id, Rotary_t * rotary);
-static void initSupplyData(SupplyData_t * data, uint16_t defaultV, uint16_t defaultI);
+static void initSupplyData(uint8_t id, SupplyData_t * data, uint16_t address, uint16_t defaultV, uint16_t defaultI);
+static void initSupplyStatus(SupplyStatus_t * status);
 static void initMenu(uint8_t id, MenuState_t * menu);
 static void initFSM(uint8_t id, StateMachine_t *sm);
 static void handleButton();
 
 // Callback
 static void onButtonPressed(uint8_t btn);
+static void onUartDataRead(uint8_t data);
 static void onSupplyError(Error_t error);
 
 static void initTimer() {
@@ -112,14 +114,21 @@ static void initRotary(uint8_t id, Rotary_t * rotary) {
     rotary->turns = 0;
 }
 
-static void initSupplyData(SupplyData_t * data, uint16_t defaultV, uint16_t defaultI) {
-    data->setVoltage.value = defaultV;
-    data->setVoltage.changed = true;
-    data->setCurrent.value = defaultI;
-    data->setCurrent.changed = true;
-    data->msrVoltage.value = 0;
-    data->msrCurrent.value = 0;
-    data->msrTemperature.value = 0;
+static void initSupplyData(uint8_t id, SupplyData_t * data, uint16_t address, uint16_t defaultV, uint16_t defaultI) {
+    data->supply_id = id;
+    data->i2c_address = address;
+
+    data->set_voltage.value = defaultV;
+    data->set_voltage.changed = true;
+    data->set_current.value = defaultI;
+    data->set_current.changed = true;
+    data->msr_voltage.value = 0;
+    data->msr_current.value = 0;
+    data->msr_temperature.value = 0;
+}
+
+static void initSupplyStatus(SupplyStatus_t * status) {
+    status->value = 0x0000;
 }
 
 static void initFSM(uint8_t id, StateMachine_t *sm) {
@@ -186,8 +195,16 @@ static void onButtonPressed(uint8_t btn) {
     button = btn;
 }
 
-static void onSupplyError(Error_t error) {
+static void onUartDataRead(uint8_t data) {
 
+}
+
+static void onSupplyError(Error_t error) {
+    if (error.hasError) {
+        if (error.source == ES_I2C) {
+            dbgPrintI2CError(error.code);
+        }
+    }
 }
 
 static void transitionReadSupply(StateMachine_t * sm) {
@@ -213,8 +230,10 @@ static void transitionUpdateGLCD(StateMachine_t * sm) {
 // State handlers
 
 static void handleReadSupply(StateMachine_t * sm) {
-    splUpdateMeasuremnets();
-    splUpdateData(sm->supply_data);
+    // TODO: for all supplies
+    if (sm->supply_id == SUPPLY_1) {
+        splUpdateData(sm->supply_status, sm->supply_data);
+    }
 }
 
 static void handleRotary(StateMachine_t * sm) {
@@ -223,7 +242,7 @@ static void handleRotary(StateMachine_t * sm) {
     if (turns != 0) {
         if (sm->menu_state->voltage) {
             int16_t change = turns * VOLTAGE_STEP;
-            int16_t value = sm->supply_data->setVoltage.value;
+            int16_t value = sm->supply_data->set_voltage.value;
             value += change;
             if (value < VOLTAGE_MIN) {
                 value = VOLTAGE_MIN;
@@ -231,12 +250,12 @@ static void handleRotary(StateMachine_t * sm) {
             if (value > VOLTAGE_MAX) {
                 value = VOLTAGE_MAX;
             }
-            sm->supply_data->setVoltage.value = (uint16_t) value;
-            sm->supply_data->setVoltage.changed = true;
+            sm->supply_data->set_voltage.value = (uint16_t) value;
+            sm->supply_data->set_voltage.changed = true;
 
         } else {
             int16_t change = turns * CURRENT_STEP;
-            int16_t value = sm->supply_data->setCurrent.value;
+            int16_t value = sm->supply_data->set_current.value;
             value += change;
             if (value < CURRENT_MIN) {
                 value = CURRENT_MIN;
@@ -244,22 +263,26 @@ static void handleRotary(StateMachine_t * sm) {
             if (value > CURRENT_MAX) {
                 value = CURRENT_MAX;
             }
-            sm->supply_data->setCurrent.value = (uint16_t) value;
-            sm->supply_data->setCurrent.changed = true;
+            sm->supply_data->set_current.value = (uint16_t) value;
+            sm->supply_data->set_current.changed = true;
 
         }
     }
 }
 
 static void handleWriteSupply(StateMachine_t * sm) {
-    if (sm->supply_data->setVoltage.changed) {
-        splSetVoltage(voltageToDigital(sm->supply_data->setVoltage.value));
+
+    // TODO: for all supplies
+    if (sm->supply_id == SUPPLY_1) {
+        if (sm->supply_data->set_voltage.changed) {
+            splWriteVoltage(sm->supply_data);
+        }
     }
 
-//    if (sm->supply_data->setCurrent.changed) {
-//        menuSetCurrentSet(sm->supply_id, sm->supply_data->setCurrent.value);
-//        splSetCurrent(currentToDigital)
-//    }
+    //    if (sm->supply_data->setCurrent.changed) {
+    //        menuSetCurrentSet(sm->supply_id, sm->supply_data->setCurrent.value);
+    //        splSetCurrent(currentToDigital)
+    //    }
 }
 
 static void handleUpdateGLCD(StateMachine_t * sm) {
@@ -274,27 +297,27 @@ static void handleUpdateGLCD(StateMachine_t * sm) {
         }
         sm->menu_state->updateSelection = false;
     }
-    
-    if (sm->supply_data->setVoltage.changed) {
-        menuSetVoltageSet(sm->supply_id, sm->supply_data->setVoltage.value);
-        sm->supply_data->setVoltage.changed = false;
+
+    if (sm->supply_data->set_voltage.changed) {
+        menuSetVoltageSet(sm->supply_id, sm->supply_data->set_voltage.value);
+        sm->supply_data->set_voltage.changed = false;
     }
 
-    if (sm->supply_data->setCurrent.changed) {
-        menuSetCurrentSet(sm->supply_id, sm->supply_data->setCurrent.value);
-        sm->supply_data->setCurrent.changed = false;
+    if (sm->supply_data->set_current.changed) {
+        menuSetCurrentSet(sm->supply_id, sm->supply_data->set_current.value);
+        sm->supply_data->set_current.changed = false;
     }
 
-    if (sm->supply_data->msrVoltage.changed) {
-        uint16_t voltage = sm->supply_data->msrVoltage.value;
+    if (sm->supply_data->msr_voltage.changed) {
+        uint16_t voltage = sm->supply_data->msr_voltage.value;
         menuSetVoltageRead(sm->supply_id, digitalToVoltage(voltage));
-        sm->supply_data->msrVoltage.changed = false;
+        sm->supply_data->msr_voltage.changed = false;
     }
 
-    if (sm->supply_data->msrCurrent.changed) {
-        uint16_t current = sm->supply_data->msrCurrent.value;
+    if (sm->supply_data->msr_current.changed) {
+        uint16_t current = sm->supply_data->msr_current.value;
         menuSetCurrentRead(sm->supply_id, digitalToCurrent(current));
-        sm->supply_data->msrCurrent.changed = false;
+        sm->supply_data->msr_current.changed = false;
     }
 
     current_fsm++;
@@ -308,6 +331,10 @@ static void handleUpdateGLCD(StateMachine_t * sm) {
  ******************************************************************************/
 void fsmInit() {
 
+    // For debugging
+    uart1DriverInit(UART1_BAUD, &onUartDataRead);
+    uart1DriverEnable(true);
+
     // Setup timer
     initTimer();
 
@@ -315,8 +342,7 @@ void fsmInit() {
     encDriverInit();
 
     // Initialize supplies controller
-    // TODO: multiple supplies!!!!!!!!!
-    splInit(&(supply_status[0]), &onSupplyError);
+    splInit(&onSupplyError);
 
     // Initialize rotary-encoders
     initRotary(SUPPLY_1, &(rotaries[SUPPLY_1]));
@@ -324,9 +350,14 @@ void fsmInit() {
     initRotary(SUPPLY_3, &(rotaries[SUPPLY_3]));
 
     // Initialize supply-data
-    initSupplyData(&(supply_data[SUPPLY_1]), DEFAULT_V, DEFAULT_I);
-    initSupplyData(&(supply_data[SUPPLY_2]), DEFAULT_V, DEFAULT_I);
-    initSupplyData(&(supply_data[SUPPLY_3]), DEFAULT_V, DEFAULT_I);
+    initSupplyData(SUPPLY_1, &(supply_data[SUPPLY_1]), I2C_ADDRESS_1, DEFAULT_V_1, DEFAULT_I_1);
+    initSupplyData(SUPPLY_2, &(supply_data[SUPPLY_2]), I2C_ADDRESS_2, DEFAULT_V_2, DEFAULT_I_2);
+    initSupplyData(SUPPLY_3, &(supply_data[SUPPLY_3]), I2C_ADDRESS_3, DEFAULT_V_3, DEFAULT_I_3);
+
+    // Initialize supply-status
+    initSupplyStatus(&(supply_status[SUPPLY_1]));
+    initSupplyStatus(&(supply_status[SUPPLY_2]));
+    initSupplyStatus(&(supply_status[SUPPLY_3]));
 
     // Initialize menu-states
     initMenu(SUPPLY_1, &(menus[SUPPLY_1]));
@@ -346,6 +377,11 @@ void fsmInit() {
 
     current_supply = SUPPLY_1;
     current_fsm = 0;
+
+    // Debug
+    if (DEBUG_FSM) {
+        printf("Ready!\n");
+    }
 }
 
 void fsmExecute() {

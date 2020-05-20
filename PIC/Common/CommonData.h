@@ -8,10 +8,6 @@
 /*      COMMON DEFINES                                                        */
 /******************************************************************************/
 
-#define SUPPLY_1            0
-#define SUPPLY_2            1
-#define SUPPLY_3            2
-
 #define Rs          0.1     /* Sense resistance                               */
 #define Rt          21500   /* Temperature resitance                          */
 #define Igain       20      /* Current sense amplifier gain                   */
@@ -21,8 +17,20 @@
 #define DacN        pow(2, 12)
 #define Vref        2.048
 
-#define DEFAULT_V   400
-#define DEFAULT_I   400
+#define SUPPLY_1            0
+#define I2C_ADDRESS_1       0x55
+#define DEFAULT_V_1         5000
+#define DEFAULT_I_1         1000
+
+#define SUPPLY_2            1
+#define I2C_ADDRESS_2       0x66
+#define DEFAULT_V_2         3300
+#define DEFAULT_I_2         1000
+
+#define SUPPLY_3            2
+#define I2C_ADDRESS_3       0x77
+#define DEFAULT_V_3         1800
+#define DEFAULT_I_3         1000
 
 #define I2C_COM_SET_V       0
 #define I2C_COM_SET_I       1

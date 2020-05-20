@@ -583,7 +583,7 @@ void i2cDriverRead(i2cPackage_t * data) {
     uint16_t i;
     if (DEBUG_I2C) {
         for (i = 0; i < data->length; i++) {
-            printf(" - %d = %d\n", i, (uint8_t)tmp[i]);
+            dbgPrintI2cData(i, (uint8_t)tmp[i]);
         }
     }
     

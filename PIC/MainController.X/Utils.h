@@ -17,7 +17,7 @@
 #define voltageToDigital(v) (((((float)v / 1000) * (float)DacN) / ((float)Vref)) / (float)Vgain)
 
 #define digitalToCurrent(d) ((((((float)d * (float)Vref) / ((float)AdcN)) * 1000) / ((float)Rs * (float)Igain)) * 1000)
-#define currentToDigital(i) ()
+#define currentToDigital(i) (i)
 
 #define digitalToTemp(d) ((((float)d * (float)Vref) / (float)AdcN)) / ((float)Rt * 1E-6)
 
