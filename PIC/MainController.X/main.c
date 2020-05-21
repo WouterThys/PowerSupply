@@ -42,9 +42,8 @@
  *          LOCAL FUNCTIONS
  ******************************************************************************/
 static void initialize();
-static void printStatus(SupplyStatus_t status);
-static void printI2CError(int16_t errorCode);
 
+// Callback
 static void onError(Error_t error);
 static void onSysError(int16_t error);
 

@@ -13,9 +13,11 @@
  *          LOCAL FUNCTION DEFINES
  ******************************************************************************/
 
-/* Event function pointers */
+// Callback
 static void (*onSupplyError)(Error_t error);
 
+//
+static void preparePackage(i2cPackage_t * package, uint8_t address, uint8_t command, uint8_t length, uint16_t * data);
 static bool i2cCheckState(i2cPackage_t data);
 
 
@@ -33,13 +35,22 @@ static i2cPackage_t i2cPackage;
 /*******************************************************************************
  *          I²C
  ******************************************************************************/
-bool i2cCheckState(i2cPackage_t data) {
+static bool i2cCheckState(i2cPackage_t data) {
     if (data.status < I2C_IDLE) {
         Error_t error = {true, ES_I2C, data.status};
         (*onSupplyError)(error);
+        i2cDriverReset(); // Clear errors
         return false;
     }
     return true;
+}
+
+static void preparePackage(i2cPackage_t * package, uint8_t address, uint8_t command, uint8_t length, uint16_t * data) {
+    package->address = address;
+    package->command = command;
+    package->status = I2C_IDLE;
+    package->length = length;
+    package->data = data;
 }
 
 /*******************************************************************************
@@ -68,10 +79,7 @@ void splWriteVoltage(const SupplyData_t * data) {
     digital = voltageToDigital(data->set_voltage.value);
 
     // Prepare
-    i2cPackage.address = data->i2c_address;
-    i2cPackage.length = 1;
-    i2cPackage.command = I2C_COM_SET_V;
-    i2cPackage.data = &digital;
+    preparePackage(&i2cPackage, data->i2c_address, I2C_COM_SET_V, 1, &digital);
 
     // Write
     i2cDriverWrite(&i2cPackage);
@@ -87,11 +95,8 @@ void splWriteCurrent(const SupplyData_t * data) {
     digital = currentToDigital(data->set_current.value);
 
     // Prepare
-    i2cPackage.address = data->i2c_address;
-    i2cPackage.length = 1;
-    i2cPackage.command = I2C_COM_SET_I;
-    i2cPackage.data = &digital;
-
+    preparePackage(&i2cPackage, data->i2c_address, I2C_COM_SET_I, 1, &digital);
+    
     // Write
     i2cDriverWrite(&i2cPackage);
 
@@ -117,17 +122,16 @@ void splUpdateData(SupplyStatus_t * status, SupplyData_t * data) {
     if (data == NULL) return;
 
     // Prepare
-    i2cPackage.address = data->i2c_address;
-    i2cPackage.length = 5; // Voltage, current, temperature, current_ and status
-    i2cPackage.command = I2C_COM_MSR_V; // First thing to measure
-    i2cPackage.data = &dataArray[I2C_COM_MSR_V];
+    preparePackage(&i2cPackage, data->i2c_address, I2C_COM_MSR_V, 5, &dataArray[I2C_COM_MSR_V]);
 
     // Read
     i2cDriverRead(&i2cPackage);
-    if (i2cCheckState(i2cPackage)) {
 
-        // Update status
-        status->value = dataArray[I2C_COM_STATUS];
+    // Update status
+    status->value = dataArray[I2C_COM_STATUS];
+
+    // Check and update
+    if (i2cCheckState(i2cPackage)) {
 
         // Update values
         if (data->msr_voltage.value != dataArray[I2C_COM_MSR_V]) {

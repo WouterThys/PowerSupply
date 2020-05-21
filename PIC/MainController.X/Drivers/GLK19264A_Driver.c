@@ -1,70 +1,77 @@
 #include "GLK19264A_Driver.h"
 
+#include "Bitmaps.h"
 
 /********************************************************************************
  *              COMMANDS 
  *******************************************************************************/
 // COMMUNICATION
-static const uint8_t CHANGE_BAUD_RATE[2]    = {0xFE, 0x39};
+static const uint8_t CHANGE_BAUD_RATE[2] = {0xFE, 0x39};
 
 // TEXT
-static const uint8_t CLEAR_SCREEN[2]        = {0xFE, 0x58};
-static const uint8_t GO_HOME[2]             = {0xFE, 0x48};
-static const uint8_t SET_CURSOR_POS[2]      = {0xFE, 0x47};
-static const uint8_t SET_CURSOR_COORD[2]    = {0xFE, 0x79};
-static const uint8_t GET_STRING_EXTENDS[2]  = {0xFE, 0x29};
-static const uint8_t INIT_TEXT_WINDOW[2]    = {0xFE, 0x2B};
-static const uint8_t SET_TEXT_WINDOW[2]     = {0xFE, 0x2A};
-static const uint8_t CLEAR_TEXT_WINDOW[2]   = {0xFE, 0x2C};
-static const uint8_t INIT_LABEL[2]          = {0xFE, 0x2D};
-static const uint8_t INIT_SCROLLING_LABEL[2]= {0xFE, 0x2F};
-static const uint8_t UPDATE_LABEL[2]        = {0xFE, 0x2E};
-static const uint8_t AUTO_SCROLL_ON[2]      = {0xFE, 0x51};
-static const uint8_t AUTO_SCROLL_OFF[2]     = {0xFE, 0x52};
+static const uint8_t CLEAR_SCREEN[2] = {0xFE, 0x58};
+static const uint8_t GO_HOME[2] = {0xFE, 0x48};
+static const uint8_t SET_CURSOR_POS[2] = {0xFE, 0x47};
+static const uint8_t SET_CURSOR_COORD[2] = {0xFE, 0x79};
+static const uint8_t GET_STRING_EXTENDS[2] = {0xFE, 0x29};
+static const uint8_t INIT_TEXT_WINDOW[2] = {0xFE, 0x2B};
+static const uint8_t SET_TEXT_WINDOW[2] = {0xFE, 0x2A};
+static const uint8_t CLEAR_TEXT_WINDOW[2] = {0xFE, 0x2C};
+static const uint8_t INIT_LABEL[2] = {0xFE, 0x2D};
+static const uint8_t INIT_SCROLLING_LABEL[2] = {0xFE, 0x2F};
+static const uint8_t UPDATE_LABEL[2] = {0xFE, 0x2E};
+static const uint8_t AUTO_SCROLL_ON[2] = {0xFE, 0x51};
+static const uint8_t AUTO_SCROLL_OFF[2] = {0xFE, 0x52};
 
 // DAWING
-static const uint8_t SET_DRAWING_COLOR[2]   = {0xFE, 0x63};
-static const uint8_t DRAW_PIXEL[2]          = {0xFE, 0x70};
-static const uint8_t DRAW_LINE[2]           = {0xFE, 0x6C};
-static const uint8_t CONTINUE_LINE[2]       = {0xFE, 0x65};
-static const uint8_t DRAW_RECTANGLE[2]      = {0xFE, 0x72};
-static const uint8_t DRAW_FILLED_RECT[2]    = {0xFE, 0x78};
-static const uint8_t DRAW_ROUNDED_RECT[2]   = {0xFE, 0x80};
-static const uint8_t DRAW_CIRCLE[2]         = {0xFE, 0x7B};
-static const uint8_t DRAW_FILLED_CIRCLE[2]  = {0xFE, 0x7C};
+static const uint8_t SET_DRAWING_COLOR[2] = {0xFE, 0x63};
+static const uint8_t DRAW_PIXEL[2] = {0xFE, 0x70};
+static const uint8_t DRAW_LINE[2] = {0xFE, 0x6C};
+static const uint8_t CONTINUE_LINE[2] = {0xFE, 0x65};
+static const uint8_t DRAW_RECTANGLE[2] = {0xFE, 0x72};
+static const uint8_t DRAW_FILLED_RECT[2] = {0xFE, 0x78};
+static const uint8_t DRAW_ROUNDED_RECT[2] = {0xFE, 0x80};
+static const uint8_t DRAW_CIRCLE[2] = {0xFE, 0x7B};
+static const uint8_t DRAW_FILLED_CIRCLE[2] = {0xFE, 0x7C};
+
+// BITMAPS
+static const uint8_t UPLOAD_BITMAP_FILE[2] = {0xFE, 0x5E};
+static const uint8_t UPLOAD_BITMAP_MASK[3] = {0xFE, 0x5C, 0x05};
+static const uint8_t DRAW_BITMAP[2] = {0xFE, 0x62};
 
 // GPIO
-static const uint8_t GPO_ON[2]              = {0xFE, 0x57};
-static const uint8_t GPO_OFF[2]             = {0xFE, 0x56};
-static const uint8_t SET_START_UP_STATE[2]  = {0xFE, 0xC3};
+static const uint8_t GPO_ON[2] = {0xFE, 0x57};
+static const uint8_t GPO_OFF[2] = {0xFE, 0x56};
+static const uint8_t SET_START_UP_STATE[2] = {0xFE, 0xC3};
 
 // LED Indicators
-static const uint8_t SET_LED_INDICATORS[2]  = {0xFE, 0x5A};
+static const uint8_t SET_LED_INDICATORS[2] = {0xFE, 0x5A};
 
 // KEYPAD
-static const uint8_t AUTO_TRANSMIT_KEY_ON[2]= {0xFE, 0x41};
-static const uint8_t AUTO_TRANSMIT_KEY_OFF[2]={0xFE, 0x4F};
-static const uint8_t POLL_KEY_PRESS[2]      = {0xFE, 0x26};
-static const uint8_t CLEAR_KEY_BUFFER[2]    = {0xFE, 0x45};
-static const uint8_t SET_DEBOUNCE_TIME[2]   = {0xFE, 0x55};
-static const uint8_t SET_AUTO_REPEAT_MODE[2]= {0xFE, 0x7E};
-static const uint8_t AUTO_REPEAT_MODE_OFF[2]= {0xFE, 0x60};
+static const uint8_t AUTO_TRANSMIT_KEY_ON[2] = {0xFE, 0x41};
+static const uint8_t AUTO_TRANSMIT_KEY_OFF[2] = {0xFE, 0x4F};
+static const uint8_t POLL_KEY_PRESS[2] = {0xFE, 0x26};
+static const uint8_t CLEAR_KEY_BUFFER[2] = {0xFE, 0x45};
+static const uint8_t SET_DEBOUNCE_TIME[2] = {0xFE, 0x55};
+static const uint8_t SET_AUTO_REPEAT_MODE[2] = {0xFE, 0x7E};
+static const uint8_t AUTO_REPEAT_MODE_OFF[2] = {0xFE, 0x60};
 static const uint8_t ASSIGN_KEYPAD_CODES[2] = {0xFE, 0xD5};
-static const uint8_t KEYPAD_BACKLIGHT_OFF[2]= {0xFE, 0x9B};
-static const uint8_t SET_KEYPAD_BRIGHTNESS[2]={0xFE, 0x9C};
-static const uint8_t SET_AUTO_BACKLIGHT[2]   ={0xFE, 0x9D};
-static const uint8_t SET_TYPEMATIC_DELAY[2]  ={0xFE, 0x9F};
-static const uint8_t SET_TYPEMATIC_INTERVAL[2]={0xFE, 0x9E};
+static const uint8_t KEYPAD_BACKLIGHT_OFF[2] = {0xFE, 0x9B};
+static const uint8_t SET_KEYPAD_BRIGHTNESS[2] = {0xFE, 0x9C};
+static const uint8_t SET_AUTO_BACKLIGHT[2] = {0xFE, 0x9D};
+static const uint8_t SET_TYPEMATIC_DELAY[2] = {0xFE, 0x9F};
+static const uint8_t SET_TYPEMATIC_INTERVAL[2] = {0xFE, 0x9E};
 
 // MISC
 static const uint8_t READ_VERSION_NUMBER[2] = {0xFE, 0x36};
-static const uint8_t READ_MODULE_NUMBER[2]  = {0xFE, 0x37};
+static const uint8_t READ_MODULE_NUMBER[2] = {0xFE, 0x37};
 
 /********************************************************************************
  *              PROTOTYPES 
  *******************************************************************************/
 static void uartDataRead(uint8_t data);
 static void write(const uint8_t * command, const uint8_t length);
+static void read(uint8_t * data);
 static buttonCallback btnCallback;
 
 /********************************************************************************
@@ -82,6 +89,12 @@ static void write(const uint8_t * command, const uint8_t length) {
     }
 }
 
+static void read(uint8_t * data) {
+    while (_U2RXIF == 0);
+    *data = U2RXREG;
+    _U2RXIF = 0;
+}
+
 /********************************************************************************
  *              DRIVER FUNCTIONS
  *******************************************************************************/
@@ -91,15 +104,21 @@ void GLK_Init(buttonCallback callback) {
     btnCallback = callback;
 
     // Initialize UART
-    uart2DriverInit(UART2_BAUD, uartDataRead);   
+    uart2DriverInit(UART2_BAUD, uartDataRead);
     uart2DriverEnable(true);
+
+    // Write bitmaps
+    if (UPLOAD_BITMAPS) {
+        GLK_UploadBitmapFile(CHECK_FALSE_ID, CHECK_FALSE_SIZE, &(_check_false[0]));
+        GLK_UploadBitmapFile(CHECK_TRUE_ID, CHECK_TRUE_SIZE, &(_check_true[0]));
+    }
 }
 
 void GLK_WriteText(uint8_t x, uint8_t y, const char * text) {
 
     // Go to positions
     GLK_SetCursorCoordinate(x, y);
-    
+
     char c = text[0];
     uint8_t i = 0;
 
@@ -109,7 +128,6 @@ void GLK_WriteText(uint8_t x, uint8_t y, const char * text) {
         c = text[i];
     }
 }
-
 
 /********************************************************************************
  *              COMMUNICATION
@@ -163,7 +181,7 @@ uint8_t * GLK_GetStringExtends(const char * text) {
         uart2DriverWrite(c);
         i++;
         c = text[i];
-    }   
+    }
     return 0;
 }
 
@@ -192,7 +210,6 @@ void GLK_SetTextWindow(uint8_t id) {
     write(data, 3);
 }
 
-
 void GLK_ClearTextWindow(uint8_t id) {
     uint8_t data[3];
     data[0] = CLEAR_TEXT_WINDOW[0];
@@ -200,7 +217,6 @@ void GLK_ClearTextWindow(uint8_t id) {
     data[2] = id;
     write(data, 3);
 }
-
 
 void GLK_InitializeLabel(uint8_t id, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t vert, uint8_t hor, uint16_t font, uint8_t background, uint8_t char_space) {
     uint8_t data[13];
@@ -245,7 +261,7 @@ void GLK_UpdateLabel(uint8_t id, const char * data) {
     uart2DriverWrite(UPDATE_LABEL[0]);
     uart2DriverWrite(UPDATE_LABEL[1]);
     uart2DriverWrite(id);
-    
+
     char c = 1;
     while (c != 0) {
         c = *(data++);
@@ -257,12 +273,9 @@ void GLK_AutoScrollOn(void) {
     write(AUTO_SCROLL_ON, 2);
 }
 
-
 void GLK_AutoScrollOff(void) {
     write(AUTO_SCROLL_OFF, 2);
 }
-
-
 
 /********************************************************************************
  *              DRAWING
@@ -275,7 +288,6 @@ void GLK_SetDrawingColor(uint8_t color) {
     write(data, 3);
 }
 
-
 void GLK_DrawPixel(uint8_t x, uint8_t y) {
     uint8_t data[4];
     data[0] = DRAW_PIXEL[0];
@@ -284,7 +296,6 @@ void GLK_DrawPixel(uint8_t x, uint8_t y) {
     data[3] = y;
     write(data, 4);
 }
-
 
 void GLK_DrawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
     uint8_t data[6];
@@ -296,7 +307,6 @@ void GLK_DrawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
     data[5] = y2;
     write(data, 6);
 }
-
 
 void GLK_ContinueLine(uint8_t x, uint8_t y) {
     uint8_t data[4];
@@ -361,6 +371,94 @@ void GLK_DrawFilledCircle(uint8_t x, uint8_t y, uint8_t radius) {
     data[3] = y;
     data[4] = radius;
     write(data, 5);
+}
+
+/********************************************************************************
+ *              BITMAPS
+ *******************************************************************************/
+
+void GLK_UploadBitmapFile(uint16_t id, uint32_t size, const uint8_t * data) {
+
+    // Disable interrupts
+    _U2RXIE = 0;
+    uint8_t response = 0;
+
+    // Command
+    uart2DriverWrite(UPLOAD_BITMAP_FILE[0]);
+    uart2DriverWrite(UPLOAD_BITMAP_FILE[1]);
+
+    // Id
+    uart2DriverWrite(id & 0x00FF);
+    uart2DriverWrite((id >> 8) & 0x00FF);
+
+    // Size
+    uart2DriverWrite(size & 0x00FF);
+    uart2DriverWrite((size >> 8) & 0x00FF);
+    uart2DriverWrite((size >> 16) & 0x00FF);
+    uart2DriverWrite((size >> 24) & 0x00FF);
+
+    // Wait for ACK
+    read(&response);
+    if (response != 1) {
+        // Failed
+        return;
+    }
+
+    // Data
+    uint8_t i;
+    uint8_t d;
+    uint8_t ack = 0;
+    for (i = 0; i < size; i++) {
+        do {
+            d = data[i];
+            uart2DriverWrite(d);
+            read(&response);
+            if (response == d) {
+                ack = 1;
+            } else {
+                ack = 8;
+            }
+            uart2DriverWrite(ack);
+        } while (ack != 1);
+    }
+
+    // Enable interrupts again
+    _U2RXIE = 1;
+}
+
+void GLK_UploadBitmapMask(uint16_t id, uint32_t size, const uint8_t * data) {
+
+    // Command
+    uart2DriverWrite(UPLOAD_BITMAP_MASK[0]);
+    uart2DriverWrite(UPLOAD_BITMAP_MASK[1]);
+    uart2DriverWrite(UPLOAD_BITMAP_MASK[2]);
+
+    // Id
+    uart2DriverWrite(id & 0x00FF);
+    uart2DriverWrite((id >> 8) & 0x00FF);
+
+    // Size
+    uart2DriverWrite(size & 0x000000FF);
+    uart2DriverWrite((size >> 8) & 0x000000FF);
+    uart2DriverWrite((size >> 16) & 0x000000FF);
+    uart2DriverWrite((size >> 24) & 0x000000FF);
+
+    // Data
+    uint8_t i;
+    for (i = 0; i < size; i++) {
+        uart2DriverWrite(data[i]);
+    }
+}
+
+void GLK_DrawBitmapFromMemory(uint16_t id, uint8_t x, uint8_t y) {
+    uint8_t data[6];
+    data[0] = DRAW_BITMAP[0];
+    data[1] = DRAW_BITMAP[1];
+    data[2] = id & 0x00FF;
+    data[3] = (id >> 8) & 0x00FF;
+    data[4] = x;
+    data[5] = y;
+    write(data, 6);
 }
 
 /********************************************************************************
@@ -490,21 +588,21 @@ void GLK_SetTypematicInterval(uint8_t interval) {
 void GLK_ReadVersionNumber(uint8_t * response) {
     _U2RXIE = 0; // Disable interrupts
     write(READ_VERSION_NUMBER, 2);
-    
+
     _U2RXIF = 0; // Clear flag
-    
-    while(_U2RXIF == 0);
+
+    while (_U2RXIF == 0);
     *response = U2RXREG;
     _U2RXIF = 0;
     _U2RXIE = 1; // Enable interrupts
-    
+
 }
 
 void GLK_ReadModuleType(uint8_t * response) {
     _U2RXIE = 0; // Disable interrupts
     write(READ_MODULE_NUMBER, 2);
-    
-    while(_U2RXIF == 0);
+
+    while (_U2RXIF == 0);
     *response = U2RXREG;
     _U2RXIF = 0;
     _U2RXIE = 1; // Enable interrupts

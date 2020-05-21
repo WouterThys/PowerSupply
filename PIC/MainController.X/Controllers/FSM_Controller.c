@@ -42,12 +42,14 @@ static void transitionReadSupply(StateMachine_t * sm);
 static void transitionRotary(StateMachine_t * sm);
 static void transitionWriteSupply(StateMachine_t * sm);
 static void transitionUpdateGLCD(StateMachine_t * sm);
+static void transitionDebug(StateMachine_t * sm);
 
 // State handlers
 static void handleReadSupply(StateMachine_t * sm);
 static void handleRotary(StateMachine_t * sm);
 static void handleWriteSupply(StateMachine_t * sm);
 static void handleUpdateGLCD(StateMachine_t * sm);
+static void handleDebug(StateMachine_t * sm);
 
 /*******************************************************************************
  *          VARIABLES
@@ -93,7 +95,7 @@ static void initTimer() {
     float fT = 0;
     if (DEBUG) {
         fT = (float) FCY / 256; // Timer frequency = FCY / TCKPS
-        PR4 = (4 * (float) T4_PERIOD / 1000) * fT; // Interrupt period Ti = PR4 * tT 
+        PR4 = (2 * (float) T4_PERIOD / 1000) * fT; // Interrupt period Ti = PR4 * tT 
     } else {
         fT = (float) FCY / 256; // Timer frequency = FCY / TCKPS
         PR4 = ((float) T4_PERIOD / 1000) * fT; // Interrupt period Ti = PR4 * tT 
@@ -157,6 +159,7 @@ static void handleButton() {
 
         switch (button) {
             default:
+                dbgPrintLcdCallback(button);
                 break;
 
             case BTN_LEFT:
@@ -202,7 +205,7 @@ static void onUartDataRead(uint8_t data) {
 static void onSupplyError(Error_t error) {
     if (error.hasError) {
         if (error.source == ES_I2C) {
-            dbgPrintI2CError(error.code);
+            dbgPrintI2CError(current_fsm, error.code);
         }
     }
 }
@@ -223,17 +226,21 @@ static void transitionWriteSupply(StateMachine_t * sm) {
 }
 
 static void transitionUpdateGLCD(StateMachine_t * sm) {
-    sm->transition = transitionReadSupply;
+    sm->transition = transitionDebug;
     sm->handler = handleUpdateGLCD;
+}
+
+static void transitionDebug(StateMachine_t * sm) {
+    sm->transition = transitionReadSupply;
+    sm->handler = handleDebug;
 }
 
 // State handlers
 
 static void handleReadSupply(StateMachine_t * sm) {
-    // TODO: for all supplies
-    if (sm->supply_id == SUPPLY_1) {
-        splUpdateData(sm->supply_status, sm->supply_data);
-    }
+    //if (sm->supply_id != SUPPLY_1) return;
+
+    splUpdateData(sm->supply_status, sm->supply_data);
 }
 
 static void handleRotary(StateMachine_t * sm) {
@@ -254,8 +261,22 @@ static void handleRotary(StateMachine_t * sm) {
             sm->supply_data->set_voltage.changed = true;
 
         } else {
-            int16_t change = turns * CURRENT_STEP;
             int16_t value = sm->supply_data->set_current.value;
+            int16_t change = 0;
+            if (turns > 0) {
+                if (value >= CURRENT_MAX_STEP) {
+                    change = turns * CURRENT_MAX_STEP;
+                } else {
+                    change = turns * CURRENT_MIN_STEP;
+                }
+            } else {
+                if (value > CURRENT_MAX_STEP) {
+                    change = turns * CURRENT_MAX_STEP;
+                } else {
+                    change = turns * CURRENT_MIN_STEP;
+                }
+            }
+
             value += change;
             if (value < CURRENT_MIN) {
                 value = CURRENT_MIN;
@@ -271,18 +292,15 @@ static void handleRotary(StateMachine_t * sm) {
 }
 
 static void handleWriteSupply(StateMachine_t * sm) {
+    //if (sm->supply_id != SUPPLY_1) return;
 
-    // TODO: for all supplies
-    if (sm->supply_id == SUPPLY_1) {
-        if (sm->supply_data->set_voltage.changed) {
-            splWriteVoltage(sm->supply_data);
-        }
+    if (sm->supply_data->set_voltage.changed) {
+        splWriteVoltage(sm->supply_data);
     }
 
-    //    if (sm->supply_data->setCurrent.changed) {
-    //        menuSetCurrentSet(sm->supply_id, sm->supply_data->setCurrent.value);
-    //        splSetCurrent(currentToDigital)
-    //    }
+    if (sm->supply_data->set_current.changed) {
+        splWriteCurrent(sm->supply_data);
+    }
 }
 
 static void handleUpdateGLCD(StateMachine_t * sm) {
@@ -324,6 +342,14 @@ static void handleUpdateGLCD(StateMachine_t * sm) {
     if (current_fsm > 2) {
         current_fsm = 0;
     }
+}
+
+static void handleDebug(StateMachine_t * sm) {
+    dbgPrintSupplyStatus(sm->supply_id, *(sm->supply_status));
+    dbgPrintSupplyMeasurements(sm->supply_id,
+            sm->supply_data->msr_voltage.value,
+            sm->supply_data->msr_current.value,
+            sm->supply_data->msr_temperature.value);
 }
 
 /*******************************************************************************

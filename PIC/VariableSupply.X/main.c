@@ -194,10 +194,10 @@ int main(void) {
     *msrTemperature = 0x0000;
     *msrCurrent_ = 0x0000;
     
-    status.statusCode = STAT_VOID;
-    status.currentClip = 0;
-    status.errorCode = 0;
-    status.outputEnabled = 0; 
+    status.status_code = STAT_VOID;
+    status.current_clip = 0;
+    status.error_code = 0;
+    status.output_enabled = 0; 
     updateStatus(status);
     
     // Initial values
@@ -230,7 +230,7 @@ int main(void) {
     clipEnable(true);
     
     // Set status running
-    status.statusCode = STAT_RUNNING;
+    status.status_code = STAT_RUNNING;
     updateStatus(status);
     
     dacSetValueA(1000);
@@ -249,8 +249,8 @@ int main(void) {
                     dacSetValueB(*setCurrent);
                     break;
                 case I2C_COM_CAL_STATE:
-                    status.calibrationSt = *calibrationState; // For ACK
-                    status.statusCode = STAT_CALIBRATING;
+                    status.calibration_state = *calibrationState; // For ACK
+                    status.status_code = STAT_CALIBRATING;
                     updateStatus(status);
                     if (DEBUG_FSM) printf("FSM: %d, %d\n", *calibrationState, *calibrationCount);
                     switch(*calibrationState) {
@@ -268,8 +268,8 @@ int main(void) {
                             // TODO: save to flash
                             
                             if (DEBUG_FSM) printCalibration();
-                            status.calibrationSt = 0; 
-                            status.statusCode = STAT_RUNNING;
+                            status.calibration_state = 0; 
+                            status.status_code = STAT_RUNNING;
                             break;
                     }
                     break;
@@ -283,12 +283,12 @@ int main(void) {
         if (adcDone) {
             adcDone = false;
             // TODO: PID
-            if (status.pidEnabled) {
+            if (status.pid_enabled) {
                 //..
             }
             
             // TODO: do this with interrupt or timer
-            status.outputEnabled = OUTPUT_ON_Pin;
+            status.output_enabled = OUTPUT_ON_Pin;
         }
     }
 }
@@ -297,7 +297,7 @@ int main(void) {
 void __attribute__ ( (interrupt, no_auto_psv) ) _CNInterrupt(void) {
     if (_CNIF) {
         bool clip = !CLIP_PIN;
-        status.currentClip = clip;
+        status.current_clip = clip;
         updateStatus(status);
         CLIP_LED = clip;
         _CNIF = 0; // Clear interrupt
@@ -312,7 +312,7 @@ void onI2cDone(i2cPackage_t data) {
 }
 
 void onAdcReadDone(uint16_t buffer, uint16_t * data) {
-    if (status.calibrateEnabled) {
+    if (status.calibrate_enabled) {
         //..
     } else {
         dataArray[I2C_COM_MSR_V + buffer] = (uint16_t) average(data, ADC_BUFFER_SIZE);

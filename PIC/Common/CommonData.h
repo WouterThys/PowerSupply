@@ -20,7 +20,7 @@
 #define SUPPLY_1            0
 #define I2C_ADDRESS_1       0x55
 #define DEFAULT_V_1         5000
-#define DEFAULT_I_1         1000
+#define DEFAULT_I_1         100
 
 #define SUPPLY_2            1
 #define I2C_ADDRESS_2       0x66
@@ -49,7 +49,8 @@
 #define VOLTAGE_STEP        100                     /* Step size in [mV]      */
 #define VOLTAGE_MAX         10000                   /* Maximum in [mV]        */
 #define VOLTAGE_MIN         100                     /* Minimum in [mV]        */
-#define CURRENT_STEP        100                     /* Step size in [mA]      */
+#define CURRENT_MIN_STEP    10                      /* Step size in [mA]      */
+#define CURRENT_MAX_STEP    100                     /* Step size in [mA]      */
 #define CURRENT_MAX         2000                    /* Maximum in [mA]        */
 #define CURRENT_MIN         0                       /* Minimum in [mA]        */
 
@@ -142,13 +143,13 @@ typedef enum {
 
 typedef union {
     struct {
-        uint16_t statusCode       : 3;
-        uint16_t errorCode        : 3;
-        uint16_t currentClip      : 1;
-        uint16_t outputEnabled    : 1;
-        uint16_t pidEnabled       : 1;
-        uint16_t calibrateEnabled : 1;
-        uint16_t calibrationSt    : 6;
+        uint16_t status_code       : 3;
+        uint16_t error_code        : 3;
+        uint16_t current_clip      : 1;
+        uint16_t output_enabled    : 1;
+        uint16_t pid_enabled       : 1;
+        uint16_t calibrate_enabled : 1;
+        uint16_t calibration_state    : 6;
     };
     uint16_t value;
 } SupplyStatus_t;

@@ -12,11 +12,15 @@
 
 void dbgInit();
 
-void dbgPrintSupplyStatus(SupplyStatus_t status);
+void dbgPrintSupplyStatus(uint8_t id, SupplyStatus_t status);
 
-void dbgPrintI2CError(int16_t errorCode);
+void dbgPrintSupplyMeasurements(uint8_t id, uint16_t v, uint16_t i, uint16_t t);
+
+void dbgPrintI2CError(uint16_t id, int16_t errorCode);
 
 void  dbgPrintI2cData(uint16_t i, uint8_t data);
+
+void dbgPrintLcdCallback(uint8_t data);
 
 #endif	
 

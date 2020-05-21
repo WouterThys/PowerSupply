@@ -1,4 +1,5 @@
 #include "DEBUG_Controller.h"
+#include "SUPPLIES_Controller.h"
 
 /*******************************************************************************
  *              DEFINITIONS
@@ -27,22 +28,31 @@ void dbgPrintReady() {
     }
 }
 
-void dbgPrintSupplyStatus(SupplyStatus_t status) {
+void dbgPrintSupplyStatus(uint8_t id, SupplyStatus_t status) {
     if (DEBUG_SPL) {
-        printf("STATUS: \n");
-        printf(" - Code: %d\n", status.statusCode);
-        printf(" - Error: %d\n", status.errorCode);
-        printf(" - Clip: %d\n", status.currentClip);
-        printf(" - Calib: %d\n", status.calibrationSt);
-        printf(" - O EN: %d\n", status.outputEnabled);
-        printf(" - C EN: %d\n", status.calibrateEnabled);
-        printf(" - P EN: %d\n", status.pidEnabled);
+        printf("SPL STATUS: %d\n", id);
+        printf(" - Code: %d\n", status.status_code);
+        printf(" - Error: %d\n", status.error_code);
+        printf(" - Clip: %d\n", status.current_clip);
+        printf(" - Calib: %d\n", status.calibration_state);
+        printf(" - O EN: %d\n", status.output_enabled);
+        printf(" - C EN: %d\n", status.calibrate_enabled);
+        printf(" - P EN: %d\n", status.pid_enabled);
     }
 }
 
-void dbgPrintI2CError(int16_t errorCode) {
+void dbgPrintSupplyMeasurements(uint8_t id, uint16_t v, uint16_t i, uint16_t t) {
+    if (DEBUG_SPL) {
+        printf("SPL DATA: %d\n", id);
+        printf(" - V: %d\n", v);
+        printf(" - I: %d\n", i);
+        printf(" - T: %d\n", t);
+    }
+}
+
+void dbgPrintI2CError(uint16_t id, int16_t errorCode) {
     if (DEBUG_FSM) {
-        printf("I2C ERROR: ");
+        printf("I2C %d ERROR: ", id);
         switch (errorCode) {
             default:
                 printf("UNK: %d\n", errorCode);
@@ -74,5 +84,11 @@ void dbgPrintI2CError(int16_t errorCode) {
 void  dbgPrintI2cData(uint16_t i, uint8_t data) {
     if (DEBUG_I2C) {
         printf(" - %d = %d\n", i, data);
+    }
+}
+
+void dbgPrintLcdCallback(uint8_t data) {
+    if (DEBUG_LCD) {
+        printf("LCD: %d\n", data);
     }
 }

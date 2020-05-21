@@ -149,8 +149,13 @@ void menuInit(buttonCallback callback) {
     GLK_WriteText(5, 52, "I=");
     GLK_WriteText(68, 52, "I=");
     GLK_WriteText(132, 52, "I=");
+    
+     menuSelect(1);
+    
+    GLK_DrawBitmapFromMemory(2, 100, 40);
+    GLK_DrawBitmapFromMemory(3, 110, 40);
 
-    menuSelect(1);
+   
 }
 
 void menuSelect(const int8_t menu) {
@@ -210,17 +215,19 @@ void menuSetVoltageSet(const uint8_t menu, uint16_t value) {
 }
 
 void menuSetCurrentSet(const uint8_t menu, uint16_t value) {
-    // Result value:    d1   d2        d3   d4   x   
-    char result[8] = { ' ', '5', '.', '0', '0', 'm', 'A', 0};
+        // Result value:    d1   d2    d3   d4   x   
+    char result[8] = { ' ', '1', '0', '0', '0', 'm', 'A', 0};
     
-    uint16_t d1 = value / 10000; value %= 10000;
-    uint16_t d2 = value / 1000; value %= 1000;
-    uint16_t d3 = value / 100; value %= 100;
-    uint16_t d4 = value / 10; 
+    uint16_t d0 = value / 10000; value %= 10000;
+    uint16_t d1 = value / 1000; value %= 1000;
+    uint16_t d2 = value / 100; value %= 100;
+    uint16_t d3 = value / 10; value %= 10;
+    uint16_t d4 = value / 1; 
     
-    result[0] = d1 > 0 ? (d1 + 48) : ' '; 
-    result[1] = d2 + 48;
-    result[3] = d3 + 48;
+    result[0] = (d0 > 0) ? (d0 + 48) : ' '; 
+    result[1] = (d0 > 0 || d1 > 0) ? (d1 + 48) : ' '; 
+    result[2] = (d0 > 0 || d1 > 0 || d2 > 0) ? (d2 + 48) : ' ';
+    result[3] = (d0 > 0 || d1 > 0 || d2 > 0 || d3 > 0) ? (d3 + 48) : ' ';
     result[4] = d4 + 48;
     
     GLK_UpdateLabel(menu_current_ids[menu], result);
@@ -244,17 +251,19 @@ void menuSetVoltageRead(const uint8_t menu, uint16_t value) {
 }
 
 void menuSetCurrentRead(const uint8_t menu, uint16_t value) {
-        // Result value:    d1   d2        d3   d4   x   
-    char result[8] = { ' ', '5', '.', '0', '0', 'm', 'A', 0};
+        // Result value:    d1   d2    d3   d4   x   
+    char result[8] = { ' ', '1', '0', '0', '0', 'm', 'A', 0};
     
-    uint16_t d1 = value / 10000; value %= 10000;
-    uint16_t d2 = value / 1000; value %= 1000;
-    uint16_t d3 = value / 100; value %= 100;
-    uint16_t d4 = value / 10; 
+    uint16_t d0 = value / 10000; value %= 10000;
+    uint16_t d1 = value / 1000; value %= 1000;
+    uint16_t d2 = value / 100; value %= 100;
+    uint16_t d3 = value / 10; value %= 10;
+    uint16_t d4 = value / 1; 
     
-    result[0] = d1 > 0 ? (d1 + 48) : ' '; 
-    result[1] = d2 + 48;
-    result[3] = d3 + 48;
+    result[0] = (d0 > 0) ? (d0 + 48) : ' '; 
+    result[1] = (d0 > 0 || d1 > 0) ? (d1 + 48) : ' '; 
+    result[2] = (d0 > 0 || d1 > 0 || d2 > 0) ? (d2 + 48) : ' ';
+    result[3] = (d0 > 0 || d1 > 0 || d2 > 0 || d3 > 0) ? (d3 + 48) : ' ';
     result[4] = d4 + 48;
     
     GLK_UpdateLabel(menu_current_rd_ids[menu], result);

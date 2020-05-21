@@ -354,6 +354,40 @@ void GLK_InitializeStripChart(uint8_t id, uint8_t x1, uint8_t y1, uint8_t x2, ui
 void GLK_UpdateStripChart(uint8_t id, int16_t value);
 
 /********************************************************************************
+ *              BITMAPS
+ *******************************************************************************/
+
+/**
+ * Upload a Bitmap File: Upload a bitmap to a graphic display. To create a bitmap
+ * see the Bitmap File Creation section. for upload protocol see the 
+ * File Transfer Protocol for XModem Transfer Protocol entries. Start screen is ID 1.
+ * @param id: Unique bitmap identification number, value between 0 and 1023.
+ * @param size: Size of the entire bitmap file
+ * @param data: Bitmap file data, see the Bitmap File Creation example.
+ */
+void GLK_UploadBitmapFile(uint16_t id, uint32_t size, const uint8_t * data);
+
+/**
+ * Upload a Bitmap Mask: Upload a bitmap mask that can clear areas of the screen
+ * before a bitmap is drawn. Programmatically, (bitmap&mask)|(screen&~mask) is 
+ * shown when a bitmap is drawn. To create a mask see the Bitmap Masking section,
+ * for upload protocol see the File Transfer Protocol or XModem Transfer Protocol entries.
+ * @param id
+ * @param size
+ * @param data
+ */
+void GLK_UploadBitmapMask(uint16_t id, uint32_t size, const uint8_t * data);
+
+/**
+ * Draw a Bitmap From Memory: Draw a previously uploaded bitmap from memory. 
+ * Top left corner must be specified for drawing.
+ * @param id: Unique bitmap identification number, value between 0 and 1023.
+ * @param x: Leftmost coordinate of bitmap.
+ * @param y: Rightmost coordinate of bitmap.
+ */
+void GLK_DrawBitmapFromMemory(uint16_t id, uint8_t x, uint8_t y);
+
+/********************************************************************************
  *              GPIO
  *******************************************************************************/
 

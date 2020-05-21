@@ -11,15 +11,6 @@
 #define DEBUG_FSM   (1 & DEBUG)
     
 /**
- * Board constants
- */    
-#define Rs          0.1     /* Sense resistance                               */
-#define Rt          68100   /* Temperature resitance                          */
-#define Igain       20      /* Current sense amplifier gain                   */
-#define Vgain       5       /* Voltage amplification from DAC to LT3080       */
-#define Vdivider    1/5     /* Voltage divider for sensing output voltage     */
-    
-/**
  * Interrupt priorities
  */
 

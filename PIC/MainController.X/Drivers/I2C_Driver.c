@@ -526,6 +526,12 @@ void i2cDriverReset() {
     _SI2C2IE = 0; // Disable
     _SI2C2IF = 0; // Clear flag
     _SI2C2IE = 1; // Enable
+    
+    /* Clear status */
+    i2cFsm.state = I2C_STATE_IDLE;
+    i2cFsm.cmd = I2C_IDLE;
+    i2cFsm.dataCnt = 0;
+    i2cFsm.retryCnt = 0;
 
     /* Enable again */
     i2cDriverEnable(true);
