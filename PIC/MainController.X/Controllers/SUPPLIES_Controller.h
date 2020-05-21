@@ -19,7 +19,7 @@ typedef struct {
 
 typedef struct {
     uint16_t      supply_id : 8;    /* Id of the supply                       */
-    uint16_t      i2c_address;      /* I2C address of the supply              */   
+    uint16_t      i2c_address : 8;  /* I2C address of the supply              */   
     SupplyValue_t set_voltage;      /* Variable voltage                       */
     SupplyValue_t set_current;      /* Maximum current                        */
     SupplyValue_t msr_voltage;      /* Measured output voltage                */

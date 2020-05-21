@@ -132,6 +132,8 @@ void splUpdateData(SupplyStatus_t * status, SupplyData_t * data) {
 
     // Check and update
     if (i2cCheckState(i2cPackage)) {
+        
+        status->connected = 1;
 
         // Update values
         if (data->msr_voltage.value != dataArray[I2C_COM_MSR_V]) {
@@ -148,5 +150,7 @@ void splUpdateData(SupplyStatus_t * status, SupplyData_t * data) {
             data->msr_temperature.value = dataArray[I2C_COM_MSR_T];
             data->msr_temperature.changed = true;
         }
+    } else {
+        status->connected = 0;
     }
 }

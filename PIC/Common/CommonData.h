@@ -145,11 +145,12 @@ typedef union {
     struct {
         uint16_t status_code       : 3;
         uint16_t error_code        : 3;
+        uint16_t connected         : 1;
         uint16_t current_clip      : 1;
         uint16_t output_enabled    : 1;
         uint16_t pid_enabled       : 1;
         uint16_t calibrate_enabled : 1;
-        uint16_t calibration_state    : 6;
+        uint16_t calibration_state : 5;
     };
     uint16_t value;
 } SupplyStatus_t;
