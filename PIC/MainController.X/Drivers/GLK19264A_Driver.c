@@ -1,7 +1,5 @@
 #include "GLK19264A_Driver.h"
 
-#include "Bitmaps.h"
-
 /********************************************************************************
  *              COMMANDS 
  *******************************************************************************/
@@ -109,8 +107,8 @@ void GLK_Init(buttonCallback callback) {
 
     // Write bitmaps
     if (UPLOAD_BITMAPS) {
-        GLK_UploadBitmapFile(CHECK_FALSE_ID, CHECK_FALSE_SIZE, &(_check_false[0]));
-        GLK_UploadBitmapFile(CHECK_TRUE_ID, CHECK_TRUE_SIZE, &(_check_true[0]));
+        GLK_UploadBitmapFile(ARROW_ID, ARROW_SIZE, &(_arrow[0]));
+        GLK_UploadBitmapFile(NO_ARROW_ID, NO_ARROW_SIZE, &(_no_arrow[0]));
     }
 }
 
@@ -423,31 +421,34 @@ void GLK_UploadBitmapFile(uint16_t id, uint32_t size, const uint8_t * data) {
     }
 
     // Enable interrupts again
-    _U2RXIE = 1;
+    _U2RXIF = 0; // Clear flag
+    _U2TXIF = 0;
+    _U2RXIP = IP_U2RX; // Priority
+    _U2RXIE = 1; // Enable interrupts
 }
 
 void GLK_UploadBitmapMask(uint16_t id, uint32_t size, const uint8_t * data) {
 
-    // Command
-    uart2DriverWrite(UPLOAD_BITMAP_MASK[0]);
-    uart2DriverWrite(UPLOAD_BITMAP_MASK[1]);
-    uart2DriverWrite(UPLOAD_BITMAP_MASK[2]);
-
-    // Id
-    uart2DriverWrite(id & 0x00FF);
-    uart2DriverWrite((id >> 8) & 0x00FF);
-
-    // Size
-    uart2DriverWrite(size & 0x000000FF);
-    uart2DriverWrite((size >> 8) & 0x000000FF);
-    uart2DriverWrite((size >> 16) & 0x000000FF);
-    uart2DriverWrite((size >> 24) & 0x000000FF);
-
-    // Data
-    uint8_t i;
-    for (i = 0; i < size; i++) {
-        uart2DriverWrite(data[i]);
-    }
+//    // Command
+//    uart2DriverWrite(UPLOAD_BITMAP_MASK[0]);
+//    uart2DriverWrite(UPLOAD_BITMAP_MASK[1]);
+//    uart2DriverWrite(UPLOAD_BITMAP_MASK[2]);
+//
+//    // Id
+//    uart2DriverWrite(id & 0x00FF);
+//    uart2DriverWrite((id >> 8) & 0x00FF);
+//
+//    // Size
+//    uart2DriverWrite(size & 0x000000FF);
+//    uart2DriverWrite((size >> 8) & 0x000000FF);
+//    uart2DriverWrite((size >> 16) & 0x000000FF);
+//    uart2DriverWrite((size >> 24) & 0x000000FF);
+//
+//    // Data
+//    uint8_t i;
+//    for (i = 0; i < size; i++) {
+//        uart2DriverWrite(data[i]);
+//    }
 }
 
 void GLK_DrawBitmapFromMemory(uint16_t id, uint8_t x, uint8_t y) {

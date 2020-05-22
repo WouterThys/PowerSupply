@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "../Settings.h"
+#include "../Bitmaps.h"
 #include "UART2_Driver.h"
 
 #define BTN_TOP     'B'

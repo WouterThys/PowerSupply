@@ -1,10 +1,3 @@
-/* 
- * File:   MENU_Controller.h
- * Author: wouter
- *
- * Created on April 4, 2020, 6:46 PM
- */
-
 #ifndef MENU_CONTROLLER_H
 #define	MENU_CONTROLLER_H
 
@@ -12,25 +5,17 @@
 #include <stdbool.h>       /* Includes true/false definition                  */
 
 #include "../Drivers/GLK19264A_Driver.h"
+#include "../Bitmaps.h"
 
 
 /******************************************************************************/
 /* Defines                                                                    */
 /******************************************************************************/ 
-#define MENU_1       0
-#define MENU_2       1
-#define MENU_3       2
-
-#define MENU_1_V     0
-#define MENU_2_V     1
-#define MENU_3_V     2
-
-#define MENU_1_I     0
-#define MENU_2_I     1
-#define MENU_3_I     2
-
-#define STATE_NONE   0
-#define STATE_POINT  1
+typedef enum SupplySelection {
+    Voltage,
+    Current,
+    Temperature
+} SupplySelection_e;
     
     
 /******************************************************************************/
@@ -42,42 +27,27 @@
  */
 void menuInit(buttonCallback callback);
 
-/**
- * Select current menu
- * @param menu
- */
-void menuSelect(const int8_t menu);
+void menuSetId(uint8_t id);
 
-/**
- * Set the state
- */
-void menuSetVoltageState(const uint8_t menu, const uint8_t state);
+void menuSetConnected(bool connected);
 
+void menuSetEnabled(bool enabled);
 
-/**
- * Set the state
- */
-void menuSetCurrentState(const uint8_t menu, const uint8_t state);
+void menuSetPidEnabled(bool enabled);
 
- /**
- * Set the voltage setting
- */
-void menuSetVoltageSet(const uint8_t menu, uint16_t value);
+void menuSetSelection(SupplySelection_e selection);
 
-/**
- * Set the current setting
- */
-void menuSetCurrentSet(const uint8_t menu, uint16_t value);
+void menuSetVoltageSet(uint16_t v);
 
-/**
- * Set the voltage reading
- */
-void menuSetVoltageRead(const uint8_t menu, uint16_t value);
+void menuSetCurrentSet(uint16_t i);
 
-/**
- * Set the current reading
- */
-void menuSetCurrentRead(const uint8_t menu, uint16_t value);
+void menuSetTemperatureSet(uint16_t t);
+
+void menuSetVoltageMsr(uint16_t v);
+
+void menuSetCurrentMsr(uint16_t i);
+
+void menuSetTemperatureMsr(uint16_t t);
 
 #endif	/* MENU_CONTROLLER_H */
 

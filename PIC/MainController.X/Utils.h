@@ -11,7 +11,7 @@
 #define	UTILS_H
 
 #include <xc.h> // include processor files - each processor file is guarded.  
-
+#include "../Common/CommonData.h"
 
 #define digitalToVoltage(d) (((((float)d * (float)Vref) / ((float)AdcN)) * (float)Vgain) * 1000)
 #define voltageToDigital(v) (((((float)v / 1000) * (float)DacN) / ((float)Vref)) / (float)Vgain)

@@ -5,10 +5,8 @@
  ******************************************************************************/
 
 typedef struct MenuState {
-    uint16_t supply_id; // Supply id for this menu
-    bool updateSelection; // Indicate if update is needed
-    bool selected; // Is menu selected
-    bool voltage; // Set voltage = true, set current = false
+    uint16_t supply_id : 8; // Supply id for this menu
+    uint16_t selection : 8; // Voltage, Current or Temperature
 } MenuState_t;
 
 // State machine goes through pulling data from supply boards etc
@@ -29,12 +27,6 @@ struct StateMachine {
     // State update
     state_transition transition; // Transition to next state 
     state_handler handler; // Handler for the state
-
-    // Data
-    Rotary_t * rotary; // Rotary input for this supply
-    MenuState_t * menu_state; // State of the menu for this supply
-    SupplyStatus_t * supply_status; // Status for this supply
-    SupplyData_t * supply_data; // Data of this supply
 };
 
 // State transitions
@@ -57,10 +49,7 @@ static void handleDebug(StateMachine_t * sm);
 static volatile bool fsm_flag;
 static volatile uint8_t button;
 
-static volatile uint16_t current_fsm;
-static volatile int16_t current_supply;
-
-static StateMachine_t fsms[3];
+static StateMachine_t fsm;
 static Rotary_t rotaries[3];
 static MenuState_t menus[3];
 static SupplyStatus_t supply_status[3];
@@ -74,8 +63,8 @@ static void initRotary(uint8_t id, Rotary_t * rotary);
 static void initSupplyData(uint8_t id, SupplyData_t * data, uint16_t address, uint16_t defaultV, uint16_t defaultI);
 static void initSupplyStatus(SupplyStatus_t * status);
 static void initMenu(uint8_t id, MenuState_t * menu);
-static void initFSM(uint8_t id, StateMachine_t *sm);
-static void handleButton();
+static void initFSM(StateMachine_t *sm);
+static void handleButton(StateMachine_t *sm);
 
 // Callback
 static void onButtonPressed(uint8_t btn);
@@ -133,29 +122,20 @@ static void initSupplyStatus(SupplyStatus_t * status) {
     status->value = 0x0000;
 }
 
-static void initFSM(uint8_t id, StateMachine_t *sm) {
-    sm->supply_id = id;
+static void initFSM(StateMachine_t *sm) {
+    sm->supply_id = SUPPLY_1;
     sm->transition = transitionReadSupply;
     sm->handler = NULL;
-    sm->menu_state = &(menus[id]);
-    sm->rotary = &(rotaries[id]);
-    sm->supply_status = &(supply_status[id]);
-    sm->supply_data = &(supply_data[id]);
 }
 
 static void initMenu(uint8_t id, MenuState_t * menu) {
     menu->supply_id = id;
-    menu->updateSelection = false;
-    menu->selected = false;
-    menu->voltage = true;
+    menu->selection = Voltage;
 }
 
-static void handleButton() {
+static void handleButton(StateMachine_t *sm) {
 
     if (button != 0) {
-
-        menus[current_supply].selected = false;
-        menus[current_supply].updateSelection = false;
 
         switch (button) {
             default:
@@ -163,31 +143,48 @@ static void handleButton() {
                 break;
 
             case BTN_LEFT:
-                current_supply--;
-                if (current_supply < SUPPLY_1) {
-                    current_supply = SUPPLY_3;
-                }
-                menus[current_supply].selected = true;
-                menus[current_supply].updateSelection = true;
+//                sm->supply_id--;
+//                if (sm->supply_id < SUPPLY_1) {
+//                    sm->supply_id = SUPPLY_3;
+//                }
+//                menus[sm->supply_id].selected = true;
+//                menus[sm->supply_id].updateSelection = true;
                 break;
 
             case BTN_RIGHT:
-                current_supply++;
-                if (current_supply > SUPPLY_3) {
-                    current_supply = SUPPLY_1;
-                }
-                menus[current_supply].selected = true;
-                menus[current_supply].updateSelection = true;
+//                sm->supply_id++;
+//                if (sm->supply_id > SUPPLY_3) {
+//                    sm->supply_id = SUPPLY_1;
+//                }
+//                menus[sm->supply_id].selected = true;
+//                menus[sm->supply_id].updateSelection = true;
                 break;
 
             case BTN_TOP:
-            case BTN_BOTTOM:
-                if (menus[current_supply].voltage) {
-                    menus[current_supply].voltage = false;
-                } else {
-                    menus[current_supply].voltage = true;
+                switch(menus[sm->supply_id].selection) {
+                    case Voltage:
+                        menus[sm->supply_id].selection = Temperature;
+                        break;
+                    case Current:
+                        menus[sm->supply_id].selection = Voltage;
+                        break;
+                    case Temperature:
+                        menus[sm->supply_id].selection = Current;
+                        break;
                 }
-                menus[current_supply].updateSelection = true;
+                break;
+            case BTN_BOTTOM:
+                switch(menus[sm->supply_id].selection) {
+                    case Voltage:
+                        menus[sm->supply_id].selection = Current;
+                        break;
+                    case Current:
+                        menus[sm->supply_id].selection = Temperature;
+                        break;
+                    case Temperature:
+                        menus[sm->supply_id].selection = Voltage;
+                        break;
+                }
                 break;
         }
         button = 0;
@@ -205,7 +202,7 @@ static void onUartDataRead(uint8_t data) {
 static void onSupplyError(Error_t error) {
     if (error.hasError) {
         if (error.source == ES_I2C) {
-            dbgPrintI2CError(current_fsm, error.code);
+            //dbgPrintI2CError(current_fsm, error.code);
         }
     }
 }
@@ -238,18 +235,18 @@ static void transitionDebug(StateMachine_t * sm) {
 // State handlers
 
 static void handleReadSupply(StateMachine_t * sm) {
-    //if (sm->supply_id != SUPPLY_1) return;
-
-    splUpdateData(sm->supply_status, sm->supply_data);
+    splUpdateData(&supply_status[SUPPLY_1], &supply_data[SUPPLY_1]);
+    splUpdateData(&supply_status[SUPPLY_2], &supply_data[SUPPLY_2]);
+    splUpdateData(&supply_status[SUPPLY_3], &supply_data[SUPPLY_3]);
 }
 
 static void handleRotary(StateMachine_t * sm) {
-    encGetRotaryData(sm->rotary);
-    int16_t turns = sm->rotary->turns;
+    encGetRotaryData(&(rotaries[sm->supply_id]));
+    int16_t turns = rotaries[sm->supply_id].turns;
     if (turns != 0) {
-        if (sm->menu_state->voltage) {
+        if (menus[sm->supply_id].selection == Voltage) {
             int16_t change = turns * VOLTAGE_STEP;
-            int16_t value = sm->supply_data->set_voltage.value;
+            int16_t value = supply_data[sm->supply_id].set_voltage.value;
             value += change;
             if (value < VOLTAGE_MIN) {
                 value = VOLTAGE_MIN;
@@ -257,11 +254,11 @@ static void handleRotary(StateMachine_t * sm) {
             if (value > VOLTAGE_MAX) {
                 value = VOLTAGE_MAX;
             }
-            sm->supply_data->set_voltage.value = (uint16_t) value;
-            sm->supply_data->set_voltage.changed = true;
+            supply_data[sm->supply_id].set_voltage.value = (uint16_t) value;
+            supply_data[sm->supply_id].set_voltage.changed = true;
 
-        } else {
-            int16_t value = sm->supply_data->set_current.value;
+        } else if (menus[sm->supply_id].selection == Current) {
+            int16_t value = supply_data[sm->supply_id].set_current.value;
             int16_t change = 0;
             if (turns > 0) {
                 if (value >= CURRENT_MAX_STEP) {
@@ -284,72 +281,68 @@ static void handleRotary(StateMachine_t * sm) {
             if (value > CURRENT_MAX) {
                 value = CURRENT_MAX;
             }
-            sm->supply_data->set_current.value = (uint16_t) value;
-            sm->supply_data->set_current.changed = true;
+            supply_data[sm->supply_id].set_current.value = (uint16_t) value;
+            supply_data[sm->supply_id].set_current.changed = true;
 
         }
     }
 }
 
 static void handleWriteSupply(StateMachine_t * sm) {
-    //if (sm->supply_id != SUPPLY_1) return;
 
-    if (sm->supply_data->set_voltage.changed) {
-        splWriteVoltage(sm->supply_data);
+    if (supply_data[SUPPLY_1].set_voltage.changed) {
+        splWriteVoltage(&(supply_data[SUPPLY_1]));
+        supply_data[SUPPLY_1].set_voltage.changed = false;
     }
 
-    if (sm->supply_data->set_current.changed) {
-        splWriteCurrent(sm->supply_data);
+    if (supply_data[SUPPLY_1].set_current.changed) {
+        splWriteCurrent(&(supply_data[SUPPLY_1]));
+        supply_data[SUPPLY_1].set_current.changed = false;
+    }
+
+    if (supply_data[SUPPLY_2].set_voltage.changed) {
+        splWriteVoltage(&(supply_data[SUPPLY_2]));
+        supply_data[SUPPLY_2].set_voltage.changed = false;
+    }
+
+    if (supply_data[SUPPLY_2].set_current.changed) {
+        splWriteCurrent(&(supply_data[SUPPLY_2]));
+        supply_data[SUPPLY_2].set_current.changed = false;
+    }
+
+    if (supply_data[SUPPLY_3].set_voltage.changed) {
+        splWriteVoltage(&(supply_data[SUPPLY_3]));
+        supply_data[SUPPLY_3].set_voltage.changed = false;
+    }
+
+    if (supply_data[SUPPLY_3].set_current.changed) {
+        splWriteCurrent(&(supply_data[SUPPLY_3]));
+        supply_data[SUPPLY_3].set_current.changed = false;
     }
 }
 
 static void handleUpdateGLCD(StateMachine_t * sm) {
-    // Update GLCD
-    if (sm->menu_state->updateSelection) {
-        if (sm->menu_state->voltage) {
-            menuSetVoltageState(sm->supply_id, STATE_POINT);
-            menuSetCurrentState(sm->supply_id, STATE_NONE);
-        } else {
-            menuSetVoltageState(sm->supply_id, STATE_NONE);
-            menuSetCurrentState(sm->supply_id, STATE_POINT);
-        }
-        sm->menu_state->updateSelection = false;
-    }
 
-    if (sm->supply_data->set_voltage.changed) {
-        menuSetVoltageSet(sm->supply_id, sm->supply_data->set_voltage.value);
-        sm->supply_data->set_voltage.changed = false;
-    }
+    menuSetId(sm->supply_id + 1);
+    menuSetSelection(menus[sm->supply_id].selection);
+    menuSetConnected(supply_status[sm->supply_id].connected);
+    menuSetEnabled(supply_status[sm->supply_id].output_enabled);
+    menuSetPidEnabled(supply_status[sm->supply_id].pid_enabled);
+    menuSetVoltageSet(supply_data[sm->supply_id].set_voltage.value);
+    menuSetCurrentSet(supply_data[sm->supply_id].set_current.value);
+    //menuSetTemperatureSet(supply_data[sm->supply_id].set_voltage.value);
+    menuSetVoltageMsr(supply_data[sm->supply_id].msr_voltage.value);
+    menuSetCurrentMsr(supply_data[sm->supply_id].msr_current.value);
+    menuSetTemperatureMsr(supply_data[sm->supply_id].msr_temperature.value);
 
-    if (sm->supply_data->set_current.changed) {
-        menuSetCurrentSet(sm->supply_id, sm->supply_data->set_current.value);
-        sm->supply_data->set_current.changed = false;
-    }
-
-    if (sm->supply_data->msr_voltage.changed) {
-        uint16_t voltage = sm->supply_data->msr_voltage.value;
-        menuSetVoltageRead(sm->supply_id, digitalToVoltage(voltage));
-        sm->supply_data->msr_voltage.changed = false;
-    }
-
-    if (sm->supply_data->msr_current.changed) {
-        uint16_t current = sm->supply_data->msr_current.value;
-        menuSetCurrentRead(sm->supply_id, digitalToCurrent(current));
-        sm->supply_data->msr_current.changed = false;
-    }
-
-    current_fsm++;
-    if (current_fsm > 2) {
-        current_fsm = 0;
-    }
 }
 
 static void handleDebug(StateMachine_t * sm) {
-    dbgPrintSupplyStatus(sm->supply_id, *(sm->supply_status));
-    dbgPrintSupplyMeasurements(sm->supply_id,
-            sm->supply_data->msr_voltage.value,
-            sm->supply_data->msr_current.value,
-            sm->supply_data->msr_temperature.value);
+    //    dbgPrintSupplyStatus(sm->supply_id, *(sm->supply_status));
+    //    dbgPrintSupplyMeasurements(sm->supply_id,
+    //            sm->supply_data->msr_voltage.value,
+    //            sm->supply_data->msr_current.value,
+    //            sm->supply_data->msr_temperature.value);
 }
 
 /*******************************************************************************
@@ -363,6 +356,9 @@ void fsmInit() {
 
     // Setup timer
     initTimer();
+    
+    // Initialize menu driver
+    menuInit(&onButtonPressed);
 
     // Initialize rotary driver
     encDriverInit();
@@ -391,18 +387,7 @@ void fsmInit() {
     initMenu(SUPPLY_3, &(menus[SUPPLY_3]));
 
     // Initialize FSMs
-    initFSM(SUPPLY_1, &(fsms[SUPPLY_1]));
-    initFSM(SUPPLY_2, &(fsms[SUPPLY_2]));
-    initFSM(SUPPLY_3, &(fsms[SUPPLY_3]));
-
-    // Initialize menu
-    menuInit(&onButtonPressed);
-    menuSetVoltageState(SUPPLY_3, STATE_POINT);
-    menuSetVoltageState(SUPPLY_2, STATE_POINT);
-    menuSetVoltageState(SUPPLY_1, STATE_POINT);
-
-    current_supply = SUPPLY_1;
-    current_fsm = 0;
+    initFSM(&fsm);
 
     // Debug
     if (DEBUG_FSM) {
@@ -415,13 +400,13 @@ void fsmExecute() {
     PORTBbits.RB7 = !PORTBbits.RB7;
 
     // Button
-    handleButton();
+    handleButton(&fsm);
 
     // Transition
-    (fsms[current_fsm].transition)(&fsms[current_fsm]);
+    (fsm.transition)(&fsm);
 
     // Handle
-    (fsms[current_fsm].handler)(&fsms[current_fsm]);
+    (fsm.handler)(&fsm);
 
     // Clear
     fsm_flag = false;
