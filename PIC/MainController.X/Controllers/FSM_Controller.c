@@ -4,11 +4,6 @@
  *          FSM
  ******************************************************************************/
 
-typedef struct MenuState {
-    uint16_t supply_id : 8; // Supply id for this menu
-    uint16_t selection : 8; // Voltage, Current or Temperature
-} MenuState_t;
-
 // State machine goes through pulling data from supply boards etc
 typedef struct StateMachine StateMachine_t;
 
@@ -19,10 +14,9 @@ typedef void (*state_transition)(StateMachine_t *sm);
 typedef void (*state_handler)(StateMachine_t *sm);
 
 // Actual FSM data
-
 struct StateMachine {
     // ID
-    uint16_t supply_id; // Id of supply 
+    int16_t supply_id; // Id of supply 
 
     // State update
     state_transition transition; // Transition to next state 
@@ -108,7 +102,6 @@ static void initRotary(uint8_t id, Rotary_t * rotary) {
 static void initSupplyData(uint8_t id, SupplyData_t * data, uint16_t address, uint16_t defaultV, uint16_t defaultI) {
     data->supply_id = id;
     data->i2c_address = address;
-
     data->set_voltage.value = defaultV;
     data->set_voltage.changed = true;
     data->set_current.value = defaultI;
@@ -143,21 +136,17 @@ static void handleButton(StateMachine_t *sm) {
                 break;
 
             case BTN_LEFT:
-//                sm->supply_id--;
-//                if (sm->supply_id < SUPPLY_1) {
-//                    sm->supply_id = SUPPLY_3;
-//                }
-//                menus[sm->supply_id].selected = true;
-//                menus[sm->supply_id].updateSelection = true;
+                sm->supply_id--;
+                if (sm->supply_id < SUPPLY_1) {
+                    sm->supply_id = SUPPLY_3;
+                }
                 break;
 
             case BTN_RIGHT:
-//                sm->supply_id++;
-//                if (sm->supply_id > SUPPLY_3) {
-//                    sm->supply_id = SUPPLY_1;
-//                }
-//                menus[sm->supply_id].selected = true;
-//                menus[sm->supply_id].updateSelection = true;
+                sm->supply_id++;
+                if (sm->supply_id > SUPPLY_3) {
+                    sm->supply_id = SUPPLY_1;
+                }
                 break;
 
             case BTN_TOP:
@@ -323,9 +312,9 @@ static void handleWriteSupply(StateMachine_t * sm) {
 
 static void handleUpdateGLCD(StateMachine_t * sm) {
 
+    menuSetConnected(supply_status[sm->supply_id].connected);
     menuSetId(sm->supply_id + 1);
     menuSetSelection(menus[sm->supply_id].selection);
-    menuSetConnected(supply_status[sm->supply_id].connected);
     menuSetEnabled(supply_status[sm->supply_id].output_enabled);
     menuSetPidEnabled(supply_status[sm->supply_id].pid_enabled);
     menuSetVoltageSet(supply_data[sm->supply_id].set_voltage.value);

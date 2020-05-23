@@ -16,6 +16,11 @@ typedef enum SupplySelection {
     Current,
     Temperature
 } SupplySelection_e;
+
+typedef struct MenuState {
+    uint16_t supply_id : 8; // Supply id for this menu
+    uint16_t selection : 8; // Voltage, Current or Temperature
+} MenuState_t;
     
     
 /******************************************************************************/

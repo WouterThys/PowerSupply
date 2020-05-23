@@ -1,12 +1,3 @@
-/* 
- * File:   
- * Author: 
- * Comments:
- * Revision history: 
- */
-
-// This is a guard condition so that contents of this file are not included
-// more than once.  
 #ifndef UTILS_H
 #define	UTILS_H
 
@@ -19,7 +10,7 @@
 #define digitalToCurrent(d) (((((float)d * (float)Vref) / ((float)AdcN)) * 1000) / ((float)Rs * (float)Igain))
 #define currentToDigital(i) ((((((float)i) / 1000) * (float)Rs * (float)Igain) * (float)DacN) / ((float)Vref))
 
-#define digitalToTemp(d) ((((float)d * (float)Vref) / (float)AdcN)) / ((float)Rt * 1E-6)
+#define digitalToTemp(d)    (((((float)d * (float)Vref) / (float)AdcN)) / ((float)Rt * 1E-6))
 
 
 bool stringEquals(const char * str1, const char * str2);
